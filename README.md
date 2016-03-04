@@ -5,6 +5,7 @@ Connecting to query via [API](https://github.com/TheHolyWaffle/TeamSpeak-3-Java-
 Current features
 -------
 - Create channels for users
+  - Gives channel admin to the creating user
   - Adds their username to the channelname
   - Sets the channel as temporary
   - Sets given message as password

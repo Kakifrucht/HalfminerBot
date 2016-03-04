@@ -30,7 +30,7 @@ class HalfminerBotListener extends TS3EventAdapter {
     @Override
     public void onClientMoved(ClientMovedEvent e) {
         // If the user joins the bots channel (not when he leaves)
-        if (this.channelOfBot == e.getClientTargetId()) messageUser(e.getClientId());
+        if (this.channelOfBot == e.getTargetChannelId()) messageUser(e.getClientId());
     }
 
     @Override

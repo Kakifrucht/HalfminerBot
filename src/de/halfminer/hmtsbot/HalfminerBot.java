@@ -95,7 +95,7 @@ public class HalfminerBot {
             // START Move bot into channel and start listeners
             List<Channel> channels = api.getChannelsByName(config.getChannelMoveName());
 
-            if (channels == null || !api.moveClient(channels.get(0))) {
+            if (channels == null || !api.moveClient(api.whoAmI().getId(), channels.get(0).getId())) {
                 logger.warning("The provided channelname does not exist or can't be accessed, staying in default channel");
             }
 
@@ -110,8 +110,6 @@ public class HalfminerBot {
             else logger.info("Could not get AFK Channel. Inactivity check disabled.");
 
             logger.info("HalfminerBot connected successfully and ready");
-
-            instance = this;
         } else {
             stop("The provided password is not valid, quitting...", 2);
         }
