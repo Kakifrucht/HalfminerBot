@@ -1,6 +1,5 @@
-/teamspeak3-api-1.0.12-javadoc.jar
-/teamspeak3-api-1.0.12.jar
 /out
 /META-INF
 /.idea
-/HalfminerBot.iml
+*.iml
+*.jar

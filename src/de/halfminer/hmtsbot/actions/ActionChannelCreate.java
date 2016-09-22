@@ -26,8 +26,9 @@ public class ActionChannelCreate extends Action {
     @Override
     public void run() throws ActionNotCompletedException {
 
+        // move if channel already exists
         if (bot.getStorage().moveToChannel(invoker.getId()))
-            throw new ActionNotCompletedException(this, "User already owns a channel."); // move if channel already exists
+            throw new ActionNotCompletedException(this, "User already owns a channel.");
 
         int waitingTime = waitingTime(invoker.getDatabaseId()); // rate limit check
         if (waitingTime >= 0) {
@@ -43,9 +44,10 @@ public class ActionChannelCreate extends Action {
         channelCreateProperty.put(ChannelProperty.CHANNEL_CODEC_QUALITY, "10");
         channelCreateProperty.put(ChannelProperty.CHANNEL_PASSWORD, this.command.getCommandLine());
         channelCreateProperty.put(ChannelProperty.CHANNEL_FLAG_SEMI_PERMANENT, "1");
-        SimpleDateFormat format = new SimpleDateFormat("dd.MM.yy / HH:mm");
-        channelCreateProperty.put(ChannelProperty.CHANNEL_TOPIC, "Channel Erstelldatum: " + format.format(new Date()));
+        channelCreateProperty.put(ChannelProperty.CHANNEL_TOPIC,
+                "Channel Erstelldatum: " + new SimpleDateFormat("dd.MM.yy / HH:mm").format(new Date()));
         channelCreateProperty.put(ChannelProperty.CPID, Integer.toString(botChannel.getParentChannelId()));
+
         int channelCreateID = api.createChannel(channelCreateName, channelCreateProperty);
 
         if (channelCreateID > 0) {
@@ -55,9 +57,11 @@ public class ActionChannelCreate extends Action {
             api.setClientChannelGroup(config.getChannelAdminID(), channelCreateID, invoker.getDatabaseId());
             api.addChannelPermission(channelCreateID, "i_icon_id", (int) botChannel.getIconId());
 
+            // switch to temporary channel with delete delay, since it can't be set upon creation
             channelCreateProperty.clear();
             channelCreateProperty.put(ChannelProperty.CHANNEL_FLAG_SEMI_PERMANENT, "0");
             channelCreateProperty.put(ChannelProperty.CHANNEL_FLAG_TEMPORARY, "1");
+            channelCreateProperty.put(ChannelProperty.CHANNEL_DELETE_DELAY, "180");
             api.editChannel(channelCreateID, channelCreateProperty);
 
             api.sendPrivateMessage(command.getClientId(),
@@ -67,7 +71,8 @@ public class ActionChannelCreate extends Action {
 
         } else {
 
-            bot.getStorage().getMapFloodProtection().remove(invoker.getDatabaseId()); //allow user to create another channel
+            // allow user to create another channel
+            bot.getStorage().getMapFloodProtection().remove(invoker.getDatabaseId());
             throw new ActionNotCompletedException(this, "An unknown error has occurred",
                     "Ein unbekannter Fehler ist aufgetreten. Bitte versuche es erneut, oder wende dich an ein Teammitglied.");
 
