@@ -1,21 +1,13 @@
-package de.halfminer.hmtsbot.actions;
+package de.halfminer.hmbot.actions;
 
 import com.github.theholywaffle.teamspeak3.api.event.TextMessageEvent;
-import de.halfminer.hmtsbot.HalfminerBot;
-import de.halfminer.hmtsbot.actions.Action;
-import de.halfminer.hmtsbot.actions.ActionChannelCreate;
-import de.halfminer.hmtsbot.actions.ActionHelp;
-import de.halfminer.hmtsbot.actions.CommandLine;
-import de.halfminer.hmtsbot.exception.ActionNotCompletedException;
-import de.halfminer.hmtsbot.exception.InvalidCommandLineException;
+import de.halfminer.hmbot.HalfminerBot;
+import de.halfminer.hmbot.HalfminerBotClass;
+import de.halfminer.hmbot.util.CommandLine;
+import de.halfminer.hmbot.exception.ActionNotCompletedException;
+import de.halfminer.hmbot.exception.InvalidCommandLineException;
 
-public class ActionManager {
-
-    private final HalfminerBot bot;
-
-    public ActionManager() {
-        this.bot = HalfminerBot.getInstance();
-    }
+public class ActionManager extends HalfminerBotClass {
 
     public void parseAction(TextMessageEvent event) {
 
@@ -34,12 +26,12 @@ public class ActionManager {
                     break;
             }
         } catch (InvalidCommandLineException e) {
-            bot.getApi().sendPrivateMessage(event.getInvokerId(), e.getError() + " | Verwendung: " + e.getCorrectUsage());
+            api.sendPrivateMessage(event.getInvokerId(), e.getError() + " | Verwendung: " + e.getCorrectUsage());
             return;
         }
 
         if (action == null) {
-            bot.getApi().sendPrivateMessage(event.getInvokerId(),
+            api.sendPrivateMessage(event.getInvokerId(),
                     "Unbekanntes Kommando. Verwende !help für eine Befehlsübersicht.");
             return;
         }

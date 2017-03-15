@@ -1,4 +1,4 @@
-package de.halfminer.hmtsbot.exception;
+package de.halfminer.hmbot.exception;
 
 public class NoConfigurationException extends Exception {
 }

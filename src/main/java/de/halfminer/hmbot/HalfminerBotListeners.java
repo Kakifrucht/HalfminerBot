@@ -1,18 +1,18 @@
-package de.halfminer.hmtsbot;
+package de.halfminer.hmbot;
 
 import com.github.theholywaffle.teamspeak3.api.TextMessageTargetMode;
 import com.github.theholywaffle.teamspeak3.api.event.*;
 import com.github.theholywaffle.teamspeak3.api.wrapper.ClientInfo;
-import de.halfminer.hmtsbot.actions.ActionManager;
+import de.halfminer.hmbot.actions.ActionManager;
 
-class HalfminerBotListener extends TS3EventAdapter {
+class HalfminerBotListeners extends TS3EventAdapter {
 
     private final HalfminerBot bot;
     private final ActionManager actions;
 
     private final int channelOfBot;
 
-    public HalfminerBotListener() {
+    public HalfminerBotListeners() {
 
         this.bot = HalfminerBot.getInstance();
         this.actions = bot.getActionmanager();

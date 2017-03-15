@@ -1,6 +1,6 @@
-package de.halfminer.hmtsbot;
+package de.halfminer.hmbot;
 
-import de.halfminer.hmtsbot.exception.NoConfigurationException;
+import de.halfminer.hmbot.exception.NoConfigurationException;
 
 import java.io.*;
 import java.util.Properties;

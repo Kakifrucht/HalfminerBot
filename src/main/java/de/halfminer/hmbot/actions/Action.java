@@ -1,29 +1,23 @@
-package de.halfminer.hmtsbot.actions;
+package de.halfminer.hmbot.actions;
 
-import com.github.theholywaffle.teamspeak3.TS3Api;
 import com.github.theholywaffle.teamspeak3.api.wrapper.ClientInfo;
-import de.halfminer.hmtsbot.HalfminerConfig;
-import de.halfminer.hmtsbot.HalfminerBot;
-import de.halfminer.hmtsbot.exception.ActionNotCompletedException;
-import de.halfminer.hmtsbot.exception.InvalidCommandLineException;
+import de.halfminer.hmbot.HalfminerBotClass;
+import de.halfminer.hmbot.HalfminerConfig;
+import de.halfminer.hmbot.exception.ActionNotCompletedException;
+import de.halfminer.hmbot.util.CommandLine;
 
-public abstract class Action {
+public abstract class Action extends HalfminerBotClass {
 
-    final HalfminerBot bot;
-    final TS3Api api;
     final HalfminerConfig config;
 
     //Variable information about the action
     final CommandLine command;
     final ClientInfo invoker;
 
-    Action(CommandLine command) throws InvalidCommandLineException {
-        this.bot = HalfminerBot.getInstance();
-        this.api = bot.getApi();
+    Action(CommandLine command) {
         this.config = bot.getConfig();
 
         this.command = command;
-
         this.invoker = api.getClientInfo(command.getClientId());
     }
 

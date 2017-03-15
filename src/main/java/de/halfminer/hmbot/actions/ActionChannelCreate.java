@@ -1,10 +1,11 @@
-package de.halfminer.hmtsbot.actions;
+package de.halfminer.hmbot.actions;
 
 import com.github.theholywaffle.teamspeak3.api.ChannelProperty;
 import com.github.theholywaffle.teamspeak3.api.wrapper.Channel;
-import de.halfminer.hmtsbot.HalfminerBot;
-import de.halfminer.hmtsbot.exception.ActionNotCompletedException;
-import de.halfminer.hmtsbot.exception.InvalidCommandLineException;
+import de.halfminer.hmbot.HalfminerBot;
+import de.halfminer.hmbot.exception.ActionNotCompletedException;
+import de.halfminer.hmbot.exception.InvalidCommandLineException;
+import de.halfminer.hmbot.util.CommandLine;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;

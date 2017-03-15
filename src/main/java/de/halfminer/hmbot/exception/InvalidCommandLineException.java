@@ -1,4 +1,4 @@
-package de.halfminer.hmtsbot.exception;
+package de.halfminer.hmbot.exception;
 
 public class InvalidCommandLineException extends Exception {
 
@@ -17,5 +17,4 @@ public class InvalidCommandLineException extends Exception {
     public String getCorrectUsage() {
         return correctUsage;
     }
-
 }

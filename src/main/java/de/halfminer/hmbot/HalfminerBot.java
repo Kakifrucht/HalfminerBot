@@ -1,4 +1,4 @@
-package de.halfminer.hmtsbot;
+package de.halfminer.hmbot;
 
 import com.github.theholywaffle.teamspeak3.TS3Api;
 import com.github.theholywaffle.teamspeak3.TS3ApiAsync;
@@ -8,12 +8,14 @@ import com.github.theholywaffle.teamspeak3.TS3Query.FloodRate;
 import com.github.theholywaffle.teamspeak3.api.exception.TS3ConnectionFailedException;
 import com.github.theholywaffle.teamspeak3.api.wrapper.Channel;
 import com.github.theholywaffle.teamspeak3.api.wrapper.ChannelGroup;
-import de.halfminer.hmtsbot.actions.ActionManager;
-import de.halfminer.hmtsbot.exception.NoConfigurationException;
-import de.halfminer.hmtsbot.scheduled.InactivityCheck;
+import de.halfminer.hmbot.actions.ActionManager;
+import de.halfminer.hmbot.exception.NoConfigurationException;
+import de.halfminer.hmbot.tasks.InactivityCheck;
+import de.halfminer.hmbot.tasks.StatusPUT;
 
 import java.util.List;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -102,11 +104,14 @@ public class HalfminerBot {
             this.storage = new HalfminerStorage();
             this.actions = new ActionManager();
             api.registerAllEvents();
-            api.addTS3Listeners(new HalfminerBotListener());
+            api.addTS3Listeners(new HalfminerBotListeners());
+
+            ScheduledExecutorService schedule = Executors.newScheduledThreadPool(1);
+            schedule.scheduleAtFixedRate(new StatusPUT(), 0, 1, TimeUnit.MINUTES);
 
             InactivityCheck inactivityCheck = new InactivityCheck();
             if (inactivityCheck.isEnabled())
-                Executors.newScheduledThreadPool(1).scheduleAtFixedRate(inactivityCheck, 10, 10, TimeUnit.SECONDS);
+                schedule.scheduleAtFixedRate(inactivityCheck, 10, 10, TimeUnit.SECONDS);
             else logger.info("Could not get AFK Channel. Inactivity check disabled.");
 
             logger.info("HalfminerBot connected successfully and ready");

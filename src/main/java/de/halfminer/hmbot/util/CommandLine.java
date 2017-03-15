@@ -1,4 +1,4 @@
-package de.halfminer.hmtsbot.actions;
+package de.halfminer.hmbot.util;
 
 import com.github.theholywaffle.teamspeak3.api.event.TextMessageEvent;
 
@@ -11,7 +11,6 @@ public class CommandLine {
 
     //Information about the command
     private final String line;
-    private final String[] parsedLine;
     private final String command;
     private final String commandLine;
 
@@ -25,7 +24,7 @@ public class CommandLine {
         }
 
         this.line = sb.toString();
-        this.parsedLine = sb.toString().split("\\s+");
+        String[] parsedLine = sb.toString().split("\\s+");
         this.command = parsedLine[0].substring(1);
         if (line.contains(" ")) commandLine = line.substring(line.indexOf(' ') + 1);
         else commandLine = "";
@@ -46,13 +45,6 @@ public class CommandLine {
     }
 
     /**
-     * @return the whole commandline seperated at spaces
-     */
-    public String[] getParsedLine() {
-        return parsedLine;
-    }
-
-    /**
      * @return only the command (without !)
      */
     public String getCommand() {
@@ -65,6 +57,4 @@ public class CommandLine {
     public String getCommandLine() {
         return commandLine;
     }
-
-
 }

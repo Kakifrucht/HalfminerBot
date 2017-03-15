@@ -4,6 +4,7 @@ Connecting to query via [API](https://github.com/TheHolyWaffle/TeamSpeak-3-Java-
 
 Current features
 -------
+- Configurable
 - Create channels for users
   - Gives channel admin to the creating user
   - Adds their username to the channelname
@@ -12,8 +13,9 @@ Current features
   - Floodprotection, limit channel creation
   - Detect if user already has a channel, automatically move user to his channel on join/chat/move
 - Command interface with !
-  - Default command will be !channelcreate, to make channel creation easier
-- Periodically check for inactive users
-  - Move them into AFK channel
-  - If server is full, kick AFK users to make room
-- Configure address / some aspects
+  - Default command if none supplied is !channelcreate, to make channel creation easier
+- Scheduled tasks
+  - Periodically check for inactive users
+    - Move them into AFK channel
+    - If server is full, kick AFK users to make room
+  - Send current status to API via HTTP PUT

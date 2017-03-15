@@ -1,6 +1,7 @@
-package de.halfminer.hmtsbot.actions;
+package de.halfminer.hmbot.actions;
 
-import de.halfminer.hmtsbot.exception.InvalidCommandLineException;
+import de.halfminer.hmbot.exception.InvalidCommandLineException;
+import de.halfminer.hmbot.util.CommandLine;
 
 public class ActionHelp extends Action {
 

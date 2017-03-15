@@ -1,33 +1,29 @@
-package de.halfminer.hmtsbot.scheduled;
+package de.halfminer.hmbot.tasks;
 
-import com.github.theholywaffle.teamspeak3.TS3ApiAsync;
 import com.github.theholywaffle.teamspeak3.api.wrapper.Channel;
 import com.github.theholywaffle.teamspeak3.api.wrapper.Client;
-import de.halfminer.hmtsbot.HalfminerBot;
+import de.halfminer.hmbot.HalfminerBot;
+import de.halfminer.hmbot.HalfminerBotClass;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 
 /**
  * Will be run at fixed interval and move AFK users to AFK channel
  */
-public class InactivityCheck implements Runnable {
+public class InactivityCheck extends HalfminerBotClass implements Runnable {
+
+    private final static int IDLE_TIME_UNTIL_MOVE_IN_SECONDS = 300;
 
     private boolean isEnabled = false;
 
-    private static final HalfminerBot bot = HalfminerBot.getInstance();
-    private final static int IDLE_TIME_UNTIL_MOVE_IN_SECONDS = 300;
-    private final TS3ApiAsync api = bot.getApiAsync();
-
-    private Channel afkChannel;
     private final int maxClients;
+    private Channel afkChannel;
 
     public InactivityCheck() {
 
-        // Suppose that first channel containing the word afk is the designated one
         maxClients = bot.getApi().getServerInfo().getMaxClients();
+        // suppose that first channel containing the word afk is the designated one
         for (Channel channel : bot.getApi().getChannelsByName("AFK")) {
             if (channel.getNeededTalkPower() > 0) {
                 afkChannel = channel;
@@ -42,7 +38,7 @@ public class InactivityCheck implements Runnable {
 
         List<Client> clients;
         try {
-            clients = api.getClients().get();
+            clients = apiAsync.getClients().get();
         } catch (InterruptedException e) {
             HalfminerBot.getLogger().warning("Could not get Clientlist");
             return;
@@ -58,7 +54,7 @@ public class InactivityCheck implements Runnable {
 
         int currentlyOnline;
         try {
-            currentlyOnline = api.getServerInfo().get().getClientsOnline();
+            currentlyOnline = apiAsync.getServerInfo().get().getClientsOnline();
         } catch (InterruptedException e) {
             return;
         }

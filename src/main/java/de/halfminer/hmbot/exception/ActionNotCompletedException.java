@@ -1,7 +1,7 @@
-package de.halfminer.hmtsbot.exception;
+package de.halfminer.hmbot.exception;
 
-import de.halfminer.hmtsbot.HalfminerBot;
-import de.halfminer.hmtsbot.actions.Action;
+import de.halfminer.hmbot.HalfminerBot;
+import de.halfminer.hmbot.actions.Action;
 
 public class ActionNotCompletedException extends Exception {
 
@@ -21,5 +21,4 @@ public class ActionNotCompletedException extends Exception {
     public String getError() {
         return action.getClientInfo().getNickname() + " caused error with command " + '"' + action.getCommand().getLine() + '"' + ": " + error;
     }
-
 }
