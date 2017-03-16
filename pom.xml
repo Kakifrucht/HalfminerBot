@@ -22,6 +22,7 @@
                 <directory>${basedir}/src/main/resources/</directory>
                 <includes>
                     <include>*.yml</include>
+                    <include>META-INF/MANIFEST.MF</include>
                 </includes>
             </resource>
         </resources>
@@ -34,19 +35,6 @@
                     <configuration>
                         <source>1.7</source>
                         <target>1.7</target>
-                    </configuration>
-                </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-jar-plugin</artifactId>
-                    <version>3.0.2</version>
-                    <configuration>
-                        <archive>
-                            <manifest>
-                                <addClasspath>true</addClasspath>
-                                <mainClass>de.halfminer.hmbot.HalfminerBot</mainClass>
-                            </manifest>
-                        </archive>
                     </configuration>
                 </plugin>
             </plugins>

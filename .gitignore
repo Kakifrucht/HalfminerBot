@@ -1,4 +1,3 @@
-/out
-**/META-INF
+/target
 /.idea
 *.iml
