@@ -10,22 +10,27 @@ import com.github.theholywaffle.teamspeak3.api.wrapper.Channel;
 import com.github.theholywaffle.teamspeak3.api.wrapper.ChannelGroup;
 import de.halfminer.hmbot.actions.ActionManager;
 import de.halfminer.hmbot.exception.NoConfigurationException;
-import de.halfminer.hmbot.tasks.InactivityCheck;
 import de.halfminer.hmbot.tasks.StatusPUT;
+import de.halfminer.hmbot.tasks.TaskInactivityCheck;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
+/**
+ * Halfminer Teamspeak 3 query bot, implementing a chat based command interface and automatic tasks.
+ *
+ * @author Fabian Prieto Wunderlich - Kakifrucht
+ */
 public class HalfminerBot {
+
+    private final static Logger logger = LoggerFactory.getLogger(HalfminerBot.class);
 
     public static void main(String[] args) {
 
-        logger = Logger.getLogger("HalfminerBot");
-        logger.setLevel(Level.INFO);
         logger.info("HalfminerBot is starting...");
 
         HalfminerConfig config;
@@ -43,13 +48,12 @@ public class HalfminerBot {
 
             config.setPassword(args[0]);
             new HalfminerBot(config);
-        } else logger.severe("No password given. Please provide it via commandline argument.");
+        } else logger.error("No password given. Please provide it via commandline argument.");
     }
 
     private static HalfminerBot instance;
-    private static Logger logger;
-    private final HalfminerConfig config;
 
+    private final HalfminerConfig config;
     private final TS3Query query;
     private TS3Api api;
     private TS3ApiAsync apiAsync;
@@ -62,20 +66,20 @@ public class HalfminerBot {
         this.config = config;
 
         // START Configure API
-        TS3Config ts3config = new TS3Config();
-        ts3config.setHost(config.getHost());
-        ts3config.setDebugLevel(Level.WARNING);
+        TS3Config apiConfig = new TS3Config();
+        apiConfig.setHost(config.getHost());
+        apiConfig.setDebugLevel(java.util.logging.Level.WARNING);
         if (config.hasLocalhost()) {
-            ts3config.setFloodRate(FloodRate.UNLIMITED);
+            apiConfig.setFloodRate(FloodRate.UNLIMITED);
             logger.info("Floodrate set to unlimited");
-        } else ts3config.setFloodRate(FloodRate.DEFAULT);
+        } else apiConfig.setFloodRate(FloodRate.DEFAULT);
 
         // START Open Query
-        query = new TS3Query(ts3config);
+        query = new TS3Query(apiConfig);
         try {
             query.connect();
         } catch (TS3ConnectionFailedException e) {
-            logger.warning("Couldn't connect to given server, quitting...");
+            logger.error("Couldn't connect to given server, quitting...");
             return;
         }
 
@@ -84,7 +88,7 @@ public class HalfminerBot {
         // START Check login, port and Nickname
         if (api.login("serveradmin", config.getPassword())) {
             if (!api.selectVirtualServerByPort(config.getPort()) || !api.setNickname(config.getBotName())) {
-                stop("The provided port or botname are not valid, quitting...", 2);
+                stop("The provided port or botname are not valid, quitting...");
             }
 
             // START Check if channelgroup exists
@@ -92,13 +96,13 @@ public class HalfminerBot {
             for (ChannelGroup o : api.getChannelGroups()) {
                 if (o.getId() == config.getChannelAdminID()) channelGroupExists = true;
             }
-            if (!channelGroupExists) stop("The provided channelAdminID does not exist, quitting...", 2);
+            if (!channelGroupExists) stop("The provided channelAdminID does not exist, quitting...");
 
             // START Move bot into channel and start listeners
             List<Channel> channels = api.getChannelsByName(config.getChannelMoveName());
 
             if (channels == null || !api.moveClient(api.whoAmI().getId(), channels.get(0).getId())) {
-                logger.warning("The provided channelname does not exist or can't be accessed, staying in default channel");
+                logger.error("The provided channelname does not exist or can't be accessed, staying in default channel");
             }
 
             this.storage = new HalfminerStorage();
@@ -109,14 +113,14 @@ public class HalfminerBot {
             ScheduledExecutorService schedule = Executors.newScheduledThreadPool(1);
             schedule.scheduleAtFixedRate(new StatusPUT(), 0, 1, TimeUnit.MINUTES);
 
-            InactivityCheck inactivityCheck = new InactivityCheck();
+            TaskInactivityCheck inactivityCheck = new TaskInactivityCheck();
             if (inactivityCheck.isEnabled())
                 schedule.scheduleAtFixedRate(inactivityCheck, 10, 10, TimeUnit.SECONDS);
             else logger.info("Could not get AFK Channel. Inactivity check disabled.");
 
             logger.info("HalfminerBot connected successfully and ready");
         } else {
-            stop("The provided password is not valid, quitting...", 2);
+            stop("The provided password is not valid, quitting...");
         }
     }
 
@@ -124,21 +128,19 @@ public class HalfminerBot {
         return instance;
     }
 
-    public static Logger getLogger() {
-        return logger;
-    }
-
-    private void stop(String message, int seconds) {
+    private void stop(String message) {
 
         query.exit();
         if (message.length() > 0) {
-            logger.warning(message);
-        } else logger.warning("Bot quitting...");
+            logger.info(message);
+        } else {
+            logger.info("Bot quitting...");
+        }
 
         try {
-            Thread.sleep(seconds * 1000L);
-        } catch (InterruptedException ignored) {
-        }
+            Thread.sleep(2000L);
+        } catch (InterruptedException ignored) {}
+
         Runtime.getRuntime().exit(0);
     }
 
@@ -146,8 +148,12 @@ public class HalfminerBot {
         return api;
     }
 
-    public TS3ApiAsync getApiAsync() {
+    TS3ApiAsync getApiAsync() {
         return apiAsync;
+    }
+
+    ActionManager getActionManager() {
+        return actions;
     }
 
     public HalfminerStorage getStorage() {
@@ -157,9 +163,4 @@ public class HalfminerBot {
     public HalfminerConfig getConfig() {
         return config;
     }
-
-    public ActionManager getActionmanager() {
-        return actions;
-    }
-
 }

@@ -1,14 +1,15 @@
 package de.halfminer.hmbot;
 
 import de.halfminer.hmbot.exception.NoConfigurationException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.util.Properties;
-import java.util.logging.Logger;
 
 public class HalfminerConfig {
 
-    private final static Logger logger = HalfminerBot.getLogger();
+    private final static Logger logger = LoggerFactory.getLogger(HalfminerConfig.class);
 
     private final File configFile;
     private Properties properties;
@@ -17,10 +18,10 @@ public class HalfminerConfig {
 
     public HalfminerConfig() throws NoConfigurationException {
 
-        this.configFile = new File("halfminerbot.cfg");
+        this.configFile = new File("hmbot/halfminerbot.cfg");
         if (!configFile.exists()) {
             createDefaultConfig();
-            logger.warning("Config file halfminerbot.cfg created, please fill out your details and restart the bot.");
+            logger.error("Config file halfminerbot.cfg created, please fill out your details and restart the bot.");
             throw new NoConfigurationException();
         } else readConfig();
     }
@@ -71,10 +72,10 @@ public class HalfminerConfig {
             e.printStackTrace();
         } catch (IOException e) {
             //Config could not be read somehow
-            logger.severe("Config file could not be read. Renamed to halfminerbotinvalid.cfg and regenerated config.");
+            logger.warn("Config file could not be read. Renamed to halfminerbotinvalid.cfg and regenerated config.");
             File oldConfig = new File("halfminerbotinvalid.cfg");
             if (!(configFile.renameTo(oldConfig)))
-                logger.warning("Old config could not be saved.");
+                logger.warn("Old config could not be saved.");
             createDefaultConfig(); // regenerate
         }
 
@@ -99,7 +100,7 @@ public class HalfminerConfig {
                 properties.store(writer, "HalfminerBot Settings");
                 writer.close();
             } catch (IOException e) {
-                logger.severe("Config file could not be written.");
+                logger.warn("Config file could not be written.");
                 e.printStackTrace();
             }
         }
@@ -111,17 +112,17 @@ public class HalfminerConfig {
         this.properties = new Properties();
 
         if (!toVerify.containsKey("host")) {
-            logger.warning("Configuration: host not given. Setting default value localhost");
+            logger.warn("Configuration: host not given. Setting default value localhost");
             properties.put("host", "localhost");
         } else properties.put("host", toVerify.getProperty("host"));
 
         if (!toVerify.containsKey("name")) {
-            logger.warning("Configuration: name not given. Setting default value HalfminerBot");
+            logger.warn("Configuration: name not given. Setting default value HalfminerBot");
             properties.put("name", "HalfminerBot");
         } else properties.put("name", toVerify.getProperty("name"));
 
         if (!toVerify.containsKey("port")) {
-            logger.warning("Configuration: port not given. Setting default value 9987");
+            logger.warn("Configuration: port not given. Setting default value 9987");
             properties.put("port", "9987");
         } else {
 
@@ -130,12 +131,12 @@ public class HalfminerConfig {
             try {
                 checkRange = Integer.parseInt(toPut);
             } catch (NumberFormatException e) {
-                logger.warning("Configuration: port in wrong format. Setting default value 9987");
+                logger.warn("Configuration: port in wrong format. Setting default value 9987");
                 toPut = "9987";
             }
 
             if (checkRange > 65535 || checkRange < 0) {
-                logger.warning("Configuration: port in wrong format. Setting default value 9987");
+                logger.warn("Configuration: port in wrong format. Setting default value 9987");
                 toPut = "9987";
             }
 
@@ -143,12 +144,12 @@ public class HalfminerConfig {
 
         }
         if (!toVerify.containsKey("channelname")) {
-            logger.warning("Configuration: channelname not given. Setting default value Welcome");
+            logger.warn("Configuration: channelname not given. Setting default value Welcome");
             properties.put("channelname", "Welcome");
         } else properties.put("channelname", toVerify.getProperty("channelname"));
 
         if (!toVerify.containsKey("channeladminid")) {
-            logger.warning("Configuration: channeladminid not given. Setting default value 1");
+            logger.warn("Configuration: channeladminid not given. Setting default value 1");
             properties.put("channeladminid", "1");
         } else {
             String toPut = toVerify.getProperty("channeladminid");
@@ -156,19 +157,19 @@ public class HalfminerConfig {
             try {
                 checkRange = Integer.parseInt(toPut);
             } catch (NumberFormatException e) {
-                logger.warning("Configuration: channeladminid in wrong format. Setting default value 1");
+                logger.warn("Configuration: channeladminid in wrong format. Setting default value 1");
                 toPut = "1";
             }
 
             if (checkRange < 0) {
-                logger.warning("Configuration: channeladminid in wrong format. Setting default value 1");
+                logger.warn("Configuration: channeladminid in wrong format. Setting default value 1");
                 toPut = "1";
             }
             properties.put("channeladminid", toPut);
         }
 
         if (!toVerify.containsKey("waitingparaminseconds")) {
-            logger.warning("Configuration: waitingparaminseconds not given. Setting default value 60");
+            logger.warn("Configuration: waitingparaminseconds not given. Setting default value 60");
             properties.put("waitingparaminseconds", "60");
         } else {
             String toPut = toVerify.getProperty("waitingparaminseconds");
@@ -176,12 +177,12 @@ public class HalfminerConfig {
             try {
                 checkRange = Integer.parseInt(toPut);
             } catch (NumberFormatException e) {
-                logger.warning("Configuration: waitingparaminseconds in wrong format. Setting default value 60");
+                logger.warn("Configuration: waitingparaminseconds in wrong format. Setting default value 60");
                 toPut = "60";
             }
 
             if (checkRange < 0) {
-                logger.warning("Configuration: waitingparaminseconds in wrong format. Setting default value 60");
+                logger.warn("Configuration: waitingparaminseconds in wrong format. Setting default value 60");
                 toPut = "60";
             }
             properties.put("waitingparaminseconds", toPut);

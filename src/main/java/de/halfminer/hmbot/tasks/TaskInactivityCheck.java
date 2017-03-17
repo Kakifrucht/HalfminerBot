@@ -2,16 +2,15 @@ package de.halfminer.hmbot.tasks;
 
 import com.github.theholywaffle.teamspeak3.api.wrapper.Channel;
 import com.github.theholywaffle.teamspeak3.api.wrapper.Client;
-import de.halfminer.hmbot.HalfminerBot;
 import de.halfminer.hmbot.HalfminerBotClass;
 
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Will be run at fixed interval and move AFK users to AFK channel
+ * Will be run at fixed interval and move AFK users to AFK channel.
  */
-public class InactivityCheck extends HalfminerBotClass implements Runnable {
+public class TaskInactivityCheck extends HalfminerBotClass implements Runnable {
 
     private final static int IDLE_TIME_UNTIL_MOVE_IN_SECONDS = 300;
 
@@ -20,7 +19,7 @@ public class InactivityCheck extends HalfminerBotClass implements Runnable {
     private final int maxClients;
     private Channel afkChannel;
 
-    public InactivityCheck() {
+    public TaskInactivityCheck() {
 
         maxClients = bot.getApi().getServerInfo().getMaxClients();
         // suppose that first channel containing the word afk is the designated one
@@ -40,7 +39,7 @@ public class InactivityCheck extends HalfminerBotClass implements Runnable {
         try {
             clients = apiAsync.getClients().get();
         } catch (InterruptedException e) {
-            HalfminerBot.getLogger().warning("Could not get Clientlist");
+            logger.error("Could not get client list");
             return;
         }
 
@@ -48,7 +47,7 @@ public class InactivityCheck extends HalfminerBotClass implements Runnable {
             if (client.getChannelId() != afkChannel.getId() && (client.isAway() || (client.isOutputMuted() && ((client.getIdleTime() / 1000) > IDLE_TIME_UNTIL_MOVE_IN_SECONDS)))) {
                 api.moveClient(client, afkChannel);
                 api.sendPrivateMessage(client.getId(), "Du wurdest in die AFK Lounge verschoben, da du abwesend warst.");
-                HalfminerBot.getLogger().info(client.getNickname() + " is away and has been moved into AFK channel");
+                logger.info("{} is away and has been moved into AFK channel", client.getNickname());
             }
         }
 

@@ -5,10 +5,9 @@ import de.halfminer.hmbot.HalfminerBotClass;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.logging.Level;
 
 /**
- * Created by fabpw on 15.03.2017.
+ * Sends the current user count to REST API.
  */
 public class StatusPUT extends HalfminerBotClass implements Runnable {
 
@@ -31,7 +30,7 @@ public class StatusPUT extends HalfminerBotClass implements Runnable {
 
             int responseCode = connection.getResponseCode();
             if (lastConnectSuccess && (responseCode >= 300 || responseCode < 200)) {
-                logger.warning("Received response code " + responseCode + " on HTTP PUT of user count");
+                logger.error("Received response code " + responseCode + " on HTTP PUT of user count");
                 lastConnectSuccess = false;
             } else lastConnectSuccess = true;
         } catch (Exception e) {
@@ -40,6 +39,6 @@ public class StatusPUT extends HalfminerBotClass implements Runnable {
     }
 
     private void logWarning(Exception toLog) {
-        logger.log(Level.WARNING, "Could not update Teamspeak status", toLog);
+        logger.error("Could not update Teamspeak status", toLog);
     }
 }

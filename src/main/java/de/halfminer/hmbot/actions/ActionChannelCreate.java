@@ -2,7 +2,6 @@ package de.halfminer.hmbot.actions;
 
 import com.github.theholywaffle.teamspeak3.api.ChannelProperty;
 import com.github.theholywaffle.teamspeak3.api.wrapper.Channel;
-import de.halfminer.hmbot.HalfminerBot;
 import de.halfminer.hmbot.exception.ActionNotCompletedException;
 import de.halfminer.hmbot.exception.InvalidCommandLineException;
 import de.halfminer.hmbot.util.CommandLine;
@@ -15,7 +14,7 @@ public class ActionChannelCreate extends Action {
 
     private final Channel botChannel;
 
-    public ActionChannelCreate(CommandLine command) throws InvalidCommandLineException {
+    ActionChannelCreate(CommandLine command) throws InvalidCommandLineException {
         super(command);
 
         botChannel = api.getChannelsByName(config.getChannelMoveName()).get(0);
@@ -68,7 +67,7 @@ public class ActionChannelCreate extends Action {
             api.sendPrivateMessage(command.getClientId(),
                     "Dein Channel wurde erfolgreich erstellt, das Passwort lautet "
                             + '"' + this.command.getCommandLine() + '"' + '.');
-            HalfminerBot.getLogger().info("Channel created: " + channelCreateName);
+            logger.info("Channel created: {}", channelCreateName);
 
         } else {
 

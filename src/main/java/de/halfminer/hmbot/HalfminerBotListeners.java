@@ -7,18 +7,10 @@ import de.halfminer.hmbot.actions.ActionManager;
 
 class HalfminerBotListeners extends TS3EventAdapter {
 
-    private final HalfminerBot bot;
-    private final ActionManager actions;
+    private final HalfminerBot bot = HalfminerBot.getInstance();
+    private final ActionManager actions = bot.getActionManager();
 
-    private final int channelOfBot;
-
-    public HalfminerBotListeners() {
-
-        this.bot = HalfminerBot.getInstance();
-        this.actions = bot.getActionmanager();
-
-        this.channelOfBot = bot.getApi().whoAmI().getChannelId();
-    }
+    private final int channelOfBot = bot.getApi().whoAmI().getChannelId();
 
     @Override
     public void onClientJoin(ClientJoinEvent e) {
@@ -42,8 +34,9 @@ class HalfminerBotListeners extends TS3EventAdapter {
     }
 
     private void messageUser(int clientId) {
-        if (!bot.getStorage().moveToChannel(clientId))
+        if (!bot.getStorage().moveToChannel(clientId)) {
             bot.getApi().sendPrivateMessage(clientId,
                     "Antworte mit deinem gewünschten Passwort, um einen eigenen Channel mit Passwort zu erhalten.");
+        }
     }
 }

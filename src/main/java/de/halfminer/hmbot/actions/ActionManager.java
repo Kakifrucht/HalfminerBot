@@ -1,18 +1,17 @@
 package de.halfminer.hmbot.actions;
 
 import com.github.theholywaffle.teamspeak3.api.event.TextMessageEvent;
-import de.halfminer.hmbot.HalfminerBot;
 import de.halfminer.hmbot.HalfminerBotClass;
-import de.halfminer.hmbot.util.CommandLine;
 import de.halfminer.hmbot.exception.ActionNotCompletedException;
 import de.halfminer.hmbot.exception.InvalidCommandLineException;
+import de.halfminer.hmbot.util.CommandLine;
 
 public class ActionManager extends HalfminerBotClass {
 
     public void parseAction(TextMessageEvent event) {
 
         CommandLine command = new CommandLine(event);
-        HalfminerBot.getLogger().info("User " + event.getInvokerName() + " issued server command: " + command.getLine());
+        logger.info("User " + event.getInvokerName() + " issued server command: " + command.getLine());
 
         Action action = null;
 
@@ -39,7 +38,7 @@ public class ActionManager extends HalfminerBotClass {
         try {
             runAction(action);
         } catch (ActionNotCompletedException e) {
-            HalfminerBot.getLogger().info(e.getError());
+            logger.info(e.getError());
         }
     }
 
