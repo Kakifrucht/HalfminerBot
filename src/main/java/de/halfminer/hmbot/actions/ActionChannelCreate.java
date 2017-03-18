@@ -17,7 +17,7 @@ public class ActionChannelCreate extends Action {
     ActionChannelCreate(CommandLine command) throws InvalidCommandLineException {
         super(command);
 
-        botChannel = api.getChannelsByName(config.getChannelMoveName()).get(0);
+        botChannel = api.getChannelsByName(botConfig.getChannelMoveName()).get(0);
 
         if (command.getCommandLine().equals(""))
             throw new InvalidCommandLineException("Bitte gib ein Passwort an.", "!channelcreate <passwort>");
@@ -54,7 +54,7 @@ public class ActionChannelCreate extends Action {
 
             bot.getStorage().getMapChannelOwner().put(invoker.getDatabaseId(), channelCreateID);
             api.moveClient(command.getClientId(), channelCreateID);
-            api.setClientChannelGroup(config.getChannelAdminID(), channelCreateID, invoker.getDatabaseId());
+            api.setClientChannelGroup(botConfig.getChannelAdminID(), channelCreateID, invoker.getDatabaseId());
             api.addChannelPermission(channelCreateID, "i_icon_id", (int) botChannel.getIconId());
 
             // switch to temporary channel with delete delay, since it can't be set upon creation
@@ -88,7 +88,7 @@ public class ActionChannelCreate extends Action {
     private int waitingTime(int userDBID) {
 
         HashMap<Integer, Long> floodProtection = bot.getStorage().getMapFloodProtection();
-        int waitingParamInSeconds = bot.getConfig().getWaitingParamTimeInSeconds();
+        int waitingParamInSeconds = bot.getBotConfig().getWaitingParamTimeInSeconds();
 
         if (floodProtection.containsKey(userDBID)) {
             long lastusedTime = floodProtection.get(userDBID);

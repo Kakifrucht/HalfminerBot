@@ -1,4 +1,4 @@
-package de.halfminer.hmbot;
+package de.halfminer.hmbot.storage;
 
 import de.halfminer.hmbot.exception.NoConfigurationException;
 import org.slf4j.Logger;
@@ -7,16 +7,16 @@ import org.slf4j.LoggerFactory;
 import java.io.*;
 import java.util.Properties;
 
-public class HalfminerConfig {
+public class BotConfig {
 
-    private final static Logger logger = LoggerFactory.getLogger(HalfminerConfig.class);
+    private final static Logger logger = LoggerFactory.getLogger(BotConfig.class);
 
     private final File configFile;
     private Properties properties;
 
     private String password;
 
-    public HalfminerConfig() throws NoConfigurationException {
+    public BotConfig() throws NoConfigurationException {
 
         this.configFile = new File("hmbot/halfminerbot.cfg");
         if (!configFile.exists()) {
@@ -69,7 +69,7 @@ public class HalfminerConfig {
             verifyConfig();
         } catch (FileNotFoundException e) {
             //This can't usually happen, as we already checked if the file actually exists
-            e.printStackTrace();
+            logger.error("Couldn't read config file.", e);
         } catch (IOException e) {
             //Config could not be read somehow
             logger.warn("Config file could not be read. Renamed to halfminerbotinvalid.cfg and regenerated config.");
@@ -100,8 +100,7 @@ public class HalfminerConfig {
                 properties.store(writer, "HalfminerBot Settings");
                 writer.close();
             } catch (IOException e) {
-                logger.warn("Config file could not be written.");
-                e.printStackTrace();
+                logger.warn("Config file could not be written.", e);
             }
         }
     }

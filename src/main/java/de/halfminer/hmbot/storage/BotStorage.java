@@ -1,12 +1,13 @@
-package de.halfminer.hmbot;
+package de.halfminer.hmbot.storage;
 
 import com.github.theholywaffle.teamspeak3.api.wrapper.Channel;
 import com.github.theholywaffle.teamspeak3.api.wrapper.ClientInfo;
 import com.github.theholywaffle.teamspeak3.api.wrapper.ServerQueryInfo;
+import de.halfminer.hmbot.HalfminerBotClass;
 
 import java.util.HashMap;
 
-public class HalfminerStorage extends HalfminerBotClass {
+public class BotStorage extends HalfminerBotClass {
 
     private final HashMap<Integer, Integer> channelOwner = new HashMap<>();
     private final HashMap<Integer, Long> floodProtection = new HashMap<>();
