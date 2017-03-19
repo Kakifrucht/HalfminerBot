@@ -54,10 +54,6 @@ public class BotConfig {
         return Integer.parseInt(properties.getProperty("channeladminid"));
     }
 
-    public int getWaitingParamTimeInSeconds() {
-        return Integer.parseInt(properties.getProperty("waitingparaminseconds"));
-    }
-
     public boolean hasLocalhost() {
         return properties.get("host").equals("localhost");
     }
@@ -90,7 +86,6 @@ public class BotConfig {
         properties.setProperty("port", "9987");
         properties.setProperty("channelname", "Welcome");
         properties.setProperty("channeladminid", "1");
-        properties.setProperty("waitingparaminseconds", "60");
         writeConfig();
     }
 
@@ -165,26 +160,6 @@ public class BotConfig {
                 toPut = "1";
             }
             properties.put("channeladminid", toPut);
-        }
-
-        if (!toVerify.containsKey("waitingparaminseconds")) {
-            logger.warn("Configuration: waitingparaminseconds not given. Setting default value 60");
-            properties.put("waitingparaminseconds", "60");
-        } else {
-            String toPut = toVerify.getProperty("waitingparaminseconds");
-            int checkRange = 60;
-            try {
-                checkRange = Integer.parseInt(toPut);
-            } catch (NumberFormatException e) {
-                logger.warn("Configuration: waitingparaminseconds in wrong format. Setting default value 60");
-                toPut = "60";
-            }
-
-            if (checkRange < 0) {
-                logger.warn("Configuration: waitingparaminseconds in wrong format. Setting default value 60");
-                toPut = "60";
-            }
-            properties.put("waitingparaminseconds", toPut);
         }
 
         writeConfig();

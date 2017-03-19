@@ -33,12 +33,12 @@ public class StatusPUT extends HalfminerBotClass implements Runnable {
                 logger.error("Received response code " + responseCode + " on HTTP PUT of user count");
                 lastConnectSuccess = false;
             } else lastConnectSuccess = true;
-        } catch (Exception e) {
+        } catch (Throwable e) {
             logWarning(e);
         }
     }
 
-    private void logWarning(Exception toLog) {
+    private void logWarning(Throwable toLog) {
         logger.error("Could not update Teamspeak status", toLog);
     }
 }

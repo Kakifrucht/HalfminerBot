@@ -10,15 +10,10 @@ import java.util.HashMap;
 public class BotStorage extends HalfminerBotClass {
 
     private final HashMap<Integer, Integer> channelOwner = new HashMap<>();
-    private final HashMap<Integer, Long> floodProtection = new HashMap<>();
     private ServerQueryInfo botInformation;
 
     public HashMap<Integer, Integer> getMapChannelOwner() {
         return channelOwner;
-    }
-
-    public HashMap<Integer, Long> getMapFloodProtection() {
-        return floodProtection;
     }
 
     public ServerQueryInfo getBotInformation() {

@@ -8,7 +8,6 @@ import com.github.theholywaffle.teamspeak3.TS3Query.FloodRate;
 import com.github.theholywaffle.teamspeak3.api.exception.TS3ConnectionFailedException;
 import com.github.theholywaffle.teamspeak3.api.wrapper.Channel;
 import com.github.theholywaffle.teamspeak3.api.wrapper.ChannelGroup;
-import de.halfminer.hmbot.actions.ActionManager;
 import de.halfminer.hmbot.exception.NoConfigurationException;
 import de.halfminer.hmbot.storage.BotConfig;
 import de.halfminer.hmbot.storage.BotStorage;
@@ -23,7 +22,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Halfminer Teamspeak 3 query bot, implementing a chat based command interface and automatic tasks.
+ * Halfminer Teamspeak 3 query bot, implementing a chat based commandLine interface and automatic tasks.
  *
  * @author Fabian Prieto Wunderlich - Kakifrucht
  */
@@ -34,7 +33,6 @@ public class HalfminerBot {
     public static void main(String[] args) {
 
         logger.info("HalfminerBot is starting...");
-
 
         BotConfig botConfig;
         try {
@@ -61,7 +59,6 @@ public class HalfminerBot {
     private TS3Api api;
     private TS3ApiAsync apiAsync;
     private BotStorage storage;
-    private ActionManager actions;
 
     private HalfminerBot(BotConfig botConfig) {
 
@@ -109,7 +106,6 @@ public class HalfminerBot {
             }
 
             this.storage = new BotStorage();
-            this.actions = new ActionManager();
             api.registerAllEvents();
             api.addTS3Listeners(new HalfminerBotListeners());
 
@@ -153,10 +149,6 @@ public class HalfminerBot {
 
     TS3ApiAsync getApiAsync() {
         return apiAsync;
-    }
-
-    ActionManager getActionManager() {
-        return actions;
     }
 
     public BotStorage getStorage() {
