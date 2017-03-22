@@ -3,6 +3,7 @@ package de.halfminer.hmbot.exception;
 import com.github.theholywaffle.teamspeak3.api.wrapper.ClientInfo;
 import de.halfminer.hmbot.cmd.abs.Command;
 
+@SuppressWarnings("SameParameterValue")
 public class CommandNotCompletedException extends Exception {
 
     private final Command command;

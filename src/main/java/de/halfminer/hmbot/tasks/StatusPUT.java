@@ -29,9 +29,11 @@ public class StatusPUT extends HalfminerBotClass implements Runnable {
             out.close();
 
             int responseCode = connection.getResponseCode();
-            if (lastConnectSuccess && (responseCode >= 300 || responseCode < 200)) {
-                logger.error("Received response code " + responseCode + " on HTTP PUT of user count");
-                lastConnectSuccess = false;
+            if (responseCode >= 300 || responseCode < 200) {
+                if (lastConnectSuccess) {
+                    logger.error("Received response code {} on HTTP PUT of user count", responseCode);
+                    lastConnectSuccess = false;
+                }
             } else lastConnectSuccess = true;
         } catch (Throwable e) {
             logWarning(e);

@@ -1,6 +1,7 @@
 package de.halfminer.hmbot.util;
 
 import java.util.Arrays;
+import java.util.regex.Pattern;
 
 /**
  * Helper class to parse a String into arguments and easily convert between different types.
@@ -14,12 +15,12 @@ public class StringArgumentSeparator {
 
     public StringArgumentSeparator(String string) {
         this.concatenated = string;
-        arguments = string.split(" ");
+        arguments = doSplit(string, ' ');
     }
 
     public StringArgumentSeparator(String string, char separator) {
         this.concatenated = string;
-        arguments = string.split(separator + "");
+        arguments = doSplit(string, separator);
     }
 
     public StringArgumentSeparator(String[] strings) {
@@ -29,6 +30,10 @@ public class StringArgumentSeparator {
         }
         this.concatenated = concat;
         arguments = strings;
+    }
+
+    private String[] doSplit(String toSplit, char separator) {
+        return toSplit.split(Pattern.quote(separator + ""));
     }
 
     public String[] getArguments() {

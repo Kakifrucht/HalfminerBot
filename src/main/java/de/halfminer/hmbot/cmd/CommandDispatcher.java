@@ -27,7 +27,7 @@ public class CommandDispatcher extends HalfminerBotClass {
         StringArgumentSeparator command = new StringArgumentSeparator(commandUnparsed);
         if (!command.meetsLength(1)) return;
 
-        logger.info("User " + clientName + " issued server command: " + command.getConcatenatedString());
+        logger.info("Client {} issued server command: {}", clientName, command.getConcatenatedString());
 
         try {
             Command cmdInstance = (Command) this.getClass()
@@ -43,7 +43,7 @@ public class CommandDispatcher extends HalfminerBotClass {
                 InvalidCommandLineException ex = (InvalidCommandLineException) e.getCause();
                 api.sendPrivateMessage(clientId, ex.getError() + " | Verwendung: " + ex.getCorrectUsage());
             } else {
-                logger.error("Unknown exception during newInstance() on class.", e);
+                logger.error("Exception during newInstance() of command", e);
             }
         } catch (CommandNotCompletedException e) {
             if (e.tellUser()) {

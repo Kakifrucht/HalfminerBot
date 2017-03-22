@@ -1,5 +1,6 @@
 package de.halfminer.hmbot.exception;
 
+@SuppressWarnings("SameParameterValue")
 public class InvalidCommandLineException extends Exception {
 
     private final String error;

@@ -1,0 +1,17 @@
+#HalfminerBot default config
+#Server to connect to
+host: 'yourhost.com'
+#Default port is 9987
+port: 9987
+#Can also be provided via command line, as "java -jar HalfminerBot.jar password"
+password: ''
+#Bot name on the server (query clients are not visible in tree view)
+botName: 'Halfminer TSBot'
+#Channel to join
+botChannelName: 'Welcome'
+command:
+  channelcreate:
+    #Delay in seconds until a channel will be deleted after the last client leaves
+    channelDeleteDelay: 180
+    #Channel group to add the player to
+    channelGroupAdminID: 2

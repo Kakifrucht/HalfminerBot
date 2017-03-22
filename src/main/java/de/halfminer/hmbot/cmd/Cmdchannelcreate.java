@@ -51,7 +51,11 @@ public class Cmdchannelcreate extends Command {
 
             bot.getStorage().getMapChannelOwner().put(invoker.getDatabaseId(), channelCreateID);
             api.moveClient(invoker.getId(), channelCreateID);
-            api.setClientChannelGroup(botConfig.getChannelAdminID(), channelCreateID, invoker.getDatabaseId());
+            api.setClientChannelGroup(
+                    botConfig.getInt("command.channelcreate.channelGroupAdminID", 2),
+                    channelCreateID,
+                    invoker.getDatabaseId()
+            );
             api.addChannelPermission(channelCreateID, "i_icon_id", (int) botChannel.getIconId());
 
             // switch to temporary channel with delete delay, since it can't be set upon creation

@@ -2,23 +2,17 @@ package de.halfminer.hmbot.storage;
 
 import com.github.theholywaffle.teamspeak3.api.wrapper.Channel;
 import com.github.theholywaffle.teamspeak3.api.wrapper.ClientInfo;
-import com.github.theholywaffle.teamspeak3.api.wrapper.ServerQueryInfo;
 import de.halfminer.hmbot.HalfminerBotClass;
 
 import java.util.HashMap;
+import java.util.Map;
 
 public class BotStorage extends HalfminerBotClass {
 
-    private final HashMap<Integer, Integer> channelOwner = new HashMap<>();
-    private ServerQueryInfo botInformation;
+    private final Map<Integer, Integer> channelOwner = new HashMap<>();
 
-    public HashMap<Integer, Integer> getMapChannelOwner() {
+    public Map<Integer, Integer> getMapChannelOwner() {
         return channelOwner;
-    }
-
-    public ServerQueryInfo getBotInformation() {
-        if (botInformation == null) botInformation = api.whoAmI();
-        return botInformation;
     }
 
     /**

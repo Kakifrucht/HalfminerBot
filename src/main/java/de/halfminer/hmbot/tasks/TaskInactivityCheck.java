@@ -39,12 +39,14 @@ public class TaskInactivityCheck extends HalfminerBotClass implements Runnable {
         try {
             clients = apiAsync.getClients().get();
         } catch (InterruptedException e) {
-            logger.error("Could not get client list");
+            logger.error("Could not get client list", e);
             return;
         }
 
         for (Client client : clients) {
-            if (client.getChannelId() != afkChannel.getId() && (client.isAway() || (client.isOutputMuted() && ((client.getIdleTime() / 1000) > IDLE_TIME_UNTIL_MOVE_IN_SECONDS)))) {
+            if (client.getChannelId() != afkChannel.getId()
+                    && (client.isAway()
+                    || (client.isOutputMuted() && ((client.getIdleTime() / 1000) > IDLE_TIME_UNTIL_MOVE_IN_SECONDS)))) {
                 api.moveClient(client, afkChannel);
                 api.sendPrivateMessage(client.getId(), "Du wurdest in die AFK Lounge verschoben, da du abwesend warst.");
                 logger.info("{} is away and has been moved into AFK channel", client.getNickname());

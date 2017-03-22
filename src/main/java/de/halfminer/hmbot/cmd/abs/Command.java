@@ -4,12 +4,12 @@ import com.github.theholywaffle.teamspeak3.api.wrapper.ClientInfo;
 import de.halfminer.hmbot.HalfminerBot;
 import de.halfminer.hmbot.HalfminerBotClass;
 import de.halfminer.hmbot.exception.CommandNotCompletedException;
-import de.halfminer.hmbot.storage.BotConfig;
+import de.halfminer.hmbot.storage.YamlConfig;
 import de.halfminer.hmbot.util.StringArgumentSeparator;
 
 public abstract class Command extends HalfminerBotClass {
 
-    protected final static BotConfig botConfig = HalfminerBot.getInstance().getBotConfig();
+    protected final static YamlConfig botConfig = HalfminerBot.getInstance().getBotConfig();
 
     //Variable information about the action
     protected final int clientId;
@@ -18,7 +18,7 @@ public abstract class Command extends HalfminerBotClass {
     private final String commandFull;
     protected final StringArgumentSeparator commandLine;
 
-    public Command(int clientId, StringArgumentSeparator command) {
+    protected Command(int clientId, StringArgumentSeparator command) {
 
         this.clientId = clientId;
         this.invoker = api.getClientInfo(clientId);
