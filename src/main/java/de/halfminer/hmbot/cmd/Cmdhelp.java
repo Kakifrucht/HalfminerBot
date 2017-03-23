@@ -5,7 +5,7 @@ import de.halfminer.hmbot.util.StringArgumentSeparator;
 @SuppressWarnings("unused")
 public class Cmdhelp extends Command {
 
-    Cmdhelp(int clientId, StringArgumentSeparator command) throws InvalidCommandLineException {
+    public Cmdhelp(int clientId, StringArgumentSeparator command) {
         super(clientId, command);
     }
 

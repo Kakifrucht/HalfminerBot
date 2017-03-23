@@ -31,7 +31,7 @@ class HalfminerBotListeners extends TS3EventAdapter {
     public void onTextMessage(TextMessageEvent e) {
         // Disregard messages the bot creates and make sure it's in the private chat
         if (e.getInvokerId() != idOfBot && e.getTargetMode().equals(TextMessageTargetMode.CLIENT)) {
-            cmd.passCommand(e.getInvokerName(), e.getInvokerId(), e.getMessage());
+            cmd.dispatchCommand(e.getInvokerName(), e.getInvokerId(), e.getMessage());
         }
     }
 

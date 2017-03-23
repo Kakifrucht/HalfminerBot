@@ -13,7 +13,7 @@ public class Cmdchannelcreate extends Command {
 
     private final ChannelInfo botChannel;
 
-    Cmdchannelcreate(int clientId, StringArgumentSeparator command) throws InvalidCommandLineException {
+    public Cmdchannelcreate(int clientId, StringArgumentSeparator command) throws InvalidCommandLineException {
         super(clientId, command);
 
         if (!commandLine.meetsLength(1)) {
