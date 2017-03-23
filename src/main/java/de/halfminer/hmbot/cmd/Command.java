@@ -1,24 +1,23 @@
-package de.halfminer.hmbot.cmd.abs;
+package de.halfminer.hmbot.cmd;
 
 import com.github.theholywaffle.teamspeak3.api.wrapper.ClientInfo;
 import de.halfminer.hmbot.HalfminerBot;
 import de.halfminer.hmbot.HalfminerBotClass;
-import de.halfminer.hmbot.exception.CommandNotCompletedException;
 import de.halfminer.hmbot.storage.YamlConfig;
 import de.halfminer.hmbot.util.StringArgumentSeparator;
 
-public abstract class Command extends HalfminerBotClass {
+abstract class Command extends HalfminerBotClass {
 
-    protected final static YamlConfig botConfig = HalfminerBot.getInstance().getBotConfig();
+    final static YamlConfig botConfig = HalfminerBot.getInstance().getBotConfig();
 
     //Variable information about the action
-    protected final int clientId;
-    protected final ClientInfo invoker;
+    final int clientId;
+    final ClientInfo invoker;
 
     private final String commandFull;
-    protected final StringArgumentSeparator commandLine;
+    final StringArgumentSeparator commandLine;
 
-    protected Command(int clientId, StringArgumentSeparator command) {
+    Command(int clientId, StringArgumentSeparator command) {
 
         this.clientId = clientId;
         this.invoker = api.getClientInfo(clientId);
@@ -32,13 +31,13 @@ public abstract class Command extends HalfminerBotClass {
      *
      * @throws CommandNotCompletedException when the action wasn't completed properly
      */
-    public abstract void run() throws CommandNotCompletedException;
+    abstract void run() throws CommandNotCompletedException;
 
-    public String getCommand() {
+    String getCommand() {
         return commandFull;
     }
 
-    public ClientInfo getClientInfo() {
+    ClientInfo getClientInfo() {
         return this.invoker;
     }
 }

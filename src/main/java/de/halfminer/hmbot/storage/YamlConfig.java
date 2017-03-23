@@ -1,6 +1,5 @@
 package de.halfminer.hmbot.storage;
 
-import de.halfminer.hmbot.exception.ConfigurationException;
 import de.halfminer.hmbot.util.StringArgumentSeparator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

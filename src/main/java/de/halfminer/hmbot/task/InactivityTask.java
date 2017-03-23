@@ -1,39 +1,41 @@
-package de.halfminer.hmbot.tasks;
+package de.halfminer.hmbot.task;
 
 import com.github.theholywaffle.teamspeak3.api.wrapper.Channel;
 import com.github.theholywaffle.teamspeak3.api.wrapper.Client;
-import de.halfminer.hmbot.HalfminerBotClass;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Will be run at fixed interval and move AFK users to AFK channel.
  */
-public class TaskInactivityCheck extends HalfminerBotClass implements Runnable {
+class InactivityTask extends Task {
 
     private final static int IDLE_TIME_UNTIL_MOVE_IN_SECONDS = 300;
 
-    private boolean isEnabled = false;
-
-    private final int maxClients;
+    private int maxClients;
     private Channel afkChannel;
 
-    public TaskInactivityCheck() {
+    InactivityTask() {
+        super(10, 10, TimeUnit.SECONDS);
+    }
 
+    @Override
+    boolean checkIfEnabled() {
         maxClients = bot.getApi().getServerInfo().getMaxClients();
         // suppose that first channel containing the word afk is the designated one
         for (Channel channel : bot.getApi().getChannelsByName("AFK")) {
             if (channel.getNeededTalkPower() > 0) {
                 afkChannel = channel;
-                isEnabled = true;
-                return;
+                return true;
             }
         }
+        return false;
     }
 
     @Override
-    public void run() {
+    public void execute() {
 
         List<Client> clients;
         try {
@@ -76,9 +78,5 @@ public class TaskInactivityCheck extends HalfminerBotClass implements Runnable {
                 api.sendPrivateMessage(afk.getId(), message);
             }
         }
-    }
-
-    public boolean isEnabled() {
-        return isEnabled;
     }
 }

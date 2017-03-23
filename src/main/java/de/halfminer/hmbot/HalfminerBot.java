@@ -7,18 +7,14 @@ import com.github.theholywaffle.teamspeak3.TS3Query;
 import com.github.theholywaffle.teamspeak3.TS3Query.FloodRate;
 import com.github.theholywaffle.teamspeak3.api.exception.TS3ConnectionFailedException;
 import com.github.theholywaffle.teamspeak3.api.wrapper.Channel;
-import de.halfminer.hmbot.exception.ConfigurationException;
 import de.halfminer.hmbot.storage.BotStorage;
+import de.halfminer.hmbot.storage.ConfigurationException;
 import de.halfminer.hmbot.storage.YamlConfig;
-import de.halfminer.hmbot.tasks.StatusPUT;
-import de.halfminer.hmbot.tasks.TaskInactivityCheck;
+import de.halfminer.hmbot.task.TaskManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Halfminer Teamspeak 3 query bot, implementing a chat based command interface and automatic tasks.
@@ -78,7 +74,9 @@ public class HalfminerBot {
         if (host.equals("localhost")) {
             apiConfig.setFloodRate(FloodRate.UNLIMITED);
             logger.info("Floodrate set to unlimited");
-        } else apiConfig.setFloodRate(FloodRate.DEFAULT);
+        } else {
+            apiConfig.setFloodRate(FloodRate.DEFAULT);
+        }
 
         // START Open Query
         query = new TS3Query(apiConfig);
@@ -91,12 +89,16 @@ public class HalfminerBot {
 
         this.api = query.getApi();
         this.apiAsync = query.getAsyncApi();
+
         // START Check login, port and Nickname
         if (api.login("serveradmin", botConfig.getString("password", ""))) {
+
             if (!api.selectVirtualServerByPort(botConfig.getInt("port", 9987))
                     || !api.setNickname(botConfig.getString("botName", "Halfminer TSBot"))) {
                 stop("The provided port or botname are not valid, quitting...");
             }
+
+            this.storage = new BotStorage();
 
             // START Move bot into channel and start listeners
             List<Channel> channels = api.getChannelsByName(botConfig.getString("botChannelName", "Welcome"));
@@ -106,18 +108,11 @@ public class HalfminerBot {
                 logger.error("The provided channelname does not exist or can't be accessed, staying in default channel");
             }
 
-            this.storage = new BotStorage();
             api.registerAllEvents();
             api.addTS3Listeners(new HalfminerBotListeners());
 
-            //TODO generify
-            ScheduledExecutorService schedule = Executors.newScheduledThreadPool(1);
-            schedule.scheduleAtFixedRate(new StatusPUT(), 0, 1, TimeUnit.MINUTES);
-
-            TaskInactivityCheck inactivityCheck = new TaskInactivityCheck();
-            if (inactivityCheck.isEnabled())
-                schedule.scheduleAtFixedRate(inactivityCheck, 10, 10, TimeUnit.SECONDS);
-            else logger.info("Could not get AFK Channel. Inactivity check disabled.");
+            // load tasks
+            new TaskManager();
 
             logger.info("HalfminerBot connected successfully and ready");
         } else {
@@ -127,18 +122,18 @@ public class HalfminerBot {
 
     private void stop(String message) {
 
-        query.exit();
         if (message.length() > 0) {
             logger.info(message);
         } else {
             logger.info("Bot quitting...");
         }
 
+        query.exit();
         try {
             Thread.sleep(2000L);
         } catch (InterruptedException ignored) {}
 
-        Runtime.getRuntime().exit(0);
+        System.exit(1);
     }
 
     public TS3Api getApi() {

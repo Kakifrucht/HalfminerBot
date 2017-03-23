@@ -1,4 +1,4 @@
-package de.halfminer.hmbot.exception;
+package de.halfminer.hmbot.storage;
 
 public class ConfigurationException extends Exception {
 

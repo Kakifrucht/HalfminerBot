@@ -1,7 +1,5 @@
 package de.halfminer.hmbot.cmd;
 
-import de.halfminer.hmbot.cmd.abs.Command;
-import de.halfminer.hmbot.exception.InvalidCommandLineException;
 import de.halfminer.hmbot.util.StringArgumentSeparator;
 
 @SuppressWarnings("unused")
@@ -12,7 +10,7 @@ public class Cmdhelp extends Command {
     }
 
     @Override
-    public void run() {
+    void run() {
         api.sendPrivateMessage(clientId,
                 "HalfminerBot - halfminer.de | Verfügbare Kommandos: !channelcreate <passwort> -> erstelle einen eigenen Channel");
     }

@@ -8,8 +8,12 @@ import com.github.theholywaffle.teamspeak3.api.event.TextMessageEvent;
 import com.github.theholywaffle.teamspeak3.api.wrapper.ClientInfo;
 import com.github.theholywaffle.teamspeak3.api.wrapper.ServerQueryInfo;
 import de.halfminer.hmbot.cmd.CommandDispatcher;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 class HalfminerBotListeners extends TS3EventAdapter {
+
+    private final static Logger logger = LoggerFactory.getLogger(HalfminerBotListeners.class);
 
     private final HalfminerBot bot = HalfminerBot.getInstance();
     private final CommandDispatcher cmd = new CommandDispatcher();
@@ -39,9 +43,15 @@ class HalfminerBotListeners extends TS3EventAdapter {
 
     @Override
     public void onClientMoved(ClientMovedEvent e) {
-        // If the user joins the bots channel (not when he leaves)
-        if (this.channelOfBot == e.getTargetChannelId()) clientEnterMessageAndMove(e.getClientId());
-        //TODO move back if bot is moved
+        // If client joins the bots channel (not when he leaves), also move bot back to his channel if moved out
+        if (this.channelOfBot == e.getTargetChannelId()) {
+            clientEnterMessageAndMove(e.getClientId());
+        } else if (e.getClientId() == idOfBot && e.getTargetChannelId() != this.channelOfBot) {
+            boolean moveBackSuccessful = bot.getApi().moveClient(idOfBot, channelOfBot);
+            if (!moveBackSuccessful) {
+                logger.warn("Couldn't move bot back to his channel");
+            }
+        }
     }
 
     private void clientEnterMessageAndMove(int clientId) {

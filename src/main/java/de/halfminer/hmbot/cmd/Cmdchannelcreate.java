@@ -2,9 +2,6 @@ package de.halfminer.hmbot.cmd;
 
 import com.github.theholywaffle.teamspeak3.api.ChannelProperty;
 import com.github.theholywaffle.teamspeak3.api.wrapper.ChannelInfo;
-import de.halfminer.hmbot.cmd.abs.Command;
-import de.halfminer.hmbot.exception.CommandNotCompletedException;
-import de.halfminer.hmbot.exception.InvalidCommandLineException;
 import de.halfminer.hmbot.util.StringArgumentSeparator;
 
 import java.text.SimpleDateFormat;
@@ -27,7 +24,7 @@ public class Cmdchannelcreate extends Command {
     }
 
     @Override
-    public void run() throws CommandNotCompletedException {
+    void run() throws CommandNotCompletedException {
 
         // move if channel already exists
         if (bot.getStorage().moveToChannel(invoker.getId())) {

@@ -16,9 +16,9 @@ public class BotStorage extends HalfminerBotClass {
     }
 
     /**
-     * Move user to his channel if he has one already (on join or when joining the bots channel)
+     * Move user to his channel if he has one already (on join or when joining the bots channel).
      *
-     * @param clientID - ID of the client
+     * @param clientID ID of the client
      */
     public boolean moveToChannel(int clientID) {
 

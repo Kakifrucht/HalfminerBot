@@ -3,9 +3,6 @@ package de.halfminer.hmbot.cmd;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import de.halfminer.hmbot.HalfminerBotClass;
-import de.halfminer.hmbot.cmd.abs.Command;
-import de.halfminer.hmbot.exception.CommandNotCompletedException;
-import de.halfminer.hmbot.exception.InvalidCommandLineException;
 import de.halfminer.hmbot.util.StringArgumentSeparator;
 
 import java.lang.reflect.InvocationTargetException;
@@ -38,19 +35,26 @@ public class CommandDispatcher extends HalfminerBotClass {
 
             cmdInstance.run();
             floodProtection.put(clientId, true);
+
         } catch (InvocationTargetException e) {
+
             if (e.getCause() instanceof InvalidCommandLineException) {
                 InvalidCommandLineException ex = (InvalidCommandLineException) e.getCause();
                 api.sendPrivateMessage(clientId, ex.getError() + " | Verwendung: " + ex.getCorrectUsage());
             } else {
                 logger.error("Exception during newInstance() of command", e);
             }
+
         } catch (CommandNotCompletedException e) {
+
             if (e.tellUser()) {
                 api.sendPrivateMessage(clientId, e.toTellUser());
             }
+
             logger.warn(e.getError());
+
         } catch (Exception e) {
+
             api.sendPrivateMessage(clientId, "Unbekanntes Kommando. Verwende !help für eine Befehlsübersicht.");
         }
     }

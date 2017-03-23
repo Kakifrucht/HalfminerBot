@@ -1,20 +1,28 @@
-package de.halfminer.hmbot.tasks;
-
-import de.halfminer.hmbot.HalfminerBotClass;
+package de.halfminer.hmbot.task;
 
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Sends the current user count to REST API.
  */
-public class StatusPUT extends HalfminerBotClass implements Runnable {
+class StatusTask extends Task {
 
     private boolean lastConnectSuccess = true;
 
+    StatusTask() {
+        super(0, 2, TimeUnit.MINUTES);
+    }
+
     @Override
-    public void run() {
+    boolean checkIfEnabled() {
+        return true;
+    }
+
+    @Override
+    public void execute() {
 
         try {
             URL api = new URL("https://api.halfminer.de/storage/status");
@@ -31,7 +39,7 @@ public class StatusPUT extends HalfminerBotClass implements Runnable {
             int responseCode = connection.getResponseCode();
             if (responseCode >= 300 || responseCode < 200) {
                 if (lastConnectSuccess) {
-                    logger.error("Received response code {} on HTTP PUT of user count", responseCode);
+                    logger.warn("Received response code {} on HTTP PUT of user count", responseCode);
                     lastConnectSuccess = false;
                 }
             } else lastConnectSuccess = true;
