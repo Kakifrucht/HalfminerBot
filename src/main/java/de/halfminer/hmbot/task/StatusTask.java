@@ -3,7 +3,6 @@ package de.halfminer.hmbot.task;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Sends the current user count to REST API.
@@ -11,10 +10,6 @@ import java.util.concurrent.TimeUnit;
 class StatusTask extends Task {
 
     private boolean lastConnectSuccess = true;
-
-    StatusTask() {
-        super(0, 2, TimeUnit.MINUTES);
-    }
 
     @Override
     boolean checkIfEnabled() {
@@ -38,6 +33,7 @@ class StatusTask extends Task {
 
             int responseCode = connection.getResponseCode();
             if (responseCode >= 300 || responseCode < 200) {
+                // only log warning once in a row
                 if (lastConnectSuccess) {
                     logger.warn("Received response code {} on HTTP PUT of user count", responseCode);
                     lastConnectSuccess = false;

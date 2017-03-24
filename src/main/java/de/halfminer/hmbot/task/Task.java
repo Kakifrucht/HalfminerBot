@@ -1,6 +1,7 @@
 package de.halfminer.hmbot.task;
 
 import de.halfminer.hmbot.HalfminerBotClass;
+import de.halfminer.hmbot.util.StringArgumentSeparator;
 
 import java.util.concurrent.TimeUnit;
 
@@ -9,17 +10,44 @@ import java.util.concurrent.TimeUnit;
  */
 abstract class Task extends HalfminerBotClass implements Runnable {
 
-    private final int initialDelay;
-    private final int period;
-    private final TimeUnit unit;
+    private int initialDelay;
+    private int period;
+    private TimeUnit unit;
 
     private boolean isEnabled = true;
 
-    Task(int initialDelay, int period, TimeUnit unit) {
-        this.initialDelay = initialDelay;
-        this.period = period;
-        this.unit = unit;
+    Task() {
+        configWasReloaded();
         isEnabled = checkIfEnabled();
+    }
+
+    void configWasReloaded() {
+        String className = this.getClass().getSimpleName();
+        String configNode = "task.settings." + className.substring(0, className.length() - 4);
+        String toParse = config.getString(configNode);
+        StringArgumentSeparator separator = new StringArgumentSeparator(toParse, ',');
+        if (separator.meetsLength(3)) {
+            initialDelay = separator.getArgumentInt(0);
+            period = separator.getArgumentInt(1);
+            String timeUnitString = separator.getArgument(2).toUpperCase().trim();
+            if (timeUnitString.equals("DISABLED")) {
+                unit = null;
+            } else {
+                try {
+                    unit = TimeUnit.valueOf(timeUnitString.toUpperCase());
+                } catch (IllegalArgumentException e) {
+                    unit = null;
+                }
+            }
+        } else {
+            initialDelay = Integer.MIN_VALUE;
+            period = Integer.MIN_VALUE;
+            unit = null;
+        }
+    }
+
+    boolean shouldRegisterTask() {
+        return initialDelay >= 0 && period > 0 && unit != null;
     }
 
     /**
@@ -31,12 +59,24 @@ abstract class Task extends HalfminerBotClass implements Runnable {
         return true;
     }
 
+    void setTaskDisabled() {
+        isEnabled = false;
+    }
+
     @Override
     public void run() {
-        if (isEnabled) execute();
+        if (isEnabled) executeWithCatchAll();
         else {
             isEnabled = checkIfEnabled();
-            run();
+            if (isEnabled) executeWithCatchAll();
+        }
+    }
+
+    private void executeWithCatchAll() {
+        try {
+            execute();
+        } catch (Throwable e) {
+            logger.error("Unhandled exception caught upon task execution", e);
         }
     }
 

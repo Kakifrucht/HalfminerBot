@@ -18,3 +18,17 @@ command:
     channelDeleteDelay: 180
     #Channel group to add the player to
     channelGroupAdminID: 2
+task:
+  settings:
+    #First number is initial delay, second delay between execution and third the time unit (seconds, minutes, hours etc.)
+    #or disabled, to not run task
+    Inactivity: 10, 10, seconds
+    ReloadConfig: 20, 20, seconds
+    Status: 0, 2, minutes
+  inactivity:
+    #String the designated AFK channel must contain, channels necessary talk power must also be higher than 0
+    channelNameContains: 'AFK'
+    #How many clients to kick from AFK lounge when server is full
+    clientsToKickIfFull: 2
+    #Time in seconds until users will be marked inactive (only if speakers are muted), marking as AFK overrides this
+    idleTimeUntilMove: 300

@@ -5,44 +5,47 @@ import com.github.theholywaffle.teamspeak3.api.wrapper.Client;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Will be run at fixed interval and move AFK users to AFK channel.
  */
 class InactivityTask extends Task {
 
-    private final static int IDLE_TIME_UNTIL_MOVE_IN_SECONDS = 300;
-
-    private int maxClients;
+    private final int maxClients;
     private Channel afkChannel;
 
     InactivityTask() {
-        super(10, 10, TimeUnit.SECONDS);
+        maxClients = api.getServerInfo().getMaxClients();
     }
 
     @Override
     boolean checkIfEnabled() {
-        maxClients = api.getServerInfo().getMaxClients();
         // suppose that first channel containing the word afk is the designated one
-        for (Channel channel : api.getChannelsByName("AFK")) {
+        for (Channel channel : api.getChannelsByName(config.getString("task.inactivity.channelNameContains"))) {
             if (channel.getNeededTalkPower() > 0) {
                 afkChannel = channel;
                 return true;
             }
         }
+
         return false;
     }
 
     @Override
     public void execute() {
 
+        if (api.getChannelInfo(afkChannel.getId()) == null) {
+            setTaskDisabled();
+            return;
+        }
+
         List<Client> clients = api.getClients();
 
         for (Client client : clients) {
+            int idleTimeUntilMove = config.getInt("task.inactivity.idleTimeUntilMove");
             if (client.getChannelId() != afkChannel.getId()
                     && (client.isAway()
-                    || (client.isOutputMuted() && ((client.getIdleTime() / 1000) > IDLE_TIME_UNTIL_MOVE_IN_SECONDS)))) {
+                    || (client.isOutputMuted() && ((client.getIdleTime() / 1000) > idleTimeUntilMove)))) {
                 api.moveClient(client, afkChannel);
                 api.sendPrivateMessage(client.getId(), "Du wurdest in die AFK Lounge verschoben, da du abwesend warst.");
                 logger.info("{} is away and has been moved into AFK channel", client.getNickname());
@@ -52,12 +55,12 @@ class InactivityTask extends Task {
         int currentlyOnline = api.getServerInfo().getClientsOnline();
         if (currentlyOnline >= maxClients) {
             List<Client> afkClients = new ArrayList<>();
+            int clientsToKick = config.getInt("task.inactivity.clientsToKickIfFull");
             int count = 0;
             for (Client client : clients) {
                 if (client.getChannelId() == afkChannel.getId()) {
+                    if (count++ == clientsToKick) break;
                     afkClients.add(client);
-
-                    if (++count == 2) break;
                 }
             }
             for (Client afk : afkClients) {
