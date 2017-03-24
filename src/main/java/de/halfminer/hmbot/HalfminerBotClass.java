@@ -1,7 +1,6 @@
 package de.halfminer.hmbot;
 
 import com.github.theholywaffle.teamspeak3.TS3Api;
-import com.github.theholywaffle.teamspeak3.TS3ApiAsync;
 import de.halfminer.hmbot.storage.YamlConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,7 +13,6 @@ public class HalfminerBotClass {
     protected final static HalfminerBot bot = HalfminerBot.getInstance();
     protected final static YamlConfig config = bot.getBotConfig();
     protected final static TS3Api api = bot.getApi();
-    protected final static TS3ApiAsync apiAsync = bot.getApiAsync();
 
     protected final Logger logger = LoggerFactory.getLogger(this.getClass());
 }

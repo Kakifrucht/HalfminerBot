@@ -25,15 +25,15 @@ class StatusTask extends Task {
     public void execute() {
 
         try {
-            URL api = new URL("https://api.halfminer.de/storage/status");
+            URL apiURL = new URL("https://api.halfminer.de/storage/status");
 
-            HttpURLConnection connection = (HttpURLConnection) api.openConnection();
+            HttpURLConnection connection = (HttpURLConnection) apiURL.openConnection();
             connection.setDoOutput(true);
             connection.setRequestMethod("PUT");
             connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
 
             OutputStreamWriter out = new OutputStreamWriter(connection.getOutputStream());
-            out.write("expiry=240&teamspeak=" + apiAsync.getServerInfo().get().getClientsOnline());
+            out.write("expiry=240&teamspeak=" + api.getServerInfo().getClientsOnline());
             out.close();
 
             int responseCode = connection.getResponseCode();

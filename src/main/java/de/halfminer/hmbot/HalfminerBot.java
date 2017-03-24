@@ -1,7 +1,6 @@
 package de.halfminer.hmbot;
 
 import com.github.theholywaffle.teamspeak3.TS3Api;
-import com.github.theholywaffle.teamspeak3.TS3ApiAsync;
 import com.github.theholywaffle.teamspeak3.TS3Config;
 import com.github.theholywaffle.teamspeak3.TS3Query;
 import com.github.theholywaffle.teamspeak3.TS3Query.FloodRate;
@@ -60,7 +59,6 @@ public class HalfminerBot {
     private final Scheduler scheduler;
     private final TS3Query query;
     private TS3Api api;
-    private TS3ApiAsync apiAsync;
     private BotStorage storage;
 
     private HalfminerBot(YamlConfig botConfig) {
@@ -90,7 +88,6 @@ public class HalfminerBot {
         }
 
         this.api = query.getApi();
-        this.apiAsync = query.getAsyncApi();
 
         // START Check login, port and Nickname
         if (api.login("serveradmin", botConfig.getString("password", ""))) {
@@ -139,10 +136,6 @@ public class HalfminerBot {
 
     public TS3Api getApi() {
         return api;
-    }
-
-    TS3ApiAsync getApiAsync() {
-        return apiAsync;
     }
 
     public BotStorage getStorage() {

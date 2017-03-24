@@ -37,13 +37,7 @@ class InactivityTask extends Task {
     @Override
     public void execute() {
 
-        List<Client> clients;
-        try {
-            clients = apiAsync.getClients().get();
-        } catch (InterruptedException e) {
-            logger.error("Could not get client list", e);
-            return;
-        }
+        List<Client> clients = api.getClients();
 
         for (Client client : clients) {
             if (client.getChannelId() != afkChannel.getId()
@@ -55,13 +49,7 @@ class InactivityTask extends Task {
             }
         }
 
-        int currentlyOnline;
-        try {
-            currentlyOnline = apiAsync.getServerInfo().get().getClientsOnline();
-        } catch (InterruptedException e) {
-            return;
-        }
-
+        int currentlyOnline = api.getServerInfo().getClientsOnline();
         if (currentlyOnline >= maxClients) {
             List<Client> afkClients = new ArrayList<>();
             int count = 0;
