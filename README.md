@@ -27,3 +27,5 @@ Current features
     - Move them into AFK channel
     - If server is full, kick AFK users to make room
   - *Send current status to API via HTTP PUT*
+  - *Automatically reloads the configuration file periodically*
+    - Won't reload if file was not modified or if it is in invalid format

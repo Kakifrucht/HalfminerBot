@@ -5,7 +5,7 @@ import de.halfminer.hmbot.HalfminerBotClass;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Tasks scheduled by {@link java.util.concurrent.ExecutorService ExecutorService} in {@link TaskManager}.
+ * Tasks scheduled by {@link java.util.concurrent.ExecutorService ExecutorService} in {@link Scheduler}.
  */
 abstract class Task extends HalfminerBotClass implements Runnable {
 
@@ -23,11 +23,13 @@ abstract class Task extends HalfminerBotClass implements Runnable {
     }
 
     /**
-     * Check if task should be run.
+     * Check if task should be run. True by default.
      *
      * @return true if it should, else false
      */
-    abstract boolean checkIfEnabled();
+    boolean checkIfEnabled() {
+        return true;
+    }
 
     @Override
     public void run() {

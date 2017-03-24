@@ -19,6 +19,7 @@ public class YamlConfig {
     private final File configFile = new File("hmbot/config.yml");
     private final Yaml yaml = new Yaml();
     private Map<String, Object> yamlParsed;
+    private long lastModified;
 
     public YamlConfig() throws ConfigurationException {
         this("");
@@ -28,6 +29,7 @@ public class YamlConfig {
 
         if (configFile.exists()) {
             loadYaml(password);
+            logger.info("Configuration loaded successfully");
         } else {
 
             try (InputStream inputStream = this.getClass().getClassLoader().getResourceAsStream("config.yml");
@@ -52,6 +54,8 @@ public class YamlConfig {
 
     private void loadYaml(String password) throws ConfigurationException {
 
+        lastModified = configFile.lastModified();
+
         Object loaded;
         try (FileInputStream stream = new FileInputStream(configFile)) {
             loaded = yaml.load(stream);
@@ -72,10 +76,33 @@ public class YamlConfig {
             } else if (getString("password", "").length() == 0) {
                 throw new ConfigurationException("No password was set");
             }
-            logger.info("Configuration loaded successfully");
 
         } else {
             throw new ConfigurationException("Config file is in invalid format");
+        }
+    }
+
+    /**
+     * Reloads the configuration file. Will only run if file was modified since last
+     * reload and won't reload if configuration is broken.
+     *
+     * @return true if reload was successful, false if not modified or {@link ConfigurationException} was thrown
+     */
+    public boolean reloadConfig() {
+
+        if (configFile.lastModified() == lastModified) {
+            lastModified = configFile.lastModified();
+            return false;
+        }
+
+        Map<String, Object> oldParsed = yamlParsed;
+        try {
+            loadYaml(getString("password", ""));
+            return true;
+        } catch (ConfigurationException e) {
+            logger.warn(e.getMessage(), e);
+            yamlParsed = oldParsed;
+            return false;
         }
     }
 

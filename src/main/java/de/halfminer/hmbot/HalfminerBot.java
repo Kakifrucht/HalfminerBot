@@ -10,7 +10,7 @@ import com.github.theholywaffle.teamspeak3.api.wrapper.Channel;
 import de.halfminer.hmbot.storage.BotStorage;
 import de.halfminer.hmbot.storage.ConfigurationException;
 import de.halfminer.hmbot.storage.YamlConfig;
-import de.halfminer.hmbot.task.TaskManager;
+import de.halfminer.hmbot.task.Scheduler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -52,11 +52,12 @@ public class HalfminerBot {
 
     private static HalfminerBot instance;
 
-    public static HalfminerBot getInstance() {
+    static HalfminerBot getInstance() {
         return instance;
     }
 
     private final YamlConfig botConfig;
+    private final Scheduler scheduler;
     private final TS3Query query;
     private TS3Api api;
     private TS3ApiAsync apiAsync;
@@ -66,6 +67,7 @@ public class HalfminerBot {
 
         instance = this;
         this.botConfig = botConfig;
+        this.scheduler = new Scheduler();
 
         // START Configure API
         String host = botConfig.getString("host", "localhost");
@@ -110,11 +112,10 @@ public class HalfminerBot {
 
             api.registerAllEvents();
             api.addTS3Listeners(new HalfminerBotListeners());
-
-            // load tasks
-            new TaskManager();
+            scheduler.registerAllTasks();
 
             logger.info("HalfminerBot connected successfully and ready");
+
         } else {
             stop("The provided password is not valid, quitting...");
         }
@@ -148,7 +149,7 @@ public class HalfminerBot {
         return storage;
     }
 
-    public YamlConfig getBotConfig() {
+    YamlConfig getBotConfig() {
         return botConfig;
     }
 }
