@@ -1,7 +1,7 @@
 package de.halfminer.hmbot;
 
 import com.github.theholywaffle.teamspeak3.TS3Api;
-import de.halfminer.hmbot.storage.YamlConfig;
+import de.halfminer.hmbot.config.YamlConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

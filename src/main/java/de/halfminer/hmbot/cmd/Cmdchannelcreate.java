@@ -49,7 +49,7 @@ public class Cmdchannelcreate extends Command {
             bot.getStorage().getMapChannelOwner().put(invoker.getDatabaseId(), channelCreateID);
             api.moveClient(invoker.getId(), channelCreateID);
             api.setClientChannelGroup(
-                    config.getInt("command.channelcreate.channelGroupAdminID", 2),
+                    config.getInt("command.channelcreate.channelGroupAdminID"),
                     channelCreateID,
                     invoker.getDatabaseId()
             );

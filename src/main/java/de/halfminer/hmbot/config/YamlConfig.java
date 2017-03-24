@@ -1,4 +1,4 @@
-package de.halfminer.hmbot.storage;
+package de.halfminer.hmbot.config;
 
 import de.halfminer.hmbot.util.StringArgumentSeparator;
 import org.slf4j.Logger;
@@ -18,6 +18,8 @@ public class YamlConfig {
 
     private final File configFile = new File("hmbot/config.yml");
     private final Yaml yaml = new Yaml();
+
+    private Map<String, Object> defaultYaml;
     private Map<String, Object> yamlParsed;
     private long lastModified;
 
@@ -28,6 +30,14 @@ public class YamlConfig {
     public YamlConfig(String password) throws ConfigurationException {
 
         if (configFile.exists()) {
+            try {
+                //noinspection unchecked
+                defaultYaml = (Map) yaml.load(this.getClass().getClassLoader().getResourceAsStream("config.yml"));
+            } catch (ClassCastException e) {
+                // easiest way to check if format is valid
+                throw new ConfigurationException("Default config is not in valid format", e);
+            }
+
             loadYaml(password);
             logger.info("Configuration loaded successfully");
         } else {
@@ -35,6 +45,7 @@ public class YamlConfig {
             try (InputStream inputStream = this.getClass().getClassLoader().getResourceAsStream("config.yml");
                  OutputStream outputStream = new FileOutputStream(configFile)) {
 
+                // manually copy file
                 byte[] buffer = new byte[1024];
                 int read;
                 while ((read = inputStream.read(buffer)) > 0) {
@@ -73,7 +84,7 @@ public class YamlConfig {
 
             if (password.length() > 0) {
                 yamlParsed.put("password", password);
-            } else if (getString("password", "").length() == 0) {
+            } else if (getString("password").length() == 0) {
                 throw new ConfigurationException("No password was set");
             }
 
@@ -97,7 +108,7 @@ public class YamlConfig {
 
         Map<String, Object> oldParsed = yamlParsed;
         try {
-            loadYaml(getString("password", ""));
+            loadYaml(getString("password"));
             return true;
         } catch (ConfigurationException e) {
             logger.warn(e.getMessage(), e);
@@ -106,23 +117,30 @@ public class YamlConfig {
         }
     }
 
-    public int getInt(String path, int returnIfNull) {
-        Object toGet = get(path);
-        if (toGet instanceof Integer) return (int) toGet;
-        else return returnIfNull;
+    public int getInt(String path) {
+        return (int) get(path, Integer.class);
     }
 
-    public String getString(String path, String returnIfNull) {
-        Object toGet = get(path);
-        if (toGet != null) return toGet.toString();
-        else return returnIfNull;
+    public String getString(String path) {
+        return (String) get(path, String.class);
     }
 
-    private Object get(String path) {
+    private Object get(String path, Class<?> instanceOf) {
+
+        Object toGet = get(path, yamlParsed);
+        if (toGet != null && instanceOf.isAssignableFrom(toGet.getClass())) {
+            return toGet;
+        } else {
+            // no need to check on defaultYaml, as it is part of the classpath
+            return get(path, defaultYaml);
+        }
+    }
+
+    private Object get(String path, Map<String, Object> getFrom) {
 
         StringArgumentSeparator separator = new StringArgumentSeparator(path, '.');
 
-        Map<?, ?> currentSection = yamlParsed;
+        Map<?, ?> currentSection = getFrom;
         int currentIndex = 0;
         while (separator.meetsLength(currentIndex + 2)) {
             Object checkIfSubsection = currentSection.get(separator.getArgument(currentIndex));

@@ -1,11 +1,11 @@
-package de.halfminer.hmbot.storage;
+package de.halfminer.hmbot.config;
 
 public class ConfigurationException extends Exception {
 
     private boolean printStacktrace = false;
 
     public ConfigurationException() {
-        printStacktrace = true;
+        printStacktrace = false;
     }
 
     public ConfigurationException(String error) {

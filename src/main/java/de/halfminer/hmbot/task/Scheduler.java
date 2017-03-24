@@ -22,10 +22,6 @@ public class Scheduler {
                 .build();
 
         service = Executors.newScheduledThreadPool(2, threadFactory);
-
-        for (Task task : Arrays.asList(new InactivityTask(), new StatusTask())) {
-            service.scheduleAtFixedRate(task, task.getInitialDelay(), task.getPeriod(), task.getUnit());
-        }
     }
 
     public void registerAllTasks() {

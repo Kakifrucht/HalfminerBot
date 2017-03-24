@@ -7,8 +7,8 @@ import com.github.theholywaffle.teamspeak3.TS3Query.FloodRate;
 import com.github.theholywaffle.teamspeak3.api.exception.TS3ConnectionFailedException;
 import com.github.theholywaffle.teamspeak3.api.wrapper.Channel;
 import de.halfminer.hmbot.storage.BotStorage;
-import de.halfminer.hmbot.storage.ConfigurationException;
-import de.halfminer.hmbot.storage.YamlConfig;
+import de.halfminer.hmbot.config.ConfigurationException;
+import de.halfminer.hmbot.config.YamlConfig;
 import de.halfminer.hmbot.task.Scheduler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,11 +32,13 @@ public class HalfminerBot {
         try {
             config = args.length > 0 ? new YamlConfig(args[0]) : new YamlConfig();
         } catch (ConfigurationException e) {
-            String message = ", quitting..." + e.getMessage();
+            String message = e.getMessage() + ", quitting...";
             if (e.shouldPrintStacktrace()) {
                 logger.error(message, e);
             } else {
-                logger.error(message);
+                if (e.getMessage() != null) {
+                    logger.error(message);
+                }
             }
 
             try {
@@ -68,9 +70,10 @@ public class HalfminerBot {
         this.scheduler = new Scheduler();
 
         // START Configure API
-        String host = botConfig.getString("host", "localhost");
+        String host = botConfig.getString("host");
         TS3Config apiConfig = new TS3Config();
         apiConfig.setHost(host);
+        apiConfig.setQueryPort(botConfig.getInt("ports.queryPort"));
         if (host.equals("localhost")) {
             apiConfig.setFloodRate(FloodRate.UNLIMITED);
             logger.info("Floodrate set to unlimited");
@@ -90,17 +93,17 @@ public class HalfminerBot {
         this.api = query.getApi();
 
         // START Check login, port and Nickname
-        if (api.login("serveradmin", botConfig.getString("password", ""))) {
+        if (api.login("serveradmin", botConfig.getString("password"))) {
 
-            if (!api.selectVirtualServerByPort(botConfig.getInt("port", 9987))
-                    || !api.setNickname(botConfig.getString("botName", "Halfminer TSBot"))) {
+            if (!api.selectVirtualServerByPort(botConfig.getInt("ports.serverPort"))
+                    || !api.setNickname(botConfig.getString("botName"))) {
                 stop("The provided port or botname are not valid, quitting...");
             }
 
             this.storage = new BotStorage();
 
             // START Move bot into channel and start listeners
-            List<Channel> channels = api.getChannelsByName(botConfig.getString("botChannelName", "Welcome"));
+            List<Channel> channels = api.getChannelsByName(botConfig.getString("botChannelName"));
             if (channels == null
                     || channels.isEmpty()
                     || !api.moveClient(api.whoAmI().getId(), channels.get(0).getId())) {
