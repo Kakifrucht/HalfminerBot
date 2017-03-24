@@ -1,48 +1,48 @@
 package de.halfminer.hmbot.storage;
 
-import com.github.theholywaffle.teamspeak3.api.wrapper.Channel;
-import com.github.theholywaffle.teamspeak3.api.wrapper.ClientInfo;
+import com.github.theholywaffle.teamspeak3.api.wrapper.Client;
 import de.halfminer.hmbot.HalfminerBotClass;
 
-import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 
 public class BotStorage extends HalfminerBotClass {
 
-    private final Map<Integer, Integer> channelOwner = new HashMap<>();
+    private final Map<Integer, HalfClient> clientsOnline = new ConcurrentHashMap<>();
 
-    public Map<Integer, Integer> getMapChannelOwner() {
-        return channelOwner;
+    public BotStorage() {
+        // add already online clients
+        for (Client client : api.getClients()) {
+            if (client.isRegularClient()) {
+                clientJoined(client.getDatabaseId(), client.getId());
+            }
+        }
+
+        // check for dead client objects every 10 minutes
+        scheduler.scheduleRunnable(new Runnable() {
+            @Override
+            public void run() {
+                Iterator<HalfClient> it = clientsOnline.values().iterator();
+                while (it.hasNext()) {
+                    if (it.next().canBeEvicted()) {
+                        it.remove();
+                    }
+                }
+            }
+        }, 0, 10, TimeUnit.MINUTES);
     }
 
-    /**
-     * Move user to his channel if he has one already (on join or when joining the bots channel).
-     *
-     * @param clientID ID of the client
-     */
-    public boolean moveToChannel(int clientID) {
-
-        ClientInfo user = api.getClientInfo(clientID);
-
-        Channel channelOfUser = null;
-        if (this.channelOwner.containsKey(user.getDatabaseId())) {
-
-            int channelID = channelOwner.get(user.getDatabaseId());
-            for (Channel channel : api.getChannels()) {
-                if (channel.getId() == channelID) channelOfUser = channel;
-            }
-
+    public void clientJoined(int clientDatabaseId, int clientId) {
+        if (clientsOnline.containsKey(clientDatabaseId)) {
+            clientsOnline.get(clientDatabaseId).updateClientId(clientId);
+        } else {
+            clientsOnline.put(clientDatabaseId, new HalfClient(clientId));
         }
+    }
 
-        if (channelOfUser == null) channelOwner.remove(user.getDatabaseId());
-        else {
-            if (user.getChannelId() != channelOfUser.getId()) { //check if user is already in his channel, if not move
-                api.moveClient(clientID, channelOfUser.getId());
-            }
-            api.sendPrivateMessage(clientID, "Du hast bereits einen privaten Channel.");
-            return true;
-        }
-
-        return false;
+    public HalfClient getClient(int clientId) {
+        return clientsOnline.get(api.getClientInfo(clientId).getDatabaseId());
     }
 }

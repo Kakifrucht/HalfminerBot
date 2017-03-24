@@ -1,13 +1,12 @@
 #HalfminerBot default config
 #Server to connect to
 host: 'yourhost.com'
-#Default port is 9987
 ports:
   #The servers voice port (the one you use when connecting to it via the client)
   serverPort: 9987
   #Server query port, default is 10011
   queryPort: 10011
-#Can also be provided via command line, as "java -jar HalfminerBot.jar password"
+#Password of query user serveradmin, can also be provided via command line, as "java -jar HalfminerBot.jar password"
 password: ''
 #Bot name on the server (query clients are not visible in tree view)
 botName: 'Halfminer TSBot'

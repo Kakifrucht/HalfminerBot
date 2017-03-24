@@ -2,6 +2,7 @@ package de.halfminer.hmbot.cmd;
 
 import com.github.theholywaffle.teamspeak3.api.ChannelProperty;
 import com.github.theholywaffle.teamspeak3.api.wrapper.ChannelInfo;
+import de.halfminer.hmbot.storage.HalfClient;
 import de.halfminer.hmbot.util.StringArgumentSeparator;
 
 import java.text.SimpleDateFormat;
@@ -26,9 +27,10 @@ public class Cmdchannelcreate extends Command {
     @Override
     void run() throws CommandNotCompletedException {
 
-        // move if channel already exists
-        if (bot.getStorage().moveToChannel(invoker.getId())) {
-            throw new CommandNotCompletedException(this, "User already owns a channel.");
+        // move if user has channel already
+        HalfClient halfClient = bot.getStorage().getClient(clientId);
+        if (halfClient.moveToChannel()) {
+            return;
         }
 
         String channelCreateName = invoker.getNickname() + "'s Channel";
@@ -46,7 +48,7 @@ public class Cmdchannelcreate extends Command {
 
         if (channelCreateID > 0) {
 
-            bot.getStorage().getMapChannelOwner().put(invoker.getDatabaseId(), channelCreateID);
+            halfClient.setChannelId(channelCreateID);
             api.moveClient(invoker.getId(), channelCreateID);
             api.setClientChannelGroup(
                     config.getInt("command.channelcreate.channelGroupAdminID"),
@@ -59,15 +61,16 @@ public class Cmdchannelcreate extends Command {
             channelCreateProperty.clear();
             channelCreateProperty.put(ChannelProperty.CHANNEL_FLAG_SEMI_PERMANENT, "0");
             channelCreateProperty.put(ChannelProperty.CHANNEL_FLAG_TEMPORARY, "1");
-            channelCreateProperty.put(ChannelProperty.CHANNEL_DELETE_DELAY, "180");
+            channelCreateProperty.put(ChannelProperty.CHANNEL_DELETE_DELAY,
+                    config.getString("command.channelcreate.channelDeleteDelay"));
             api.editChannel(channelCreateID, channelCreateProperty);
 
             api.sendPrivateMessage(clientId,
                     "Dein Channel wurde erfolgreich erstellt, das Passwort lautet \"" + password + "\".");
             logger.info("Channel created: {}", channelCreateName);
         } else {
-            throw new CommandNotCompletedException(this, "An unknown error has occurred",
-                    "Ein unbekannter Fehler ist aufgetreten. Bitte versuche es erneut, oder wende dich an ein Teammitglied.");
+            throw new CommandNotCompletedException(this, "Channel already exists",
+                    "Der Channel konnte nicht erstellt werden, da es bereits einen Channel mit deinem Namen gibt.");
         }
     }
 }

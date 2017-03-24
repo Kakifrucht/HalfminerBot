@@ -137,15 +137,19 @@ public class HalfminerBot {
         System.exit(1);
     }
 
-    public TS3Api getApi() {
+    YamlConfig getBotConfig() {
+        return botConfig;
+    }
+
+    Scheduler getScheduler() {
+        return scheduler;
+    }
+
+    TS3Api getApi() {
         return api;
     }
 
     public BotStorage getStorage() {
         return storage;
-    }
-
-    YamlConfig getBotConfig() {
-        return botConfig;
     }
 }

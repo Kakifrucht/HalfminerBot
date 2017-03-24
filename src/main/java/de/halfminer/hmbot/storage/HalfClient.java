@@ -1,0 +1,61 @@
+package de.halfminer.hmbot.storage;
+
+import com.github.theholywaffle.teamspeak3.api.wrapper.Channel;
+import com.github.theholywaffle.teamspeak3.api.wrapper.ClientInfo;
+import de.halfminer.hmbot.HalfminerBotClass;
+
+/**
+ * Client class managed by {@link BotStorage}.
+ */
+public class HalfClient extends HalfminerBotClass {
+
+    private int clientId;
+
+    private int channelId = Integer.MIN_VALUE;
+
+    HalfClient(int clientId) {
+        this.clientId = clientId;
+    }
+
+    boolean canBeEvicted() {
+        return api.getClientInfo(clientId) == null && getChannel() == null;
+    }
+
+    void updateClientId(int clientId) {
+        this.clientId = clientId;
+    }
+
+    public void setChannelId(int channelId) {
+        this.channelId = channelId;
+    }
+
+    /**
+     * Move client to his channel if he created one via {@link de.halfminer.hmbot.cmd.Cmdchannelcreate},
+     * used on join, when joining the bots channel or when trying to create a channel if player already has one.
+     *
+     * @return true if user was moved to own channel, false if he doesn't have a channel
+     */
+    public boolean moveToChannel() {
+
+        Channel channelOfUser = getChannel();
+        if (channelOfUser != null) {
+            ClientInfo user = api.getClientInfo(clientId);
+            if (user.getChannelId() != channelOfUser.getId()) { //check if user is already in his channel, if not move
+                api.moveClient(clientId, channelOfUser.getId());
+            }
+            api.sendPrivateMessage(clientId, "Du hast bereits einen privaten Channel.");
+            return true;
+        }
+
+        return false;
+    }
+
+    private Channel getChannel() {
+        for (Channel channel : api.getChannels()) {
+            if (channel.getId() == channelId) {
+                return channel;
+            }
+        }
+        return null;
+    }
+}

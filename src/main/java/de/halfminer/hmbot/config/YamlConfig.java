@@ -122,7 +122,7 @@ public class YamlConfig {
     }
 
     public String getString(String path) {
-        return (String) get(path, String.class);
+        return get(path, Object.class).toString();
     }
 
     private Object get(String path, Class<?> instanceOf) {

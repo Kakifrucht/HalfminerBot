@@ -11,13 +11,13 @@ import java.util.concurrent.TimeUnit;
 public class CommandDispatcher extends HalfminerBotClass {
 
     private final Cache<Integer, Boolean> floodProtection = CacheBuilder.newBuilder()
-            .expireAfterAccess(2, TimeUnit.SECONDS)
+            .expireAfterWrite(2, TimeUnit.SECONDS)
             .build();
 
     public void dispatchCommand(String clientName, int clientId, String commandUnparsed) {
 
         if (floodProtection.getIfPresent(clientId) != null) {
-            api.sendPrivateMessage(clientId, "Bitte warte einen kurzen Moment und versuche es erneut.");
+            api.sendPrivateMessage(clientId, "Bitte warte einen kurzen Moment und versuche es danach erneut.");
             return;
         }
 

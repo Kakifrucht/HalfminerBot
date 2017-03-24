@@ -5,9 +5,9 @@ import com.github.theholywaffle.teamspeak3.api.event.ClientJoinEvent;
 import com.github.theholywaffle.teamspeak3.api.event.ClientMovedEvent;
 import com.github.theholywaffle.teamspeak3.api.event.TS3EventAdapter;
 import com.github.theholywaffle.teamspeak3.api.event.TextMessageEvent;
-import com.github.theholywaffle.teamspeak3.api.wrapper.ClientInfo;
 import com.github.theholywaffle.teamspeak3.api.wrapper.ServerQueryInfo;
 import de.halfminer.hmbot.cmd.CommandDispatcher;
+import de.halfminer.hmbot.storage.BotStorage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -16,6 +16,7 @@ class HalfminerBotListeners extends TS3EventAdapter {
     private final static Logger logger = LoggerFactory.getLogger(HalfminerBotListeners.class);
 
     private final HalfminerBot bot = HalfminerBot.getInstance();
+    private final BotStorage storage = bot.getStorage();
     private final CommandDispatcher cmd = new CommandDispatcher();
 
     private final int idOfBot;
@@ -37,8 +38,8 @@ class HalfminerBotListeners extends TS3EventAdapter {
 
     @Override
     public void onClientJoin(ClientJoinEvent e) {
-        ClientInfo client = bot.getApi().getClientInfo(e.getClientId());
-        if (client != null && client.isRegularClient()) clientEnterMessageAndMove(client.getId());
+        storage.clientJoined(e.getClientDatabaseId(), e.getClientId());
+        clientEnterMessageAndMove(e.getClientId());
     }
 
     @Override
@@ -55,7 +56,7 @@ class HalfminerBotListeners extends TS3EventAdapter {
     }
 
     private void clientEnterMessageAndMove(int clientId) {
-        if (!bot.getStorage().moveToChannel(clientId)) {
+        if (!storage.getClient(clientId).moveToChannel()) {
             bot.getApi().sendPrivateMessage(clientId,
                     "Antworte mit deinem gewünschten Passwort, um einen eigenen Channel mit Passwort zu erhalten.");
         }

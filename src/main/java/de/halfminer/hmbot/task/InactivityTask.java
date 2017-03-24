@@ -23,9 +23,9 @@ class InactivityTask extends Task {
 
     @Override
     boolean checkIfEnabled() {
-        maxClients = bot.getApi().getServerInfo().getMaxClients();
+        maxClients = api.getServerInfo().getMaxClients();
         // suppose that first channel containing the word afk is the designated one
-        for (Channel channel : bot.getApi().getChannelsByName("AFK")) {
+        for (Channel channel : api.getChannelsByName("AFK")) {
             if (channel.getNeededTalkPower() > 0) {
                 afkChannel = channel;
                 return true;
