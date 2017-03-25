@@ -26,7 +26,7 @@ public class HalfminerBot {
 
     public static void main(String[] args) {
 
-        logger.info("HalfminerBot is starting...");
+        logger.info("HalfminerBot v{} is starting", HalfminerBot.class.getPackage().getImplementationVersion());
 
         YamlConfig config;
         try {
@@ -69,7 +69,7 @@ public class HalfminerBot {
         this.botConfig = botConfig;
         this.scheduler = new Scheduler();
 
-        // START Configure API
+        // configure API
         String host = botConfig.getString("host");
         TS3Config apiConfig = new TS3Config();
         apiConfig.setHost(host);
@@ -81,7 +81,7 @@ public class HalfminerBot {
             apiConfig.setFloodRate(FloodRate.DEFAULT);
         }
 
-        // START Open Query
+        // connect to query
         query = new TS3Query(apiConfig);
         try {
             query.connect();
@@ -92,17 +92,20 @@ public class HalfminerBot {
 
         this.api = query.getApi();
 
-        // START Check login, port and Nickname
-        if (api.login("serveradmin", botConfig.getString("password"))) {
+        // login to server
+        if (api.login(botConfig.getString("credentials.username"), botConfig.getString("credentials.password"))) {
 
-            if (!api.selectVirtualServerByPort(botConfig.getInt("ports.serverPort"))
-                    || !api.setNickname(botConfig.getString("botName"))) {
-                stop("The provided port or botname are not valid, quitting...");
+            if (!api.selectVirtualServerByPort(botConfig.getInt("ports.serverPort"))) {
+                stop("The provided server port is not valid, quitting...");
+            }
+
+            if (!api.setNickname(botConfig.getString("botName"))) {
+                stop("The provided botname is already in use or invalid, quitting...");
             }
 
             this.storage = new BotStorage();
 
-            // START Move bot into channel and start listeners
+            // move bot into channel
             List<Channel> channels = api.getChannelsByName(botConfig.getString("botChannelName"));
             if (channels == null
                     || channels.isEmpty()
@@ -121,7 +124,7 @@ public class HalfminerBot {
         }
     }
 
-    private void stop(String message) {
+    public void stop(String message) {
 
         if (message.length() > 0) {
             logger.info(message);
@@ -129,12 +132,14 @@ public class HalfminerBot {
             logger.info("Bot quitting...");
         }
 
+        scheduler.shutdown();
         query.exit();
+
         try {
             Thread.sleep(2000L);
         } catch (InterruptedException ignored) {}
 
-        System.exit(1);
+        //TODO test without System.exit(1);
     }
 
     YamlConfig getBotConfig() {

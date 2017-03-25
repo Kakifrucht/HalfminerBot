@@ -59,7 +59,7 @@ class InactivityTask extends Task {
             int count = 0;
             for (Client client : clients) {
                 if (client.getChannelId() == afkChannel.getId()) {
-                    if (count++ == clientsToKick) break;
+                    if (count++ >= clientsToKick) break;
                     afkClients.add(client);
                 }
             }

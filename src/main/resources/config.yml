@@ -1,16 +1,19 @@
-#HalfminerBot default config
-#Server to connect to
+#HalfminerBot configuration
+#Server address to connect to, can also be an IP address
 host: 'yourhost.com'
 ports:
   #The servers voice port (the one you use when connecting to it via the client)
   serverPort: 9987
   #Server query port, default is 10011
   queryPort: 10011
-#Password of query user serveradmin, can also be provided via command line, as "java -jar HalfminerBot.jar password"
-password: ''
-#Bot name on the server (query clients are not visible in tree view)
+credentials:
+  #Query user to login as
+  username: 'serveradmin'
+  #Can also be provided via command line, as "java -jar HalfminerBot.jar password"
+  password: ''
+#Bot name on the server (query clients are not visible in tree view, will be name in chat)
 botName: 'Halfminer TSBot'
-#Channel to join
+#Channel the bot will be joining and using as base channel for commands
 botChannelName: 'Welcome'
 command:
   channelcreate:
@@ -20,11 +23,13 @@ command:
     channelGroupAdminID: 2
 task:
   settings:
-    #First number is initial delay, second delay between execution and third the time unit (seconds, minutes, hours etc.)
-    #or disabled, to not run task
+    #Provide three arguments per task seperated by comma
+    # First:    number  initial execution delay
+    # Seconds:  number  delay between subsequent execution
+    # Third:    unit    time unit for first and second argument, example: disabled, seconds, minutes, hours, ...
     Inactivity: 10, 10, seconds
     ReloadConfig: 20, 20, seconds
-    Status: 0, 2, minutes
+    Status: 0, 2, disabled
   inactivity:
     #String the designated AFK channel must contain, channels necessary talk power must also be higher than 0
     channelNameContains: 'AFK'
@@ -32,3 +37,18 @@ task:
     clientsToKickIfFull: 2
     #Time in seconds until users will be marked inactive (only if speakers are muted), marking as AFK overrides this
     idleTimeUntilMove: 300
+groups:
+  #key is group name (can be changed) and value is talk power.
+  #You can add as many groups as you like, but they cannot have the same talk power
+  admin: 100
+  moderator: 50
+  default: 0
+#Hand out permission nodes to groups. Higher groups inherit lower groups permissions
+permissions:
+  admin:
+  - cmd.stop
+  moderator:
+  - task.inactivity.exempt.move
+  - task.inactivity.exempt.kick
+  default:
+  - cmd.channelcreate

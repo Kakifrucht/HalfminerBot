@@ -24,18 +24,22 @@ public class Scheduler {
                 .setDaemon(true)
                 .build();
 
-        service = Executors.newScheduledThreadPool(2, threadFactory);
+        service = Executors.newScheduledThreadPool(4, threadFactory);
     }
 
     public void registerAllTasks() {
         allTasks = Arrays.asList(new InactivityTask(), new ReloadConfigTask(), new StatusTask());
         for (Task task : allTasks) {
-            updateTaskRegister(task);
+            registerTask(task);
         }
     }
 
     public void scheduleRunnable(Runnable toSchedule, int initialDelay, int period, TimeUnit unit) {
         service.scheduleAtFixedRate(toSchedule, initialDelay, period, unit);
+    }
+
+    public void shutdown() {
+        service.shutdownNow();
     }
 
     void configWasReloaded() {
@@ -46,14 +50,27 @@ public class Scheduler {
     }
 
     private void updateTaskRegister(Task task) {
-        //TODO reregister task only if line was actually changed
-        if (task.shouldRegisterTask() && !registeredTasks.containsKey(task)) {
-            ScheduledFuture future =
-                    service.scheduleAtFixedRate(task, task.getInitialDelay(), task.getPeriod(), task.getUnit());
-            registeredTasks.put(task, future);
-        } else if (!task.shouldRegisterTask() && registeredTasks.containsKey(task)) {
-            registeredTasks.get(task).cancel(false);
-            registeredTasks.remove(task);
+
+        if (registeredTasks.containsKey(task)) {
+
+            ScheduledFuture registeredTask = registeredTasks.get(task);
+            if (task.shouldRegisterTask()) {
+                // check if period was changed and re-register if required
+                if (task.shouldReregisterTask()) {
+                    registeredTask.cancel(false);
+                    registerTask(task);
+                }
+            } else {
+                registeredTask.cancel(false);
+            }
+
+        } else registerTask(task);
+    }
+
+    private void registerTask(Task task) {
+        if (task.shouldRegisterTask()) {
+            registeredTasks.put(task,
+                    service.scheduleAtFixedRate(task, task.getInitialDelay(), task.getPeriod(), task.getTimeUnit()));
         }
     }
 }

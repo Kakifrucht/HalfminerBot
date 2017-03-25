@@ -83,8 +83,8 @@ public class YamlConfig {
             }
 
             if (password.length() > 0) {
-                yamlParsed.put("password", password);
-            } else if (getString("password").length() == 0) {
+                yamlParsed.put("credentials.password", password);
+            } else if (getString("credentials.password").length() == 0) {
                 throw new ConfigurationException("No password was set");
             }
 
@@ -108,7 +108,7 @@ public class YamlConfig {
 
         Map<String, Object> oldParsed = yamlParsed;
         try {
-            loadYaml(getString("password"));
+            loadYaml(getString("credentials.password"));
             return true;
         } catch (ConfigurationException e) {
             logger.warn(e.getMessage(), e);
@@ -122,7 +122,7 @@ public class YamlConfig {
     }
 
     public String getString(String path) {
-        return get(path, Object.class).toString();
+        return String.valueOf(get(path, Object.class));
     }
 
     private Object get(String path, Class<?> instanceOf) {
