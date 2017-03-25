@@ -6,9 +6,10 @@ import com.github.theholywaffle.teamspeak3.api.event.ClientJoinEvent;
 import com.github.theholywaffle.teamspeak3.api.event.ClientMovedEvent;
 import com.github.theholywaffle.teamspeak3.api.event.TS3EventAdapter;
 import com.github.theholywaffle.teamspeak3.api.event.TextMessageEvent;
+import com.github.theholywaffle.teamspeak3.api.wrapper.ClientInfo;
 import com.github.theholywaffle.teamspeak3.api.wrapper.ServerQueryInfo;
 import de.halfminer.hmbot.cmd.CommandDispatcher;
-import de.halfminer.hmbot.storage.BotStorage;
+import de.halfminer.hmbot.storage.Storage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,7 +19,7 @@ class HalfminerBotListeners extends TS3EventAdapter {
 
     private final HalfminerBot bot = HalfminerBot.getInstance();
     private final TS3Api api = bot.getApi();
-    private final BotStorage storage = bot.getStorage();
+    private final Storage storage = bot.getStorage();
     private final CommandDispatcher cmd = new CommandDispatcher();
 
     private final int idOfBot;
@@ -42,8 +43,9 @@ class HalfminerBotListeners extends TS3EventAdapter {
 
     @Override
     public void onClientJoin(ClientJoinEvent e) {
-        if (isRegularClient(e.getClientId())) {
-            storage.clientJoined(e.getClientDatabaseId(), e.getClientId());
+        ClientInfo joined = api.getClientInfo(e.getClientId());
+        if (joined.isRegularClient()) {
+            storage.clientJoinedOrReloaded(joined);
             clientEnterMessageAndMove(e.getClientId());
         }
     }

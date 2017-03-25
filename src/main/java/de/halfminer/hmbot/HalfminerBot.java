@@ -6,7 +6,7 @@ import com.github.theholywaffle.teamspeak3.TS3Query;
 import com.github.theholywaffle.teamspeak3.TS3Query.FloodRate;
 import com.github.theholywaffle.teamspeak3.api.exception.TS3ConnectionFailedException;
 import com.github.theholywaffle.teamspeak3.api.wrapper.Channel;
-import de.halfminer.hmbot.storage.BotStorage;
+import de.halfminer.hmbot.storage.Storage;
 import de.halfminer.hmbot.config.ConfigurationException;
 import de.halfminer.hmbot.config.YamlConfig;
 import de.halfminer.hmbot.task.Scheduler;
@@ -61,7 +61,7 @@ public class HalfminerBot {
     private final Scheduler scheduler;
     private final TS3Query query;
     private TS3Api api;
-    private BotStorage storage;
+    private Storage storage;
 
     private HalfminerBot(YamlConfig botConfig) {
 
@@ -103,7 +103,7 @@ public class HalfminerBot {
                 stop("The provided botname is already in use or invalid, quitting...");
             }
 
-            this.storage = new BotStorage();
+            this.storage = new Storage();
 
             // move bot into channel
             List<Channel> channels = api.getChannelsByName(botConfig.getString("botChannelName"));
@@ -138,8 +138,6 @@ public class HalfminerBot {
         try {
             Thread.sleep(2000L);
         } catch (InterruptedException ignored) {}
-
-        //TODO test without System.exit(1);
     }
 
     YamlConfig getBotConfig() {
@@ -154,7 +152,7 @@ public class HalfminerBot {
         return api;
     }
 
-    public BotStorage getStorage() {
+    public Storage getStorage() {
         return storage;
     }
 }

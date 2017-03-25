@@ -10,6 +10,9 @@ Current features
 - Command interface with !<command>
   - Command flood protection
   - Default command if none supplied is !channelcreate, to make channel creation easier
+- Permissions system
+  - Define groups via talk power
+  - Higher groups inherit permissions of lower groups
 - **Commands**
   - !channelcreate
     - Create channels for users
@@ -22,6 +25,8 @@ Current features
     - Detect if user already has a channel, automatically move user to his channel on join/chat/move
   - !help
     - Sends list containing every command
+  - !stop
+    - Stops the bot
 - **Scheduled tasks**
   - *Periodically check for inactive users*
     - Move them into AFK channel

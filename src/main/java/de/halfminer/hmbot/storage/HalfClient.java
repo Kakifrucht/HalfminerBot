@@ -5,24 +5,31 @@ import com.github.theholywaffle.teamspeak3.api.wrapper.ClientInfo;
 import de.halfminer.hmbot.HalfminerBotClass;
 
 /**
- * Client class managed by {@link BotStorage}.
+ * Client class managed by {@link Storage}.
  */
 public class HalfClient extends HalfminerBotClass {
 
     private int clientId;
+    private HalfGroup group;
 
     private int channelId = Integer.MIN_VALUE;
 
-    HalfClient(int clientId) {
+    HalfClient(int clientId, HalfGroup group) {
         this.clientId = clientId;
+        this.group = group;
+    }
+
+    public boolean hasPermission(String permission) {
+        return group.hasPermission(permission);
     }
 
     boolean canBeEvicted() {
         return api.getClientInfo(clientId) == null && getChannel() == null;
     }
 
-    void updateClientId(int clientId) {
+    void updateClient(int clientId, HalfGroup group) {
         this.clientId = clientId;
+        this.group = group;
     }
 
     public void setChannelId(int channelId) {

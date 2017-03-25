@@ -3,6 +3,7 @@ package de.halfminer.hmbot.cmd;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import de.halfminer.hmbot.HalfminerBotClass;
+import de.halfminer.hmbot.storage.Storage;
 import de.halfminer.hmbot.util.StringArgumentSeparator;
 
 import java.lang.reflect.InvocationTargetException;
@@ -10,6 +11,7 @@ import java.util.concurrent.TimeUnit;
 
 public class CommandDispatcher extends HalfminerBotClass {
 
+    private final Storage storage = bot.getStorage();
     private final Cache<Integer, Boolean> floodProtection = CacheBuilder.newBuilder()
             .expireAfterWrite(2, TimeUnit.SECONDS)
             .build();
@@ -33,12 +35,18 @@ public class CommandDispatcher extends HalfminerBotClass {
         logger.info("Client {} issued server command: {}", clientName, command.getConcatenatedString());
 
         try {
-            String className = "Cmd" + command.getArgument(0).substring(1).toLowerCase();
+            String commandRefl = command.getArgument(0).substring(1).toLowerCase();
+            String className = "Cmd" + commandRefl;
             Command cmdInstance = (Command) this.getClass()
                     .getClassLoader()
                     .loadClass("de.halfminer.hmbot.cmd." + className)
                     .getConstructor(int.class, StringArgumentSeparator.class)
                     .newInstance(clientId, command);
+
+            if (!storage.getClient(clientId).hasPermission("cmd." + commandRefl)) {
+                api.sendPrivateMessage(clientId, "Du hast keine Berechtigung dies zu nutzen");
+                return;
+            }
 
             cmdInstance.run();
             floodProtection.put(clientId, true);

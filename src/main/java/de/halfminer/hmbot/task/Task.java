@@ -48,12 +48,9 @@ abstract class Task extends HalfminerBotClass implements Runnable {
             }
 
             // if values have changed, mark to be reloaded
-            if (oldInitialDelay != initialDelay
+            delayHasChanged = oldInitialDelay != initialDelay
                     || oldPeriod != period
-                    || (timeUnit != null && !timeUnit.equals(oldTimeUnit))) {
-                System.out.println(this.getClass().getSimpleName() + " delay changed to " + period);
-                delayHasChanged = true;
-            } else delayHasChanged = false;
+                    || (timeUnit != null && !timeUnit.equals(oldTimeUnit));
 
         } else {
             initialDelay = Integer.MIN_VALUE;

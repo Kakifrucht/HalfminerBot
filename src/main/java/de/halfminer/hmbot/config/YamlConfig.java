@@ -125,13 +125,18 @@ public class YamlConfig {
         return String.valueOf(get(path, Object.class));
     }
 
-    private Object get(String path, Class<?> instanceOf) {
+    public Object get(String path, Class<?> instanceOf) {
 
         Object toGet = get(path, yamlParsed);
-        if (toGet != null && instanceOf.isAssignableFrom(toGet.getClass())) {
+        if (toGet != null
+                && (instanceOf.equals(String.class) || instanceOf.isAssignableFrom(toGet.getClass()))) {
             return toGet;
         } else {
-            // no need to check on defaultYaml, as it is part of the classpath
+            if (toGet != null) {
+                logger.warn("Value at path {} not instance of {}, falling back to default value(s)",
+                        path, instanceOf.getSimpleName());
+            }
+            // no need to check instance on defaultYaml, as it is part of the classpath
             return get(path, defaultYaml);
         }
     }
