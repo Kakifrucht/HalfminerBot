@@ -7,12 +7,14 @@ Current features
 - Configurable via YAML based config file
   - Query password can either be passed as command line argument or always be set via config
 - Define channel for bot to join, stays persistent if moved out
-- Command interface with !<command>
-  - Command flood protection
-  - Default command if none supplied is !channelcreate, to make channel creation easier
 - Permissions system
   - Define groups via talk power
   - Higher groups inherit permissions of lower groups
+  - Permission changes are always logged
+- Command interface with !<command>
+  - Command flood protection
+  - Default command if none supplied is !channelcreate, to make channel creation easier
+  - Permission to use command necessary
 - **Commands**
   - !channelcreate
     - Create channels for users
@@ -31,6 +33,8 @@ Current features
   - *Periodically check for inactive users*
     - Move them into AFK channel
     - If server is full, kick AFK users to make room
-  - *Send current status to API via HTTP PUT*
+      - Configure amount of players to kick at once
+    - Exempt clients via permissions via permissions
   - *Automatically reloads the configuration file periodically*
     - Won't reload if file was not modified or if it is in invalid format
+  - *Send current status to API via HTTP PUT*

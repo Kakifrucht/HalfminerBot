@@ -1,5 +1,6 @@
 package de.halfminer.hmbot.storage;
 
+import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -9,10 +10,15 @@ class HalfGroup {
 
     private final int talkPower;
     private final Set<String> permissions;
+    private HalfGroup inheretedGroup;
 
     HalfGroup(int talkPower, Set<String> permissions) {
         this.talkPower = talkPower;
         this.permissions = permissions;
+    }
+
+    void setInheretedGroup(HalfGroup toInherit) {
+        inheretedGroup = toInherit;
     }
 
     int getTalkPower() {
@@ -20,14 +26,21 @@ class HalfGroup {
     }
 
     boolean hasPermission(String permission) {
-        return permissions.contains(permission);
+        return permissions.contains(permission)
+                || (inheretedGroup != null && inheretedGroup.hasPermission(permission));
     }
 
     void addPermissions(HalfGroup mergeWith) {
-        permissions.addAll(mergeWith.getPermissions());
+        permissions.addAll(mergeWith.permissions);
     }
 
-    private Set<String> getPermissions() {
-        return permissions;
+    Set<String> getAllPermissions() {
+        Set<String> allPerms = new HashSet<>(permissions);
+        HalfGroup currentChild = this;
+        while (currentChild.inheretedGroup != null) {
+            currentChild = currentChild.inheretedGroup;
+            allPerms.addAll(currentChild.permissions);
+        }
+        return allPerms;
     }
 }

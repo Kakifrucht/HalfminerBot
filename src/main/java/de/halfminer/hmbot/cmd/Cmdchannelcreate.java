@@ -41,7 +41,7 @@ public class Cmdchannelcreate extends Command {
         channelCreateProperty.put(ChannelProperty.CHANNEL_PASSWORD, password);
         channelCreateProperty.put(ChannelProperty.CHANNEL_FLAG_SEMI_PERMANENT, "1");
         channelCreateProperty.put(ChannelProperty.CHANNEL_TOPIC,
-                "Channel Erstelldatum: " + new SimpleDateFormat("dd.MM.yy / HH:mm").format(new Date()));
+                "Channel Erstelldatum: " + new SimpleDateFormat("dd.MM / HH:mm").format(new Date()));
         channelCreateProperty.put(ChannelProperty.CPID, Integer.toString(botChannel.getParentChannelId()));
 
         int channelCreateID = api.createChannel(channelCreateName, channelCreateProperty);
@@ -65,8 +65,7 @@ public class Cmdchannelcreate extends Command {
                     config.getString("command.channelcreate.channelDeleteDelay"));
             api.editChannel(channelCreateID, channelCreateProperty);
 
-            api.sendPrivateMessage(clientId,
-                    "Dein Channel wurde erfolgreich erstellt, das Passwort lautet \"" + password + "\".");
+            sendMessage("Dein Channel wurde erfolgreich erstellt, das Passwort lautet \"" + password + "\".");
             logger.info("Channel created: {}", channelCreateName);
         } else {
             throw new CommandNotCompletedException(this, "Channel already exists",

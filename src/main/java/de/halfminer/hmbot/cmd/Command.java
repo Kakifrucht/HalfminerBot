@@ -28,6 +28,10 @@ abstract class Command extends HalfminerBotClass {
      */
     abstract void run() throws CommandNotCompletedException;
 
+    void sendMessage(String message) {
+        api.sendPrivateMessage(clientId, message);
+    }
+
     String getCommand() {
         return commandFull;
     }

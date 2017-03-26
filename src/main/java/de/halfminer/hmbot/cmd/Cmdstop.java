@@ -14,6 +14,7 @@ public class Cmdstop extends Command {
 
     @Override
     void run() {
+        sendMessage("Bot is exiting.");
         bot.stop("Bot was stopped via command by client " + api.getClientInfo(clientId).getNickname());
     }
 }

@@ -10,7 +10,8 @@ import java.util.concurrent.TimeUnit;
 public class Storage extends HalfminerBotClass {
 
     private final Map<Integer, HalfClient> clientsOnline = new ConcurrentHashMap<>();
-    private final List<Map.Entry<String, HalfGroup>> groups = new ArrayList<>();
+    private final List<Map.Entry<String, HalfGroup>> groups =
+            Collections.synchronizedList(new ArrayList<Map.Entry<String, HalfGroup>>());
 
     public Storage() {
 
@@ -38,6 +39,7 @@ public class Storage extends HalfminerBotClass {
     }
 
     public void configWasReloaded() {
+        groups.clear();
         Map<?, ?> groupYamlMap = (Map) config.get("groups", Map.class);
         for (Map.Entry<?, ?> entry : groupYamlMap.entrySet()) {
 
@@ -51,7 +53,7 @@ public class Storage extends HalfminerBotClass {
                 List<?> permissionsObj = (List) config.get("permissions." + groupName, List.class);
                 if (permissionsObj != null) {
                     for (Object o : permissionsObj) {
-                        permissions.add(String.valueOf(o));
+                        permissions.add(String.valueOf(o).toLowerCase());
                     }
                 }
 
@@ -92,11 +94,24 @@ public class Storage extends HalfminerBotClass {
             }
         }
 
-        //TODO inheritance
         if (groups.isEmpty()) {
             groups.add(new AbstractMap.SimpleEntry<>("default",
                     new HalfGroup(0, Collections.<String>emptySet())));
             logger.warn("No groups or permissions were loaded, please check your config file");
+        } else {
+
+            for (int i = groups.size() - 1; i >= 0; i--) {
+                HalfGroup group = groups.get(i).getValue();
+                for (int j = 0; j < i; j++) {
+                    groups.get(j).getValue().setInheretedGroup(group);
+                }
+            }
+
+            logger.info("Loaded groups ({}), talk power and permissions: ", groups.size());
+            for (Map.Entry<String, HalfGroup> group : groups) {
+                logger.info("{}: {}, Permissions: {}",
+                        group.getKey(), group.getValue().getTalkPower(), group.getValue().getAllPermissions());
+            }
         }
 
         for (Client client : api.getClients()) {

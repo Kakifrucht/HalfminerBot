@@ -32,6 +32,7 @@ public class CommandDispatcher extends HalfminerBotClass {
         StringArgumentSeparator command = new StringArgumentSeparator(commandUnparsedEdit);
         if (!command.meetsLength(1)) return;
 
+        floodProtection.put(clientId, true);
         logger.info("Client {} issued server command: {}", clientName, command.getConcatenatedString());
 
         try {
@@ -49,7 +50,6 @@ public class CommandDispatcher extends HalfminerBotClass {
             }
 
             cmdInstance.run();
-            floodProtection.put(clientId, true);
 
         } catch (InvocationTargetException e) {
 

@@ -11,7 +11,7 @@ public class Cmdhelp extends Command {
 
     @Override
     void run() {
-        api.sendPrivateMessage(clientId,
-                "HalfminerBot - halfminer.de | Verfügbare Kommandos: !channelcreate <passwort> -> erstelle einen eigenen Channel");
+        sendMessage("HalfminerBot von Kakifrucht - © halfminer.de\n \n" +
+                "Verfügbare Kommandos: \n!channelcreate <passwort> -> erstelle einen eigenen Channel");
     }
 }

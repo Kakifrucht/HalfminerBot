@@ -2,6 +2,7 @@ package de.halfminer.hmbot.task;
 
 import com.github.theholywaffle.teamspeak3.api.wrapper.Channel;
 import com.github.theholywaffle.teamspeak3.api.wrapper.Client;
+import de.halfminer.hmbot.storage.Storage;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,6 +11,8 @@ import java.util.List;
  * Will be run at fixed interval and move AFK users to AFK channel.
  */
 class InactivityTask extends Task {
+
+    private final Storage storage = bot.getStorage();
 
     private final int maxClients;
     private Channel afkChannel;
@@ -43,9 +46,11 @@ class InactivityTask extends Task {
 
         for (Client client : clients) {
             int idleTimeUntilMove = config.getInt("task.inactivity.idleTimeUntilMove");
+            boolean isExempt = storage.getClient(client.getId()).hasPermission("task.inactivity.exempt.move");
             if (client.getChannelId() != afkChannel.getId()
                     && (client.isAway()
-                    || (client.isOutputMuted() && ((client.getIdleTime() / 1000) > idleTimeUntilMove)))) {
+                    || (!isExempt && (client.isOutputMuted() && ((client.getIdleTime() / 1000) > idleTimeUntilMove))))) {
+
                 api.moveClient(client, afkChannel);
                 api.sendPrivateMessage(client.getId(), "Du wurdest in die AFK Lounge verschoben, da du abwesend warst.");
                 logger.info("{} is away and has been moved into AFK channel", client.getNickname());
@@ -54,15 +59,18 @@ class InactivityTask extends Task {
 
         int currentlyOnline = api.getServerInfo().getClientsOnline();
         if (currentlyOnline >= maxClients) {
+
             List<Client> afkClients = new ArrayList<>();
             int clientsToKick = config.getInt("task.inactivity.clientsToKickIfFull");
             int count = 0;
             for (Client client : clients) {
+                if (storage.getClient(client.getId()).hasPermission("task.inactivity.exempt.kick")) continue;
                 if (client.getChannelId() == afkChannel.getId()) {
                     if (count++ >= clientsToKick) break;
                     afkClients.add(client);
                 }
             }
+
             for (Client afk : afkClients) {
                 String message = "Der Server ist aktuell voll. Du wurdest wegen Inaktivität gekickt.";
                 api.kickClientFromServer(message, afk);

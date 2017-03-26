@@ -73,8 +73,10 @@ class HalfminerBotListeners extends TS3EventAdapter {
 
     private void clientEnterMessageAndMove(int clientId) {
         if (!storage.getClient(clientId).moveToChannel()) {
-            bot.getApi().sendPrivateMessage(clientId,
-                    "Antworte mit deinem gewünschten Passwort, um einen eigenen Channel mit Passwort zu erhalten.");
+            TS3Api api = bot.getApi();
+            api.sendPrivateMessage(clientId, "Hallo " + api.getClientInfo(clientId).getNickname()
+                    + "!\n \n"
+                    + "Antworte mit deinem gewünschten Passwort, um einen eigenen Channel mit Passwort zu erhalten.");
         }
     }
 }
