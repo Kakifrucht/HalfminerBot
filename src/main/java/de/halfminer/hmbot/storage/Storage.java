@@ -25,17 +25,8 @@ public class Storage extends HalfminerBotClass {
         }
 
         // check for dead client objects every 10 minutes
-        scheduler.scheduleRunnable(new Runnable() {
-            @Override
-            public void run() {
-                Iterator<HalfClient> it = clientsOnline.values().iterator();
-                while (it.hasNext()) {
-                    if (it.next().canBeEvicted()) {
-                        it.remove();
-                    }
-                }
-            }
-        }, 0, 10, TimeUnit.MINUTES);
+        scheduler.scheduleRunnable(() -> clientsOnline.values().removeIf(HalfClient::canBeEvicted),
+                0, 10, TimeUnit.MINUTES);
     }
 
     public void configWasReloaded() {
@@ -96,7 +87,7 @@ public class Storage extends HalfminerBotClass {
 
         if (groups.isEmpty()) {
             groups.add(new AbstractMap.SimpleEntry<>("default",
-                    new HalfGroup(0, Collections.<String>emptySet())));
+                    new HalfGroup(0, Collections.emptySet())));
             logger.warn("No groups or permissions were loaded, please check your config file");
         } else {
 
