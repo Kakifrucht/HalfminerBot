@@ -100,17 +100,15 @@ public class Storage extends HalfminerBotClass {
             logger.warn("No groups or permissions were loaded, please check your config file");
         } else {
 
-            for (int i = groups.size() - 1; i >= 0; i--) {
+            for (int i = groups.size() - 1; i > 0; i--) {
                 HalfGroup group = groups.get(i).getValue();
-                for (int j = 0; j < i; j++) {
-                    groups.get(j).getValue().setInheretedGroup(group);
-                }
+                groups.get(i - 1).getValue().addPermissions(group);
             }
 
             logger.info("Loaded groups ({}), talk power and permissions: ", groups.size());
             for (Map.Entry<String, HalfGroup> group : groups) {
                 logger.info("{}: {}, Permissions: {}",
-                        group.getKey(), group.getValue().getTalkPower(), group.getValue().getAllPermissions());
+                        group.getKey(), group.getValue().getTalkPower(), group.getValue().getPermissions());
             }
         }
 

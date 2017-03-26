@@ -7,9 +7,9 @@ Current features
 - Configurable via YAML based config file
   - Query password can either be passed as command line argument or always be set via config
 - Define channel for bot to join, stays persistent if moved out
-- Permissions system
-  - Define groups via talk power
-  - Higher groups inherit permissions of lower groups
+- Permission system
+  - Define what client belongs to which group via their talk power
+  - Higher groups automatically inherit all permissions of lower groups
   - Permission changes are always logged
 - Command interface with !<command>
   - Command flood protection

@@ -9,13 +9,9 @@ class CommandNotCompletedException extends Exception {
     private final String error;
     private String tellUser = null;
 
-    CommandNotCompletedException(Command command, String error) {
+    CommandNotCompletedException(Command command, String error, String tellUser) {
         this.command = command;
         this.error = error;
-    }
-
-    CommandNotCompletedException(Command command, String error, String tellUser) {
-        this(command, error);
         this.tellUser = tellUser;
     }
 
