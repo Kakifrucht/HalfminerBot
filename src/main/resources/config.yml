@@ -16,7 +16,7 @@ botName: 'Halfminer TSBot'
 #Channel the bot will be joining and using as base channel for commands
 botChannelName: 'Welcome'
 command:
-  channelcreate:
+  channel:
     #Delay in seconds until a channel will be deleted after the last client leaves
     channelDeleteDelay: 180
     #Channel group to add the player to
@@ -50,5 +50,5 @@ permissions:
   - task.inactivity.exempt.move
   - task.inactivity.exempt.kick
   default:
-  - cmd.channelcreate
+  - cmd.channel
   - cmd.help

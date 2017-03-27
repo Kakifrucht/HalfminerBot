@@ -23,10 +23,10 @@ public class CommandDispatcher extends HalfminerBotClass {
             return;
         }
 
-        // set default command to !channelcreate
+        // set default command to !channel
         String commandUnparsedEdit = commandUnparsed;
         if (!commandUnparsed.startsWith("!")) {
-            commandUnparsedEdit = "!channelcreate " + commandUnparsed;
+            commandUnparsedEdit = "!channel create " + commandUnparsed;
         }
 
         StringArgumentSeparator command = new StringArgumentSeparator(commandUnparsedEdit);
@@ -37,6 +37,12 @@ public class CommandDispatcher extends HalfminerBotClass {
 
         try {
             String commandRefl = command.getArgument(0).substring(1).toLowerCase();
+
+            if (!storage.getClient(clientId).hasPermission("cmd." + commandRefl)) {
+                api.sendPrivateMessage(clientId, "Du hast keine Berechtigung dies zu nutzen");
+                return;
+            }
+
             String className = "Cmd" + commandRefl;
             Command cmdInstance = (Command) this.getClass()
                     .getClassLoader()
@@ -44,18 +50,13 @@ public class CommandDispatcher extends HalfminerBotClass {
                     .getConstructor(int.class, StringArgumentSeparator.class)
                     .newInstance(clientId, command);
 
-            if (!storage.getClient(clientId).hasPermission("cmd." + commandRefl)) {
-                api.sendPrivateMessage(clientId, "Du hast keine Berechtigung dies zu nutzen");
-                return;
-            }
-
             cmdInstance.run();
 
         } catch (InvocationTargetException e) {
 
             if (e.getCause() instanceof InvalidCommandLineException) {
                 InvalidCommandLineException ex = (InvalidCommandLineException) e.getCause();
-                api.sendPrivateMessage(clientId, ex.getError() + " | Verwendung: " + ex.getCorrectUsage());
+                api.sendPrivateMessage(clientId, "Verwendung: " + ex.getCorrectUsage());
             } else {
                 errorLogAndTell(e, clientId);
             }

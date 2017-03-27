@@ -13,6 +13,6 @@ public class Cmdhelp extends Command {
     @Override
     void run() {
         sendMessage("HalfminerBot v" + HalfminerBot.getVersion() + " von Kakifrucht - © halfminer.de\n \n" +
-                "Verfügbare Kommandos: \n!channelcreate <passwort> -> erstelle einen eigenen Channel");
+                "Verfügbare Kommandos: \n!channel <create|update> <passwort> -> erstelle einen eigenen Channel");
     }
 }

@@ -3,6 +3,7 @@ package de.halfminer.hmbot.storage;
 import com.github.theholywaffle.teamspeak3.api.wrapper.Channel;
 import com.github.theholywaffle.teamspeak3.api.wrapper.ClientInfo;
 import de.halfminer.hmbot.HalfminerBotClass;
+import de.halfminer.hmbot.cmd.Cmdchannel;
 
 /**
  * Client class managed by {@link Storage}.
@@ -36,8 +37,17 @@ public class HalfClient extends HalfminerBotClass {
         this.channelId = channelId;
     }
 
+    public Channel getChannel() {
+        for (Channel channel : api.getChannels()) {
+            if (channel.getId() == channelId) {
+                return channel;
+            }
+        }
+        return null;
+    }
+
     /**
-     * Move client to his channel if he created one via {@link de.halfminer.hmbot.cmd.Cmdchannelcreate},
+     * Move client to his channel if he created one via {@link Cmdchannel},
      * used on join, when joining the bots channel or when trying to create a channel if player already has one.
      *
      * @return true if user was moved to own channel, false if he doesn't have a channel
@@ -55,14 +65,5 @@ public class HalfClient extends HalfminerBotClass {
         }
 
         return false;
-    }
-
-    private Channel getChannel() {
-        for (Channel channel : api.getChannels()) {
-            if (channel.getId() == channelId) {
-                return channel;
-            }
-        }
-        return null;
     }
 }

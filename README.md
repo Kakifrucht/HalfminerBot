@@ -13,22 +13,24 @@ Current features
   - Permission changes are always logged
 - Command interface with !<command>
   - Command flood protection
-  - Default command if none supplied is !channelcreate, to make channel creation easier
+  - Default command if none supplied is !channel, to make channel creation easier
   - Permission to use command necessary
 - **Commands**
   - !admin
     - Reload the config file
       - Won't reload if file was not modified or if it is in invalid format
     - Restart (full reconnect) or shut the bot down
-  - !channelcreate
+  - !channel
     - Create channels for users
-    - Gives channel admin to the creating user
-      - Set group ID via config
-    - Adds their username to the channelname
-    - Sets the channel as temporary
-      - Stays persistent for set amount of seconds (config)
+      - Gives channel admin to the creating user
+        - Set group ID via config
+      - Adds their username to the channelname
+      - Sets the channel as temporary
+        - Stays persistent for set amount of seconds (config)
+        - Detect if user already has a channel, automatically move user to his channel on join/chat/move
+    - Update a users channel
+      - Will kick all players from channel after changing password
     - Sets given parameter as password
-    - Detect if user already has a channel, automatically move user to his channel on join/chat/move
   - !help
     - Sends list containing every command
 - **Scheduled tasks**

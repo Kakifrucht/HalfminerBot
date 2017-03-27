@@ -2,9 +2,12 @@ package de.halfminer.hmbot.cmd;
 
 import com.github.theholywaffle.teamspeak3.api.wrapper.ClientInfo;
 import de.halfminer.hmbot.HalfminerBotClass;
+import de.halfminer.hmbot.storage.Storage;
 import de.halfminer.hmbot.util.StringArgumentSeparator;
 
 abstract class Command extends HalfminerBotClass {
+
+    final Storage storage = bot.getStorage();
 
     final int clientId;
     final ClientInfo invoker;
