@@ -18,15 +18,16 @@ public class Storage extends HalfminerBotClass {
         configWasReloaded();
 
         // add already online clients
-        for (Client client : api.getClients()) {
+        List<Client> clients = api.getClients();
+        for (Client client : clients) {
             if (client.isRegularClient()) {
                 clientJoinedOrReloaded(client);
             }
         }
 
         // check for dead client objects every 10 minutes
-        scheduler.scheduleRunnable(() -> clientsOnline.values().removeIf(HalfClient::canBeEvicted),
-                0, 10, TimeUnit.MINUTES);
+        scheduler.scheduleRunnable(() -> clientsOnline.values().removeIf(c -> c.canBeEvicted(clients)),
+                10, 10, TimeUnit.MINUTES);
     }
 
     public void configWasReloaded() {

@@ -1,9 +1,12 @@
 package de.halfminer.hmbot.storage;
 
 import com.github.theholywaffle.teamspeak3.api.wrapper.Channel;
+import com.github.theholywaffle.teamspeak3.api.wrapper.Client;
 import com.github.theholywaffle.teamspeak3.api.wrapper.ClientInfo;
 import de.halfminer.hmbot.HalfminerBotClass;
 import de.halfminer.hmbot.cmd.Cmdchannel;
+
+import java.util.List;
 
 /**
  * Client class managed by {@link Storage}.
@@ -24,8 +27,9 @@ public class HalfClient extends HalfminerBotClass {
         return group.hasPermission(permission);
     }
 
-    boolean canBeEvicted() {
-        return api.getClientInfo(clientId) == null && getChannel() == null;
+    boolean canBeEvicted(List<Client> clients) {
+        boolean isOnline = clients.removeIf(c -> c.getId() == clientId);
+        return !isOnline && getChannel() == null;
     }
 
     void updateClient(int clientId, HalfGroup group) {
