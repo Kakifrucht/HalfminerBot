@@ -24,9 +24,13 @@ public class HalfminerBot {
 
     private final static Logger logger = LoggerFactory.getLogger(HalfminerBot.class);
 
+    public static String getVersion() {
+        return HalfminerBot.class.getPackage().getImplementationVersion();
+    }
+
     public static void main(String[] args) {
 
-        logger.info("HalfminerBot v{} is starting", HalfminerBot.class.getPackage().getImplementationVersion());
+        logger.info("HalfminerBot v{} is starting", getVersion());
 
         YamlConfig config;
         try {

@@ -1,5 +1,6 @@
 package de.halfminer.hmbot.cmd;
 
+import de.halfminer.hmbot.HalfminerBot;
 import de.halfminer.hmbot.util.StringArgumentSeparator;
 
 @SuppressWarnings("unused")
@@ -11,7 +12,7 @@ public class Cmdhelp extends Command {
 
     @Override
     void run() {
-        sendMessage("HalfminerBot von Kakifrucht - © halfminer.de\n \n" +
+        sendMessage("HalfminerBot v" + HalfminerBot.getVersion() + " von Kakifrucht - © halfminer.de\n \n" +
                 "Verfügbare Kommandos: \n!channelcreate <passwort> -> erstelle einen eigenen Channel");
     }
 }
