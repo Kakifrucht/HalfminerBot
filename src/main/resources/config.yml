@@ -28,7 +28,6 @@ task:
     # Seconds:  number  delay between subsequent execution
     # Third:    unit    time unit for first and second argument, example: disabled, seconds, minutes, hours, ...
     Inactivity: 10, 10, seconds
-    ReloadConfig: 20, 20, seconds
     Status: 0, 2, disabled
   inactivity:
     #String the designated AFK channel must contain, channels necessary talk power must also be higher than 0
@@ -38,7 +37,7 @@ task:
     #Time in seconds until users will be marked inactive (only if speakers are muted), marking as AFK overrides this
     idleTimeUntilMove: 300
 groups:
-  #key is group name (can be changed) and value is talk power.
+  #Key is the groups name (can be changed) and value is talk power requirement
   #You can add as many groups as you like, but they cannot have the same talk power
   admin: 100
   moderator: 50
@@ -46,7 +45,7 @@ groups:
 #Hand out permission nodes to groups. Higher groups inherit lower groups permissions
 permissions:
   admin:
-  - cmd.stop
+  - cmd.admin
   moderator:
   - task.inactivity.exempt.move
   - task.inactivity.exempt.kick

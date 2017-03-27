@@ -28,7 +28,7 @@ public class Scheduler {
     }
 
     public void registerAllTasks() {
-        allTasks = Arrays.asList(new InactivityTask(), new ReloadConfigTask(), new StatusTask());
+        allTasks = Arrays.asList(new InactivityTask(), new StatusTask());
         for (Task task : allTasks) {
             registerTask(task);
         }
@@ -43,7 +43,7 @@ public class Scheduler {
         service.shutdownNow();
     }
 
-    void configWasReloaded() {
+    public void configWasReloaded() {
         for (Task task : allTasks) {
             task.configWasReloaded();
             updateTaskRegister(task);

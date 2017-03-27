@@ -23,10 +23,9 @@ import java.util.List;
 public class HalfminerBot {
 
     private final static Logger logger = LoggerFactory.getLogger(HalfminerBot.class);
-
-    public static String getVersion() {
-        return HalfminerBot.class.getPackage().getImplementationVersion();
-    }
+    private final static Object monitor = new Object();
+    private static HalfminerBot instance;
+    private static boolean startBot = true;
 
     public static void main(String[] args) {
 
@@ -36,6 +35,7 @@ public class HalfminerBot {
         try {
             config = args.length > 0 ? new YamlConfig(args[0]) : new YamlConfig();
         } catch (ConfigurationException e) {
+
             String message = e.getMessage() + ", quitting...";
             if (e.shouldPrintStacktrace()) {
                 logger.error(message, e);
@@ -48,18 +48,31 @@ public class HalfminerBot {
             try {
                 Thread.sleep(2000L);
             } catch (InterruptedException ignored) {}
-
             return;
         }
 
-        new HalfminerBot(config);
+        // setting startBot to true before stopping threads the bot will be completely restarted
+        while (startBot) {
+            startBot = false;
+            new HalfminerBot(config);
+            synchronized (monitor) {
+                try {
+                    monitor.wait();
+                    Thread.sleep(2000L);
+                } catch (InterruptedException ignored) {}
+            }
+        }
     }
-
-    private static HalfminerBot instance;
 
     static HalfminerBot getInstance() {
         return instance;
     }
+
+    public static String getVersion() {
+        return HalfminerBot.class.getPackage().getImplementationVersion();
+    }
+
+    // -- Static End -- //
 
     private final YamlConfig botConfig;
     private final Scheduler scheduler;
@@ -100,11 +113,11 @@ public class HalfminerBot {
         if (api.login(botConfig.getString("credentials.username"), botConfig.getString("credentials.password"))) {
 
             if (!api.selectVirtualServerByPort(botConfig.getInt("ports.serverPort"))) {
-                stop("The provided server port is not valid, quitting...");
+                stop("The provided server port is not valid, quitting...", false);
             }
 
             if (!api.setNickname(botConfig.getString("botName"))) {
-                stop("The provided botname is already in use or invalid, quitting...");
+                stop("The provided botname is already in use or invalid, quitting...", false);
             }
 
             this.storage = new Storage();
@@ -124,24 +137,29 @@ public class HalfminerBot {
             logger.info("HalfminerBot connected successfully and ready");
 
         } else {
-            stop("The provided password is not valid, quitting...");
+            stop("The provided password is not valid, quitting...", false);
         }
     }
 
-    public void stop(String message) {
+    public boolean reloadConfig() {
+        if (botConfig.reloadConfig()) {
+            logger.info("Config file was reloaded");
+            scheduler.configWasReloaded();
+            storage.configWasReloaded();
+            return true;
+        } return false;
+    }
 
-        if (message.length() > 0) {
-            logger.info(message);
-        } else {
-            logger.info("Bot quitting...");
-        }
+    public void stop(String message, boolean restart) {
 
+        logger.info(message.length() > 0 ? message : "Bot quitting...");
         scheduler.shutdown();
         query.exit();
 
-        try {
-            Thread.sleep(2000L);
-        } catch (InterruptedException ignored) {}
+        synchronized (monitor) {
+            startBot = restart;
+            monitor.notify();
+        }
     }
 
     YamlConfig getBotConfig() {

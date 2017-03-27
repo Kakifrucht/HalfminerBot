@@ -70,12 +70,12 @@ public class CommandDispatcher extends HalfminerBotClass {
 
         } catch (ClassNotFoundException e) {
             api.sendPrivateMessage(clientId, "Unbekanntes Kommando. Verwende !help für eine Befehlsübersicht.");
-        } catch (Exception e) {
+        } catch (Throwable e) {
             errorLogAndTell(e, clientId);
         }
     }
 
-    private void errorLogAndTell(Exception e, int clientId) {
+    private void errorLogAndTell(Throwable e, int clientId) {
         logger.error("Exception during newInstance() of command", e);
         api.sendPrivateMessage(clientId, "Ein unbekannter Fehler ist aufgetreten. Bitte wende dich an ein Teammitglied");
     }

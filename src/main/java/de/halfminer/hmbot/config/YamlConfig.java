@@ -17,10 +17,10 @@ public class YamlConfig {
     private static final Logger logger = LoggerFactory.getLogger(YamlConfig.class);
 
     private final File configFile = new File("hmbot/config.yml");
-    private final Yaml yaml = new Yaml();
+    private final Yaml yamlParser = new Yaml();
 
-    private Map<String, Object> defaultYaml;
-    private Map<String, Object> yamlParsed;
+    private Map<String, Object> defaultParsed;
+    private Map<String, Object> configParsed;
     private long lastModified;
 
     public YamlConfig() throws ConfigurationException {
@@ -32,7 +32,7 @@ public class YamlConfig {
         if (configFile.exists()) {
             try {
                 //noinspection unchecked
-                defaultYaml = (Map) yaml.load(this.getClass().getClassLoader().getResourceAsStream("config.yml"));
+                defaultParsed = (Map) yamlParser.load(this.getClass().getClassLoader().getResourceAsStream("config.yml"));
             } catch (ClassCastException e) {
                 // easiest way to check if format is valid
                 throw new ConfigurationException("Default config is not in valid format", e);
@@ -69,7 +69,7 @@ public class YamlConfig {
 
         Object loaded;
         try (FileInputStream stream = new FileInputStream(configFile)) {
-            loaded = yaml.load(stream);
+            loaded = yamlParser.load(stream);
         } catch (Exception e) {
             throw new ConfigurationException("Could not read config file", e);
         }
@@ -77,13 +77,13 @@ public class YamlConfig {
         if (loaded instanceof Map) {
             try {
                 //noinspection unchecked
-                yamlParsed = (Map) loaded;
+                configParsed = (Map) loaded;
             } catch (ClassCastException e) {
                 throw new ConfigurationException("Config file is in invalid format", e);
             }
 
             if (password.length() > 0) {
-                yamlParsed.put("credentials.password", password);
+                configParsed.put("credentials.password", password);
             } else if (getString("credentials.password").length() == 0) {
                 throw new ConfigurationException("No password was set");
             }
@@ -106,13 +106,13 @@ public class YamlConfig {
             return false;
         }
 
-        Map<String, Object> oldParsed = yamlParsed;
+        Map<String, Object> oldParsed = configParsed;
         try {
             loadYaml(getString("credentials.password"));
             return true;
         } catch (ConfigurationException e) {
             logger.warn(e.getMessage(), e);
-            yamlParsed = oldParsed;
+            configParsed = oldParsed;
             return false;
         }
     }
@@ -127,7 +127,7 @@ public class YamlConfig {
 
     public Object get(String path, Class<?> instanceOf) {
 
-        Object toGet = get(path, yamlParsed);
+        Object toGet = get(path, configParsed);
         if (toGet != null
                 && (instanceOf.equals(String.class) || instanceOf.isAssignableFrom(toGet.getClass()))) {
             return toGet;
@@ -136,8 +136,8 @@ public class YamlConfig {
                 logger.warn("Value at path {} not instance of {}, falling back to default value(s)",
                         path, instanceOf.getSimpleName());
             }
-            // no need to check instance on defaultYaml, as it is part of the classpath
-            return get(path, defaultYaml);
+            // no need to check instance on defaultParsed, as it is part of the classpath
+            return get(path, defaultParsed);
         }
     }
 
