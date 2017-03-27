@@ -16,7 +16,7 @@ import org.slf4j.LoggerFactory;
 import java.util.List;
 
 /**
- * Halfminer Teamspeak 3 query bot, implementing a chat based command interface and automatic tasks.
+ * Halfminer Teamspeak 3 query bot, implementing a chat based command interface and automated tasks.
  *
  * @author Fabian Prieto Wunderlich - Kakifrucht
  */
@@ -51,10 +51,10 @@ public class HalfminerBot {
             return;
         }
 
-        // setting startBot to true before stopping threads the bot will be completely restarted
+        // setting startBot to true before stopping threads will restart the bot
         while (startBot) {
             startBot = false;
-            new HalfminerBot(config);
+            new Thread(() -> new HalfminerBot(config), "launch-bot").start();
             synchronized (monitor) {
                 try {
                     monitor.wait();
@@ -103,7 +103,7 @@ public class HalfminerBot {
         try {
             query.connect();
         } catch (TS3ConnectionFailedException e) {
-            logger.error("Couldn't connect to given server, quitting...");
+            stop("Couldn't connect to given server, quitting...", false);
             return;
         }
 
@@ -154,7 +154,13 @@ public class HalfminerBot {
 
         logger.info(message.length() > 0 ? message : "Bot quitting...");
         scheduler.shutdown();
-        query.exit();
+        try {
+            query.exit();
+        } catch (Exception e) {
+            if (!(e instanceof NullPointerException)) {
+                logger.warn("Couldn't disconnect from query properly", e);
+            }
+        }
 
         synchronized (monitor) {
             startBot = restart;
