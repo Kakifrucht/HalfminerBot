@@ -9,7 +9,7 @@ import java.io.*;
 import java.util.Map;
 
 /**
- * Class loading and writing yaml based configuration file from disk.
+ * Class loading and parsing yaml based configuration file from disk.
  * Uses {@link org.yaml.snakeyaml.Yaml SnakeYAML} for parsing.
  */
 public class YamlConfig {

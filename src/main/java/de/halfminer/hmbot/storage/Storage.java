@@ -17,16 +17,8 @@ public class Storage extends HalfminerBotClass {
 
         configWasReloaded();
 
-        // add already online clients
-        List<Client> clients = api.getClients();
-        for (Client client : clients) {
-            if (client.isRegularClient()) {
-                clientJoinedOrReloaded(client);
-            }
-        }
-
         // check for dead client objects every 10 minutes
-        scheduler.scheduleRunnable(() -> clientsOnline.values().removeIf(c -> c.canBeEvicted(clients)),
+        scheduler.scheduleRunnable(() -> clientsOnline.values().removeIf(c -> c.canBeEvicted(api.getClients())),
                 10, 10, TimeUnit.MINUTES);
     }
 
@@ -110,6 +102,8 @@ public class Storage extends HalfminerBotClass {
     }
 
     public void clientJoinedOrReloaded(Client client) {
+
+        if (!client.isRegularClient()) return;
 
         HalfGroup clientGroup = null;
         for (Map.Entry<String, HalfGroup> group : groups) {

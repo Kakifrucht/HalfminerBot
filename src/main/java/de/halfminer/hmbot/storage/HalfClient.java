@@ -28,7 +28,9 @@ public class HalfClient extends HalfminerBotClass {
     }
 
     boolean canBeEvicted(List<Client> clients) {
-        boolean isOnline = clients.removeIf(c -> c.getId() == clientId);
+        boolean isOnline = clients.stream()
+                .map(Client::getId)
+                .anyMatch(id -> id == clientId);
         return !isOnline && getChannel() == null;
     }
 
