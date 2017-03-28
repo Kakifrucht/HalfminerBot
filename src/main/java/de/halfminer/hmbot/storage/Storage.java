@@ -10,8 +10,8 @@ import java.util.concurrent.TimeUnit;
 public class Storage extends HalfminerBotClass {
 
     private final Map<Integer, HalfClient> clientsOnline = new ConcurrentHashMap<>();
-    private final List<Map.Entry<String, HalfGroup>> groups =
-            Collections.synchronizedList(new ArrayList<Map.Entry<String, HalfGroup>>());
+    private final List<HalfGroup> groups =
+            Collections.synchronizedList(new ArrayList<HalfGroup>());
 
     public Storage() {
 
@@ -46,31 +46,29 @@ public class Storage extends HalfminerBotClass {
                     continue;
                 }
 
-                HalfGroup group = new HalfGroup(talkPower, permissions);
+                HalfGroup group = new HalfGroup(groupName, talkPower, permissions);
 
                 boolean hasInserted = false;
-                Map.Entry<String, HalfGroup> newEntry = new AbstractMap.SimpleEntry<>(groupName, group);
                 for (int i = 0; i < groups.size(); i++) {
 
-                    Map.Entry<String, HalfGroup> currentEntry = groups.get(i);
-                    HalfGroup groupToCheck = currentEntry.getValue();
+                    HalfGroup groupToCheck = groups.get(i);
                     if (groupToCheck.getTalkPower() == talkPower) {
                         logger.info("Merged group {} with {}, as they have the same talk power requirement",
-                                groupName, currentEntry.getKey());
+                                groupName, groupToCheck.getName());
                         groupToCheck.addPermissions(group);
                         hasInserted = true;
                         continue;
                     }
 
                     if (groupToCheck.getTalkPower() < talkPower) {
-                        groups.add(newEntry);
+                        groups.add(group);
                         hasInserted = true;
                         break;
                     }
                 }
 
                 if (!hasInserted) {
-                    groups.add(newEntry);
+                    groups.add(group);
                 }
 
             } else {
@@ -79,25 +77,39 @@ public class Storage extends HalfminerBotClass {
         }
 
         if (groups.isEmpty()) {
-            groups.add(new AbstractMap.SimpleEntry<>("default",
-                    new HalfGroup(0, Collections.emptySet())));
+            groups.add(new HalfGroup("default", 0, Collections.emptySet()));
             logger.warn("No groups or permissions were loaded, please check your config file");
         } else {
 
             for (int i = groups.size() - 1; i > 0; i--) {
-                HalfGroup group = groups.get(i).getValue();
-                groups.get(i - 1).getValue().addPermissions(group);
+                HalfGroup group = groups.get(i);
+                groups.get(i - 1).addPermissions(group);
             }
 
             logger.info("Loaded groups ({}), talk power and permissions: ", groups.size());
-            for (Map.Entry<String, HalfGroup> group : groups) {
+            for (HalfGroup group : groups) {
                 logger.info("{}: {}, Permissions: {}",
-                        group.getKey(), group.getValue().getTalkPower(), group.getValue().getPermissions());
+                        group.getName(), group.getTalkPower(), group.getPermissions());
             }
         }
 
         for (Client client : api.getClients()) {
             clientJoinedOrReloaded(client);
+        }
+
+        // debug currently held clients
+        if (clientsOnline.size() > 0) {
+
+            StringBuilder sb = new StringBuilder("Clients currently online (")
+                    .append(clientsOnline.size())
+                    .append("): ");
+
+            for (HalfClient client : clientsOnline.values()) {
+                sb.append(client.toString()).append(", ");
+            }
+
+            sb.setLength(sb.length() - 2);
+            logger.debug(sb.toString());
         }
     }
 
@@ -106,9 +118,9 @@ public class Storage extends HalfminerBotClass {
         if (!client.isRegularClient()) return;
 
         HalfGroup clientGroup = null;
-        for (Map.Entry<String, HalfGroup> group : groups) {
-            if (group.getValue().getTalkPower() <= client.getTalkPower()) {
-                clientGroup = group.getValue();
+        for (HalfGroup group : groups) {
+            if (group.getTalkPower() <= client.getTalkPower()) {
+                clientGroup = group;
                 break;
             }
         }

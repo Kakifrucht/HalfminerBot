@@ -13,7 +13,7 @@ abstract class Command extends HalfminerBotClass {
     final ClientInfo invoker;
 
     private final String commandFull;
-    final StringArgumentSeparator commandLine;
+    final StringArgumentSeparator command;
 
     @SuppressWarnings("WeakerAccess")
     public Command(int clientId, StringArgumentSeparator command) {
@@ -22,7 +22,7 @@ abstract class Command extends HalfminerBotClass {
         this.invoker = api.getClientInfo(clientId);
 
         this.commandFull = command.getConcatenatedString();
-        this.commandLine = command.removeFirstElement();
+        this.command = command.removeFirstElement();
     }
 
     /**

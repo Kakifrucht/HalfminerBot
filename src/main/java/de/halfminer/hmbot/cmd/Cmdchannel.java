@@ -13,6 +13,17 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * - Create channels for users
+ *   - Gives channel admin to the creating user
+ *     - Set group ID via config
+ *   - Adds username to the channelname
+ *   - Sets the channel as temporary
+ *     - Stays persistent for set amount of seconds (config)
+ *     - Detect if user already has a channel, automatically move user to his channel on join/chat/move
+ * - Update a users channel password
+ *   - Will kick all players from channel after changing password
+ */
 @SuppressWarnings("unused")
 public class Cmdchannel extends Command {
 
@@ -24,7 +35,7 @@ public class Cmdchannel extends Command {
     public Cmdchannel(int clientId, StringArgumentSeparator command) throws InvalidCommandLineException {
         super(clientId, command);
 
-        if (!commandLine.meetsLength(2)) {
+        if (!this.command.meetsLength(2)) {
             throw new InvalidCommandLineException("!channel <create|update> <password>");
         }
 
@@ -37,7 +48,7 @@ public class Cmdchannel extends Command {
         client = storage.getClient(clientId);
 
         channelGroupAdminId = config.getInt("command.channel.channelGroupAdminID");
-        switch (commandLine.getArgument(0).toLowerCase()) {
+        switch (command.getArgument(0).toLowerCase()) {
             case "create":
                 createChannel();
                 break;
@@ -56,12 +67,14 @@ public class Cmdchannel extends Command {
             return;
         }
 
-        String password = commandLine.getArgument(1);
+        String password = command.getArgument(1);
         api.editChannel(channel.getId(), Collections.singletonMap(ChannelProperty.CHANNEL_PASSWORD, password));
 
         for (Client client : api.getClients()) {
             // kick if not admin before changing password
-            if (client.getChannelId() == channel.getId() && client.getChannelGroupId() != channelGroupAdminId) {
+            if (client.getChannelId() == channel.getId()
+                    && client.getChannelGroupId() != channelGroupAdminId
+                    && !storage.getClient(client.getId()).hasPermission("command.channel.update.exempt.kick")) {
                 api.kickClientFromChannel(client.getId());
             }
         }
@@ -77,7 +90,7 @@ public class Cmdchannel extends Command {
         }
 
         String channelCreateName = invoker.getNickname() + "'s Channel";
-        String password = commandLine.getArgument(1);
+        String password = command.getArgument(1);
 
         Map<ChannelProperty, String> channelCreateProperty = new HashMap<>();
         channelCreateProperty.put(ChannelProperty.CHANNEL_CODEC_QUALITY, "10");

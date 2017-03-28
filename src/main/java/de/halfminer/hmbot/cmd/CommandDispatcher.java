@@ -37,16 +37,17 @@ public class CommandDispatcher extends HalfminerBotClass {
 
         try {
             String commandRefl = command.getArgument(0).substring(1).toLowerCase();
+            String className = "Cmd" + commandRefl;
+            Class<?> classLoaded = this.getClass()
+                    .getClassLoader()
+                    .loadClass("de.halfminer.hmbot.cmd." + className);
 
             if (!storage.getClient(clientId).hasPermission("cmd." + commandRefl)) {
                 api.sendPrivateMessage(clientId, "Du hast keine Berechtigung dies zu nutzen");
                 return;
             }
 
-            String className = "Cmd" + commandRefl;
-            Command cmdInstance = (Command) this.getClass()
-                    .getClassLoader()
-                    .loadClass("de.halfminer.hmbot.cmd." + className)
+            Command cmdInstance = (Command) classLoaded
                     .getConstructor(int.class, StringArgumentSeparator.class)
                     .newInstance(clientId, command);
 
@@ -78,6 +79,6 @@ public class CommandDispatcher extends HalfminerBotClass {
 
     private void errorLogAndTell(Throwable e, int clientId) {
         logger.error("Exception during newInstance() of command", e);
-        api.sendPrivateMessage(clientId, "Ein unbekannter Fehler ist aufgetreten. Bitte wende dich an ein Teammitglied");
+        api.sendPrivateMessage(clientId, "Ein unbekannter Fehler ist aufgetreten. Bitte wende dich an ein Teammitglied.");
     }
 }

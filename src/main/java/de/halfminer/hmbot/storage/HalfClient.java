@@ -72,4 +72,9 @@ public class HalfClient extends HalfminerBotClass {
 
         return false;
     }
+
+    @Override
+    public String toString() {
+        return "ClientID: " + clientId + " - Group: [" + group.toString() + "]";
+    }
 }

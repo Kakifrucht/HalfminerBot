@@ -17,7 +17,7 @@ class CommandNotCompletedException extends Exception {
 
     String getError() {
         ClientInfo info = command.getClientInfo();
-        return info.getNickname() + " caused error with commandLine \"" + command.getCommand() + "\": " + error;
+        return info.getNickname() + " caused error with command \"" + command.getCommand() + "\": " + error;
     }
 
     boolean doTellUser() {

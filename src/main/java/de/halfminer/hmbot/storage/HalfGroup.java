@@ -7,12 +7,18 @@ import java.util.Set;
  */
 class HalfGroup {
 
+    private final String name;
     private final int talkPower;
     private final Set<String> permissions;
 
-    HalfGroup(int talkPower, Set<String> permissions) {
+    HalfGroup(String name, int talkPower, Set<String> permissions) {
+        this.name = name;
         this.talkPower = talkPower;
         this.permissions = permissions;
+    }
+
+    String getName() {
+        return name;
     }
 
     int getTalkPower() {
@@ -29,5 +35,10 @@ class HalfGroup {
 
     Set<String> getPermissions() {
         return permissions;
+    }
+
+    @Override
+    public String toString() {
+        return name + ": " + talkPower + ", Permissions: " + permissions;
     }
 }

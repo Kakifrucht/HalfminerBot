@@ -8,14 +8,14 @@
         <RandomAccessFile name="fileAppender" fileName="hmbot/bot.log" append="true">
             <PatternLayout pattern="[%d{yyyy-MM-dd HH:mm:ss}] [%t/%level]: %msg%n"/>
         </RandomAccessFile>
-        <Async name="asyncAppender">
+        <Async name="asyncFileAppender">
             <AppenderRef ref="fileAppender"/>
         </Async>
     </Appenders>
     <Loggers>
-        <Root level="info">
-            <AppenderRef ref="consoleAppender" level="info"/>
-            <AppenderRef ref="asyncAppender" level="info"/>
+        <Root level="debug">
+            <AppenderRef ref="consoleAppender" level="debug"/>
+            <AppenderRef ref="asyncFileAppender" level="info"/>
         </Root>
     </Loggers>
 </Configuration>

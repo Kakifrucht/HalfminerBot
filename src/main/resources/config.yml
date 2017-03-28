@@ -19,7 +19,7 @@ command:
   channel:
     #Delay in seconds until a channel will be deleted after the last client leaves
     channelDeleteDelay: 180
-    #Channel group to add the player to
+    #Channel group to add the player to, check talk power to not grant additional rights to users
     channelGroupAdminID: 2
 task:
   settings:
@@ -49,6 +49,7 @@ permissions:
   moderator:
   - task.inactivity.exempt.move
   - task.inactivity.exempt.kick
+  - command.channel.update.exempt.kick
   default:
   - cmd.channel
   - cmd.help

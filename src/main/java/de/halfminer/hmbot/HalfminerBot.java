@@ -5,10 +5,11 @@ import com.github.theholywaffle.teamspeak3.TS3Config;
 import com.github.theholywaffle.teamspeak3.TS3Query;
 import com.github.theholywaffle.teamspeak3.TS3Query.FloodRate;
 import com.github.theholywaffle.teamspeak3.api.exception.TS3ConnectionFailedException;
+import com.github.theholywaffle.teamspeak3.api.reconnect.ConnectionHandler;
 import com.github.theholywaffle.teamspeak3.api.wrapper.Channel;
-import de.halfminer.hmbot.storage.Storage;
 import de.halfminer.hmbot.config.ConfigurationException;
 import de.halfminer.hmbot.config.YamlConfig;
+import de.halfminer.hmbot.storage.Storage;
 import de.halfminer.hmbot.task.Scheduler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -93,10 +94,25 @@ public class HalfminerBot {
         apiConfig.setQueryPort(botConfig.getInt("ports.queryPort"));
         if (host.equals("localhost")) {
             apiConfig.setFloodRate(FloodRate.UNLIMITED);
-            logger.info("Floodrate set to unlimited");
         } else {
             apiConfig.setFloodRate(FloodRate.DEFAULT);
+            logger.info("Command rate is reduced, connect via localhost to remove command delay");
         }
+
+        apiConfig.setConnectionHandler(new ConnectionHandler() {
+            @Override
+            public void onConnect(TS3Query ts3Query) {
+            }
+
+            @Override
+            public void onDisconnect(TS3Query ts3Query) {
+                logger.warn("Bot lost connection to server, trying to reconnect once in 10 seconds...");
+                try {
+                    Thread.sleep(10000L);
+                } catch (InterruptedException ignored) {}
+                stop("Restarting...", true);
+            }
+        });
 
         // connect to query
         query = new TS3Query(apiConfig);
@@ -114,10 +130,12 @@ public class HalfminerBot {
 
             if (!api.selectVirtualServerByPort(botConfig.getInt("ports.serverPort"))) {
                 stop("The provided server port is not valid, quitting...", false);
+                return;
             }
 
             if (!api.setNickname(botConfig.getString("botName"))) {
-                stop("The provided botname is already in use or invalid, quitting...", false);
+                logger.warn("The provided botname is already in use or invalid, keeping default ({})",
+                        api.whoAmI().getNickname());
             }
 
             this.storage = new Storage();
