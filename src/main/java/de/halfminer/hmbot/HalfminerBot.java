@@ -6,6 +6,7 @@ import com.github.theholywaffle.teamspeak3.TS3Query;
 import com.github.theholywaffle.teamspeak3.TS3Query.FloodRate;
 import com.github.theholywaffle.teamspeak3.api.exception.TS3ConnectionFailedException;
 import com.github.theholywaffle.teamspeak3.api.reconnect.ConnectionHandler;
+import com.github.theholywaffle.teamspeak3.api.reconnect.ReconnectStrategy;
 import com.github.theholywaffle.teamspeak3.api.wrapper.Channel;
 import de.halfminer.hmbot.config.ConfigurationException;
 import de.halfminer.hmbot.config.YamlConfig;
@@ -76,8 +77,8 @@ public class HalfminerBot {
     // -- Static End -- //
 
     private final YamlConfig botConfig;
-    private final Scheduler scheduler;
     private final TS3Query query;
+    private Scheduler scheduler;
     private TS3Api api;
     private Storage storage;
 
@@ -85,7 +86,6 @@ public class HalfminerBot {
 
         instance = this;
         this.botConfig = botConfig;
-        this.scheduler = new Scheduler();
 
         // configure API
         String host = botConfig.getString("host");
@@ -99,18 +99,29 @@ public class HalfminerBot {
             logger.info("Command rate is reduced, connect via localhost to remove command delay");
         }
 
+        apiConfig.setReconnectStrategy(ReconnectStrategy.exponentialBackoff());
         apiConfig.setConnectionHandler(new ConnectionHandler() {
+
+            private boolean hasConnected = false;
+            private int attempts = 0;
             @Override
             public void onConnect(TS3Query ts3Query) {
+                scheduler = new Scheduler();
+                if (hasConnected) {
+                    logger.info("Reconnect attempt #{}", ++attempts);
+                    if (startBot()) {
+                        attempts = 0;
+                    }
+                } else {
+                    startBot();
+                    hasConnected = true;
+                }
             }
 
             @Override
             public void onDisconnect(TS3Query ts3Query) {
-                logger.warn("Bot lost connection to server, trying to reconnect once in 10 seconds...");
-                try {
-                    Thread.sleep(10000L);
-                } catch (InterruptedException ignored) {}
-                stop("Restarting...", true);
+                logger.warn("Bot lost connection to server, trying to reconnect...");
+                scheduler.shutdown();
             }
         });
 
@@ -120,9 +131,10 @@ public class HalfminerBot {
             query.connect();
         } catch (TS3ConnectionFailedException e) {
             stop("Couldn't connect to given server, quitting...", false);
-            return;
         }
+    }
 
+    private boolean startBot() {
         this.api = query.getApi();
 
         // login to server
@@ -130,15 +142,26 @@ public class HalfminerBot {
 
             if (!api.selectVirtualServerByPort(botConfig.getInt("ports.serverPort"))) {
                 stop("The provided server port is not valid, quitting...", false);
-                return;
+                return false;
             }
 
-            if (!api.setNickname(botConfig.getString("botName"))) {
-                logger.warn("The provided botname is already in use or invalid, keeping default ({})",
-                        api.whoAmI().getNickname());
-            }
+            String nickName = botConfig.getString("botName");
+            if (!api.setNickname(nickName)) {
+                boolean nicknameWasSet = false;
+                for (int i = 1; i < 10; i++) {
+                    if (api.setNickname(nickName + i)) {
+                        logger.warn("The provided botname is already in use or invalid, logged in as {}", nickName + i);
+                        nickName = nickName + i;
+                        nicknameWasSet = true;
+                        break;
+                    }
+                }
 
-            this.storage = new Storage();
+                if (!nicknameWasSet) {
+                    stop("The provided botname is already in use or invalid, quitting...", false);
+                    return false;
+                }
+            }
 
             // move bot into channel
             List<Channel> channels = api.getChannelsByName(botConfig.getString("botChannelName"));
@@ -148,14 +171,21 @@ public class HalfminerBot {
                 logger.error("The provided channelname does not exist or can't be accessed, staying in default channel");
             }
 
+            if (storage == null) {
+                this.storage = new Storage();
+            } else {
+                storage.configWasReloaded();
+            }
+
             api.registerAllEvents();
             api.addTS3Listeners(new HalfminerBotListeners());
             scheduler.registerAllTasks();
 
-            logger.info("HalfminerBot connected successfully and ready");
-
+            logger.info("HalfminerBot connected successfully and ready as {}", nickName);
+            return true;
         } else {
             stop("The provided password is not valid, quitting...", false);
+            return false;
         }
     }
 

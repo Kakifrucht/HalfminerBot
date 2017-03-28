@@ -74,7 +74,7 @@ public class Cmdchannel extends Command {
             // kick if not admin before changing password
             if (client.getChannelId() == channel.getId()
                     && client.getChannelGroupId() != channelGroupAdminId
-                    && !storage.getClient(client.getId()).hasPermission("command.channel.update.exempt.kick")) {
+                    && !storage.getClient(client.getId()).hasPermission("cmd.channel.update.exempt.kick")) {
                 api.kickClientFromChannel(client.getId());
             }
         }

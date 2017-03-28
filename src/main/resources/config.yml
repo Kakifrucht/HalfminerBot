@@ -1,8 +1,8 @@
 #HalfminerBot configuration
-#Server address to connect to, can also be an IP address
-host: 'yourhost.com'
+#Server address to connect to, can be a domain name or IP address
+host: 'localhost'
 ports:
-  #The servers voice port (the one you use when connecting to it via the client)
+  #The servers voice port (the one you use when connecting to it via the client), default is 9987
   serverPort: 9987
   #Server query port, default is 10011
   queryPort: 10011
@@ -11,7 +11,7 @@ credentials:
   username: 'serveradmin'
   #Can also be provided via command line, as "java -jar HalfminerBot.jar password"
   password: ''
-#Bot name on the server (query clients are not visible in tree view, will be name in chat)
+#Bot name on the server (query clients are not visible in tree view, will be the bots name in chat)
 botName: 'Halfminer TSBot'
 #Channel the bot will be joining and using as base channel for commands
 botChannelName: 'Welcome'
@@ -19,7 +19,7 @@ command:
   channel:
     #Delay in seconds until a channel will be deleted after the last client leaves
     channelDeleteDelay: 180
-    #Channel group to add the player to, check talk power to not grant additional rights to users
+    #Channel group to add the player to, check it's talk power to not accidentally grant additional rights to users
     channelGroupAdminID: 2
   help:
     #If true, clients can use "!help <querypassword>" to get the highest available group, useful when locked out
@@ -28,22 +28,22 @@ task:
   settings:
     #Provide three arguments per task seperated by comma
     # First:    number  initial execution delay
-    # Seconds:  number  delay between subsequent execution
+    # Second:   number  delay between subsequent execution
     # Third:    unit    time unit for first and second argument, example: disabled, seconds, minutes, hours, ...
     Inactivity: 10, 10, seconds
     Status: 0, 2, disabled
   inactivity:
-    #String the designated AFK channel must contain, channels necessary talk power must also be higher than 0
+    #String the designated AFK channel must contain, the channels necessary talk power must also be higher than 0
     channelNameContains: 'AFK'
-    #How many clients to kick from AFK lounge when server is full
+    #How many clients to kick from AFK channel when server is full
     clientsToKickIfFull: 2
     #Time in seconds until users will be marked inactive (only if speakers are muted), marking as AFK overrides this
     idleTimeUntilMove: 300
 groups:
   #Key is the groups name (can be changed) and value is talk power requirement
   #You can add as many groups as you like, but they cannot have the same talk power
-  #WARNING: Ensure that you do not accidentally give out talkpower some other way, it is fine to grant them
-  #         on a per channel basis without the client getting additional permissions though
+  #WARNING: Enable the "skip" flag on the permission setup screen for groups, to ensure that client groups
+  #         do not accidentally overwrite the value and put the client in a higher group after a reload
   admin: 100
   moderator: 50
   default: 0
@@ -54,7 +54,7 @@ permissions:
   moderator:
   - task.inactivity.exempt.move
   - task.inactivity.exempt.kick
-  - command.channel.update.exempt.kick
+  - cmd.channel.update.exempt.kick
   default:
   - cmd.channel
   - cmd.help

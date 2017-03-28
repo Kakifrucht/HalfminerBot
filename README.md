@@ -6,6 +6,7 @@ Current features
 -------
 - Configurable via YAML based config file
   - Query password can either be passed as command line argument or always be set via config
+- Automatic reconnect if connection is lost
 - Define channel for bot to join, stays persistent if moved out
 - Permission system
   - Define what client belongs to which group via their talk power
