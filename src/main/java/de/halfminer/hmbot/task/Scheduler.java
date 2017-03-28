@@ -34,7 +34,6 @@ public class Scheduler {
         }
     }
 
-    @SuppressWarnings("SameParameterValue")
     public void scheduleRunnable(Runnable toSchedule, int initialDelay, int period, TimeUnit unit) {
         service.scheduleAtFixedRate(toSchedule, initialDelay, period, unit);
     }

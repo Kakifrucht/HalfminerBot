@@ -89,7 +89,7 @@ public class Cmdchannel extends Command {
             return;
         }
 
-        String channelCreateName = invoker.getNickname() + "'s Channel";
+        String channelCreateName = clientInfo.getNickname() + "'s Channel";
         String password = command.getArgument(1);
 
         Map<ChannelProperty, String> channelCreateProperty = new HashMap<>();
@@ -105,8 +105,8 @@ public class Cmdchannel extends Command {
         if (channelCreateID > 0) {
 
             client.setChannelId(channelCreateID);
-            api.moveClient(invoker.getId(), channelCreateID);
-            api.setClientChannelGroup(channelGroupAdminId, channelCreateID, invoker.getDatabaseId());
+            api.moveClient(clientInfo.getId(), channelCreateID);
+            api.setClientChannelGroup(channelGroupAdminId, channelCreateID, clientInfo.getDatabaseId());
             api.addChannelPermission(channelCreateID, "i_icon_id", (int) botChannel.getIconId());
 
             // switch to temporary channel with delete delay, since it can't be set upon creation

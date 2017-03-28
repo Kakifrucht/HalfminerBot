@@ -10,7 +10,7 @@ abstract class Command extends HalfminerBotClass {
     final Storage storage = bot.getStorage();
 
     final int clientId;
-    final ClientInfo invoker;
+    final ClientInfo clientInfo;
 
     private final String commandFull;
     final StringArgumentSeparator command;
@@ -19,7 +19,7 @@ abstract class Command extends HalfminerBotClass {
     public Command(int clientId, StringArgumentSeparator command) {
 
         this.clientId = clientId;
-        this.invoker = api.getClientInfo(clientId);
+        this.clientInfo = api.getClientInfo(clientId);
 
         this.commandFull = command.getConcatenatedString();
         this.command = command.removeFirstElement();
@@ -41,6 +41,6 @@ abstract class Command extends HalfminerBotClass {
     }
 
     ClientInfo getClientInfo() {
-        return this.invoker;
+        return this.clientInfo;
     }
 }

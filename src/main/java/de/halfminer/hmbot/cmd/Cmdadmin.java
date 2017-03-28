@@ -89,7 +89,7 @@ public class Cmdadmin extends Command {
                         sendMessage(toSend.substring(i, Math.min(i + 1023, toSend.length())));
                     }
                     return;
-                } else sendUsage();
+                }
             default:
                 sendUsage();
         }

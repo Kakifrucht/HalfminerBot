@@ -21,6 +21,9 @@ command:
     channelDeleteDelay: 180
     #Channel group to add the player to, check talk power to not grant additional rights to users
     channelGroupAdminID: 2
+  help:
+    #If true, clients can use "!help <querypassword>" to get the highest available group, useful when locked out
+    enableGroupGrant: true
 task:
   settings:
     #Provide three arguments per task seperated by comma
@@ -39,6 +42,8 @@ task:
 groups:
   #Key is the groups name (can be changed) and value is talk power requirement
   #You can add as many groups as you like, but they cannot have the same talk power
+  #WARNING: Ensure that you do not accidentally give out talkpower some other way, it is fine to grant them
+  #         on a per channel basis without the client getting additional permissions though
   admin: 100
   moderator: 50
   default: 0

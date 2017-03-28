@@ -117,6 +117,10 @@ public class YamlConfig {
         }
     }
 
+    public boolean getBoolean(String path) {
+        return (boolean) get(path, Boolean.class);
+    }
+
     public int getInt(String path) {
         return (int) get(path, Integer.class);
     }
