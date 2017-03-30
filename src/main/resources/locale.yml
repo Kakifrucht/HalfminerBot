@@ -1,0 +1,7 @@
+#HalfminerBot localization file
+#Extract to hmbot/ directory to freely modify the file
+#Use "\n" for a line break, ensure that line is not empty, e.g. "\n \n " instead of "\n\n"
+cmdadminUsage: '!admin <lookup|reload|restart|stop|stopserver> [username/id]'
+cmdadminDescription: 'Bot related admin functions'
+cmdchannelUsage: '!channel <create|update> <password>'
+cmdchannelDescription: 'Create your own private channel'

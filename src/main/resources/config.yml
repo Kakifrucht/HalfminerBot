@@ -11,6 +11,9 @@ credentials:
   username: 'serveradmin'
   #Can also be provided via command line, as "java -jar HalfminerBot.jar password"
   password: ''
+#If true the bot will not be throttled and send commands as fast as possible. The bots IP must appear in query_ip_whitelist.txt
+#localhost is whitelisted by default, the bot will assume this value to be true if host is localhost
+isWhitelisted: false
 #Bot name on the server (query clients are not visible in tree view, will be the bots name in chat)
 botName: 'Halfminer TSBot'
 #Channel the bot will be joining and using as base channel for commands
@@ -19,7 +22,7 @@ command:
   channel:
     #Delay in seconds until a channel will be deleted after the last client leaves
     channelDeleteDelay: 180
-    #Channel group to add the player to, check it's talk power to not accidentally grant additional rights to users
+    #Channel group to add the player to
     channelGroupAdminID: 2
   help:
     #If true, clients can use "!help <querypassword>" to get the highest available group, useful when locked out
@@ -42,8 +45,8 @@ task:
 groups:
   #Key is the groups name (can be changed) and value is talk power requirement
   #You can add as many groups as you like, but they cannot have the same talk power
-  #WARNING: Enable the "skip" flag on the permission setup screen for groups, to ensure that client groups
-  #         do not accidentally overwrite the value and put the client in a higher group after a reload
+  #WARNING: Enable the "skip" flag for talk power on the group permission setup screen, to ensure that client/channel
+  #         talk power does not accidentally overwrite the value and puts the client in a higher group after a reload
   admin: 100
   moderator: 50
   default: 0

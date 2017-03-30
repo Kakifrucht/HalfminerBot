@@ -42,17 +42,6 @@
         </pluginManagement>
     </build>
 
-    <repositories>
-        <repository>
-            <id>TeamSpeak-3-Java-API-mvn-repo</id>
-            <url>https://raw.githubusercontent.com/TheHolyWaffle/TeamSpeak-3-Java-API/mvn-repo/</url>
-            <snapshots>
-                <enabled>true</enabled>
-                <updatePolicy>always</updatePolicy>
-            </snapshots>
-        </repository>
-    </repositories>
-
     <dependencies>
         <dependency>
             <groupId>com.github.theholywaffle</groupId>

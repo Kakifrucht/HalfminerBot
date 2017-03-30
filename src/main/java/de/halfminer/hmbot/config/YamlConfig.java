@@ -16,33 +16,61 @@ public class YamlConfig {
 
     private static final Logger logger = LoggerFactory.getLogger(YamlConfig.class);
 
-    private final File configFile = new File("hmbot/config.yml");
+    private final String fileName;
+    private final File configFile;
+
     private final Yaml yamlParser = new Yaml();
 
     private Map<String, Object> defaultParsed;
     private Map<String, Object> configParsed;
-    private long lastModified;
 
-    public YamlConfig() throws ConfigurationException {
-        this("");
+    private long lastModified;
+    private boolean isUsingDefaultConfig = false;
+
+    public YamlConfig(String fileName) {
+        this.fileName = fileName;
+        configFile = new File("hmbot/", fileName);
     }
 
-    public YamlConfig(String password) throws ConfigurationException {
+    /**
+     * Reloads the configuration file. Will only run if file was modified since last
+     * reload and won't reload if configuration is broken.
+     *
+     * @return true if reload was successful, false if not modified/written or {@link ConfigurationException} was thrown
+     */
+    public boolean reloadConfig() {
 
-        if (configFile.exists()) {
-            try {
-                //noinspection unchecked
-                defaultParsed = (Map) yamlParser.load(this.getClass().getClassLoader().getResourceAsStream("config.yml"));
-            } catch (ClassCastException e) {
-                // easiest way to check if format is valid
-                throw new ConfigurationException("Default config is not in valid format", e);
-            }
+        if (configFile.exists() && configFile.lastModified() == lastModified) {
+            return false;
+        }
 
-            loadYaml(password);
-            logger.info("Configuration loaded successfully");
-        } else {
+        Map<String, Object> oldParsed = configParsed;
+        try {
+            loadYaml();
+            return true;
+        } catch (ConfigurationException e) {
+            logger.warn(e.getMessage(), e);
+            configParsed = oldParsed;
+            return false;
+        }
+    }
 
-            try (InputStream inputStream = this.getClass().getClassLoader().getResourceAsStream("config.yml");
+    private void loadYaml() throws ConfigurationException {
+
+        try {
+            //noinspection unchecked
+            defaultParsed = (Map) yamlParser.load(this.getClass().getClassLoader().getResourceAsStream(fileName));
+        } catch (ClassCastException e) {
+            // easiest way to check if format is valid
+            throw new ConfigurationException("Default config is not in valid format", e);
+        }
+
+        if (!configFile.exists()) {
+
+            isUsingDefaultConfig = true;
+            configParsed = defaultParsed;
+
+            try (InputStream inputStream = this.getClass().getClassLoader().getResourceAsStream(fileName);
                  OutputStream outputStream = new FileOutputStream(configFile)) {
 
                 // manually copy file
@@ -52,18 +80,13 @@ public class YamlConfig {
                     outputStream.write(buffer, 0, read);
                 }
 
-                logger.info("Config file was written to {}, please fill it out and restart the bot",
-                        configFile.getAbsolutePath());
-
+                logger.info("Config file was written to {}", configFile.getAbsolutePath());
             } catch (Exception e) {
-                throw new ConfigurationException("Couldn't write config file", e);
+                throw new ConfigurationException("Could not write file to " + configFile.getAbsolutePath(), e);
             }
 
-            throw new ConfigurationException();
+            return;
         }
-    }
-
-    private void loadYaml(String password) throws ConfigurationException {
 
         lastModified = configFile.lastModified();
 
@@ -78,42 +101,13 @@ public class YamlConfig {
             try {
                 //noinspection unchecked
                 configParsed = (Map) loaded;
+                logger.info("Configuration at \"{}\" loaded successfully from file", configFile.getAbsolutePath());
             } catch (ClassCastException e) {
                 throw new ConfigurationException("Config file is in invalid format", e);
             }
 
-            if (password.length() > 0) {
-                configParsed.put("credentials.password", password);
-            } else if (getString("credentials.password").length() == 0) {
-                throw new ConfigurationException("No password was set");
-            }
-
         } else {
             throw new ConfigurationException("Config file is in invalid format");
-        }
-    }
-
-    /**
-     * Reloads the configuration file. Will only run if file was modified since last
-     * reload and won't reload if configuration is broken.
-     *
-     * @return true if reload was successful, false if not modified or {@link ConfigurationException} was thrown
-     */
-    public boolean reloadConfig() {
-
-        if (configFile.lastModified() == lastModified) {
-            lastModified = configFile.lastModified();
-            return false;
-        }
-
-        Map<String, Object> oldParsed = configParsed;
-        try {
-            loadYaml(getString("credentials.password"));
-            return true;
-        } catch (ConfigurationException e) {
-            logger.warn(e.getMessage(), e);
-            configParsed = oldParsed;
-            return false;
         }
     }
 
@@ -162,5 +156,20 @@ public class YamlConfig {
         }
 
         return currentSection.get(separator.getArgument(currentIndex));
+    }
+
+    public boolean isUsingDefaultConfig() {
+        return isUsingDefaultConfig;
+    }
+
+    private class ConfigurationException extends RuntimeException {
+
+        ConfigurationException(String error) {
+            super(error);
+        }
+
+        ConfigurationException(String error, Throwable cause) {
+            super(error, cause);
+        }
     }
 }

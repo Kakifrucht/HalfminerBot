@@ -8,8 +8,8 @@ import com.github.theholywaffle.teamspeak3.api.exception.TS3ConnectionFailedExce
 import com.github.theholywaffle.teamspeak3.api.reconnect.ConnectionHandler;
 import com.github.theholywaffle.teamspeak3.api.reconnect.ReconnectStrategy;
 import com.github.theholywaffle.teamspeak3.api.wrapper.Channel;
-import de.halfminer.hmbot.config.ConfigurationException;
 import de.halfminer.hmbot.config.YamlConfig;
+import de.halfminer.hmbot.config.PasswordYamlConfig;
 import de.halfminer.hmbot.storage.Storage;
 import de.halfminer.hmbot.task.Scheduler;
 import org.slf4j.Logger;
@@ -33,20 +33,14 @@ public class HalfminerBot {
 
         logger.info("HalfminerBot v{} is starting", getVersion());
 
-        YamlConfig config;
-        try {
-            config = args.length > 0 ? new YamlConfig(args[0]) : new YamlConfig();
-        } catch (ConfigurationException e) {
+        PasswordYamlConfig config = new PasswordYamlConfig("config.yml", args.length > 0 ? args[0] : "");
+        if (!config.reloadConfig() || config.isUsingDefaultConfig()) {
 
-            String message = e.getMessage() + ", quitting...";
-            if (e.shouldPrintStacktrace()) {
-                logger.error(message, e);
-            } else {
-                if (e.getMessage() != null) {
-                    logger.error(message);
-                }
+            if (config.isUsingDefaultConfig()) {
+                logger.info("Please fill out the config file at \"hmbot/config.yml\" and restart the bot");
             }
 
+            logger.info("Quitting...");
             try {
                 Thread.sleep(2000L);
             } catch (InterruptedException ignored) {}
@@ -76,27 +70,33 @@ public class HalfminerBot {
 
     // -- Static End -- //
 
-    private final YamlConfig botConfig;
+    private final PasswordYamlConfig botConfig;
+    private final YamlConfig locale = new YamlConfig("locale.yml");
     private final TS3Query query;
     private Scheduler scheduler;
     private TS3Api api;
     private Storage storage;
 
-    private HalfminerBot(YamlConfig botConfig) {
+    private HalfminerBot(PasswordYamlConfig botConfig) {
 
         instance = this;
         this.botConfig = botConfig;
+        if (!locale.reloadConfig()) {
+            query = null;
+            stop("Couldn't read locale file, quitting...", false);
+            return;
+        }
 
         // configure API
         String host = botConfig.getString("host");
         TS3Config apiConfig = new TS3Config();
         apiConfig.setHost(host);
         apiConfig.setQueryPort(botConfig.getInt("ports.queryPort"));
-        if (host.equals("localhost")) {
+        if (host.equals("localhost") || botConfig.getBoolean("isWhitelisted")) {
             apiConfig.setFloodRate(FloodRate.UNLIMITED);
         } else {
             apiConfig.setFloodRate(FloodRate.DEFAULT);
-            logger.info("Command rate is reduced, connect via localhost to remove command delay");
+            logger.info("Command rate is reduced, set isWhitelisted to true in config or connect via localhost");
         }
 
         apiConfig.setReconnectStrategy(ReconnectStrategy.exponentialBackoff());
@@ -104,6 +104,7 @@ public class HalfminerBot {
 
             private boolean hasConnected = false;
             private int attempts = 0;
+
             @Override
             public void onConnect(TS3Query ts3Query) {
                 scheduler = new Scheduler();
@@ -138,7 +139,7 @@ public class HalfminerBot {
         this.api = query.getApi();
 
         // login to server
-        if (api.login(botConfig.getString("credentials.username"), botConfig.getString("credentials.password"))) {
+        if (api.login(botConfig.getString("credentials.username"), botConfig.getPassword())) {
 
             if (!api.selectVirtualServerByPort(botConfig.getInt("ports.serverPort"))) {
                 stop("The provided server port is not valid, quitting...", false);
@@ -191,22 +192,23 @@ public class HalfminerBot {
 
     public boolean reloadConfig() {
         if (botConfig.reloadConfig()) {
+            locale.reloadConfig();
             logger.info("Config file was reloaded");
             scheduler.configWasReloaded();
             storage.configWasReloaded();
             return true;
-        } return false;
+        } else return false;
     }
 
     public void stop(String message, boolean restart) {
 
         logger.info(message.length() > 0 ? message : "Bot quitting...");
-        scheduler.shutdown();
-        try {
-            query.exit();
-        } catch (Exception e) {
-            if (!(e instanceof NullPointerException)) {
-                logger.warn("Couldn't disconnect from query properly", e);
+        if (scheduler != null) scheduler.shutdown();
+        if (query != null) {
+            try {
+                query.exit();
+            } catch (NullPointerException ignored) {
+                // if exiting from query without successful connect NullPointerEx is thrown, we cannot check beforehand
             }
         }
 
@@ -220,11 +222,15 @@ public class HalfminerBot {
         return botConfig;
     }
 
+    public YamlConfig getLocale() {
+        return locale;
+    }
+
     Scheduler getScheduler() {
         return scheduler;
     }
 
-    TS3Api getApi() {
+    public TS3Api getApi() {
         return api;
     }
 

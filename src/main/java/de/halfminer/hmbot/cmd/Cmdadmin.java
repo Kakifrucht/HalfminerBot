@@ -1,6 +1,7 @@
 package de.halfminer.hmbot.cmd;
 
 import com.github.theholywaffle.teamspeak3.api.wrapper.Client;
+import de.halfminer.hmbot.util.MessageBuilder;
 import de.halfminer.hmbot.util.StringArgumentSeparator;
 
 import java.util.List;
@@ -19,7 +20,7 @@ public class Cmdadmin extends Command {
         super(clientId, command);
 
         if (!command.meetsLength(1)) {
-            throw new InvalidCommandLineException("!admin <lookup|reload|restart|stop> [username/id]");
+            throw new InvalidCommandLineException("!admin <lookup|reload|restart|stop|stopserver> [username/id]");
         }
     }
 
@@ -33,14 +34,14 @@ public class Cmdadmin extends Command {
                 sendMessage("Bot is " + (restart ? "restarting." : "stopping."));
                 bot.stop("Bot was " + (restart ? "restarted" : "stopped")
                         + " via command by client " + api.getClientInfo(clientId).getNickname(), restart);
-                break;
+                return;
             case "reload":
                 if (bot.reloadConfig()) {
                     sendMessage("Configuration was reloaded.");
                 } else {
                     sendMessage("Configuration was not reloaded, either because it wasn't modified or because it is not in valid format (see console for details)");
                 }
-                break;
+                return;
             case "lookup":
                 if (command.meetsLength(2)) {
 
@@ -84,18 +85,24 @@ public class Cmdadmin extends Command {
                     }
 
                     // send in 1024 character chunks
+                    int CHUNK_SIZE = 1024;
                     String toSend = send.toString();
-                    for (int i = 0; i < toSend.length(); i += 1023) {
-                        sendMessage(toSend.substring(i, Math.min(i + 1023, toSend.length())));
+                    for (int i = 0; i < toSend.length(); i += CHUNK_SIZE) {
+                        sendMessage(toSend.substring(i, Math.min(i + CHUNK_SIZE, toSend.length())));
                     }
                     return;
                 }
+            case "stopserver":
+                sendMessage("Server is being shutdown in 10 seconds.");
+                MessageBuilder.create("cmdadminShutdownBroadcast").broadcastMessage(true);
+                api.stopServer(api.whoAmI().getVirtualServerId());
+                return;
             default:
                 sendUsage();
         }
     }
 
     private void sendUsage() {
-        sendMessage("Verwendung: !admin <lookup|reload|restart|stop>");
+        sendMessage("Verwendung: !admin <lookup|reload|restart|stop|stopserver>");
     }
 }
