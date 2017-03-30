@@ -49,7 +49,7 @@ class InactivityTask extends Task {
             if (!client.isRegularClient()) continue;
 
             int idleTimeUntilMove = config.getInt("task.inactivity.idleTimeUntilMove");
-            boolean isExempt = storage.getClient(client.getId()).hasPermission("task.inactivity.exempt.move");
+            boolean isExempt = storage.getClient(client).hasPermission("task.inactivity.exempt.move");
             if (client.getChannelId() != afkChannel.getId()
                     && (client.isAway()
                     || (!isExempt && (client.isOutputMuted() && ((client.getIdleTime() / 1000) > idleTimeUntilMove))))) {
@@ -69,7 +69,7 @@ class InactivityTask extends Task {
             for (Client client : clients) {
                 if (client.isRegularClient()
                         && client.getChannelId() == afkChannel.getId()
-                        && !storage.getClient(client.getId()).hasPermission("task.inactivity.exempt.kick")) {
+                        && !storage.getClient(client).hasPermission("task.inactivity.exempt.kick")) {
                     if (count++ >= clientsToKick) break;
                     afkClients.add(client);
                 }

@@ -135,4 +135,8 @@ public class Storage extends HalfminerBotClass {
     public HalfClient getClient(int clientId) {
         return clientsOnline.get(api.getClientInfo(clientId).getDatabaseId());
     }
+
+    public HalfClient getClient(Client client) {
+        return clientsOnline.get(client.getDatabaseId());
+    }
 }

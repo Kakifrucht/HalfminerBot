@@ -1,7 +1,6 @@
 package de.halfminer.hmbot.cmd;
 
 import com.github.theholywaffle.teamspeak3.api.wrapper.Client;
-import de.halfminer.hmbot.util.MessageBuilder;
 import de.halfminer.hmbot.util.StringArgumentSeparator;
 
 import java.util.List;
@@ -92,11 +91,6 @@ public class Cmdadmin extends Command {
                     }
                     return;
                 }
-            case "stopserver":
-                sendMessage("Server is being shutdown in 10 seconds.");
-                MessageBuilder.create("cmdadminShutdownBroadcast").broadcastMessage(true);
-                api.stopServer(api.whoAmI().getVirtualServerId());
-                return;
             default:
                 sendUsage();
         }

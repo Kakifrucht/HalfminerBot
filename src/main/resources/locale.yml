@@ -3,5 +3,7 @@
 #Use "\n" for a line break, ensure that line is not empty, e.g. "\n \n " instead of "\n\n"
 cmdadminUsage: '!admin <lookup|reload|restart|stop|stopserver> [username/id]'
 cmdadminDescription: 'Bot related admin functions'
+cmdbroadcastUsage: '!broadcast [-talkpower] <message>'
+cmdbroadcastDescription: 'Broadcast a message to every user or to given group'
 cmdchannelUsage: '!channel <create|update> <password>'
 cmdchannelDescription: 'Create your own private channel'

@@ -22,6 +22,10 @@ Current features
     - Reload the config file
       - Won't reload if file was not modified or if it is in invalid format
     - Restart (full reconnect) or shut the bot down
+  - !broadcast
+    - Broadcast a given message to all clients
+    - Optional talk power requirement can be passed as flag
+      - Example: "!broadcast -200 hi this will be broadcast" will broadcast to everybody with at least 200 talk power
   - !channel
     - Create channels for users
       - Gives channel admin to the creating user

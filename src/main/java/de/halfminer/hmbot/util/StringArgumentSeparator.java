@@ -9,31 +9,21 @@ import java.util.regex.Pattern;
 @SuppressWarnings("ALL")
 public class StringArgumentSeparator {
 
-    private final String concatenated;
+    private final char separator;
     private String[] arguments;
-    private int startingPoint = 0;
 
     public StringArgumentSeparator(String string) {
-        this.concatenated = string;
-        arguments = doSplit(string, ' ');
+        this(string, ' ');
     }
 
     public StringArgumentSeparator(String string, char separator) {
-        this.concatenated = string;
-        arguments = doSplit(string, separator);
+        this.separator = separator;
+        arguments = string.split(Pattern.quote(separator + ""));
     }
 
     public StringArgumentSeparator(String[] strings) {
-        String concat = "";
-        for (String str : strings) {
-            concat += str;
-        }
-        this.concatenated = concat;
+        this.separator = ' ';
         arguments = strings;
-    }
-
-    private String[] doSplit(String toSplit, char separator) {
-        return toSplit.split(Pattern.quote(separator + ""));
     }
 
     public String[] getArguments() {
@@ -41,7 +31,18 @@ public class StringArgumentSeparator {
     }
 
     public String getConcatenatedString() {
-        return concatenated;
+        return getConcatenatedString(0);
+    }
+
+    public String getConcatenatedString(int fromArg) {
+        if (!meetsLength(fromArg)) return "";
+        String concatenated = "";
+
+        for (String subString : arguments) {
+            concatenated += subString + separator;
+        }
+
+        return concatenated.substring(0, concatenated.length() - 1);
     }
 
     public int getLength() {
@@ -49,10 +50,13 @@ public class StringArgumentSeparator {
     }
 
     public StringArgumentSeparator removeFirstElement() {
-        if (arguments.length == 1)
+
+        if (arguments.length == 1) {
             arguments = new String[0];
-        else
+        } else {
             arguments = Arrays.copyOfRange(arguments, 1, arguments.length);
+        }
+
         return this;
     }
 

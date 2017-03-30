@@ -75,10 +75,16 @@ public class MessageBuilder extends HalfminerBotClass {
     }
 
     public void broadcastMessage(boolean log) {
+        broadcastMessage(log, 0);
+    }
+
+    public void broadcastMessage(boolean log, int minimumTalkPower) {
         String messageToBroadcast = returnMessage();
         if (messageToBroadcast.length() > 0) {
             for (Client client : api.getClients()) {
-                api.sendPrivateMessage(client.getId(), messageToBroadcast);
+                if (client.getTalkPower() >= minimumTalkPower) {
+                    api.sendPrivateMessage(client.getId(), messageToBroadcast);
+                }
             }
         }
 

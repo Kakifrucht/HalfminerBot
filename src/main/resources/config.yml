@@ -54,6 +54,7 @@ groups:
 permissions:
   admin:
   - cmd.admin
+  - cmd.broadcast
   moderator:
   - task.inactivity.exempt.move
   - task.inactivity.exempt.kick

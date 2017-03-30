@@ -45,7 +45,7 @@ public class Cmdchannel extends Command {
     @Override
     void run() throws CommandNotCompletedException {
 
-        client = storage.getClient(clientId);
+        client = storage.getClient(clientInfo);
 
         channelGroupAdminId = config.getInt("command.channel.channelGroupAdminID");
         switch (command.getArgument(0).toLowerCase()) {
@@ -74,7 +74,7 @@ public class Cmdchannel extends Command {
             // kick if not admin before changing password
             if (client.getChannelId() == channel.getId()
                     && client.getChannelGroupId() != channelGroupAdminId
-                    && !storage.getClient(client.getId()).hasPermission("cmd.channel.update.exempt.kick")) {
+                    && !storage.getClient(client).hasPermission("cmd.channel.update.exempt.kick")) {
                 api.kickClientFromChannel(client.getId());
             }
         }
