@@ -18,6 +18,8 @@ isWhitelisted: false
 botName: 'Halfminer TSBot'
 #Channel the bot will be joining and using as base channel for commands
 botChannelName: 'Welcome'
+#Whether the bot will message joining clients, or only upon joining the bots channel
+messageOnJoin: true
 command:
   channel:
     #Delay in seconds until a channel will be deleted after the last client leaves
@@ -55,6 +57,7 @@ permissions:
   admin:
   - cmd.admin
   - cmd.broadcast
+  - cmd.bypass.flood
   moderator:
   - task.inactivity.exempt.move
   - task.inactivity.exempt.kick

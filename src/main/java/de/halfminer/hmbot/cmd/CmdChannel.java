@@ -29,12 +29,10 @@ import java.util.Map;
 public class CmdChannel extends Command {
 
     private final ChannelInfo botChannel;
-    private HalfClient client;
-
     private int channelGroupAdminId;
 
-    public CmdChannel(int clientId, StringArgumentSeparator command) throws InvalidCommandException {
-        super(clientId, command);
+    public CmdChannel(HalfClient client, StringArgumentSeparator command) throws InvalidCommandException {
+        super(client, command);
 
         if (!this.command.meetsLength(2)) {
             throw new InvalidCommandException(CommandEnum.CHANNEL);
@@ -45,8 +43,6 @@ public class CmdChannel extends Command {
 
     @Override
     void run() throws InvalidCommandException {
-
-        client = storage.getClient(clientInfo);
 
         channelGroupAdminId = config.getInt("command.channel.channelGroupAdminID");
         switch (command.getArgument(0).toLowerCase()) {
@@ -67,7 +63,6 @@ public class CmdChannel extends Command {
         if (client.moveToChannel()) {
             return;
         }
-
 
         String channelCreateName = MessageBuilder.create("cmdChannelCreateFormat")
                 .addPlaceholderReplace("NICKNAME", clientInfo.getNickname())

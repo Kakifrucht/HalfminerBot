@@ -3,6 +3,7 @@ package de.halfminer.hmbot.cmd;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import de.halfminer.hmbot.HalfminerBotClass;
+import de.halfminer.hmbot.storage.HalfClient;
 import de.halfminer.hmbot.storage.Storage;
 import de.halfminer.hmbot.util.MessageBuilder;
 import de.halfminer.hmbot.util.StringArgumentSeparator;
@@ -32,30 +33,35 @@ public class CommandDispatcher extends HalfminerBotClass {
         }
 
         StringArgumentSeparator command = new StringArgumentSeparator(commandUnparsedEdit);
-        if (!command.meetsLength(1)) return;
+        if (!command.meetsLength(1)) {
+            return;
+        }
 
-        floodProtection.put(clientId, true);
         logger.info("Client {} issued server command: {}", clientName, command.getConcatenatedString());
+
+        HalfClient sender = storage.getClient(clientId);
         CommandEnum commandEnum = CommandEnum.getCommand(command.getArgument(0));
+
+        if (!sender.hasPermission("cmd.bypass.flood")) {
+            floodProtection.put(clientId, true);
+        }
 
         if (commandEnum == null) {
             MessageBuilder.create("cmdDispatcherUnknownCmd").sendMessage(clientId);
             return;
         }
 
+        if (!sender.hasPermission(commandEnum.getPermission())) {
+            MessageBuilder.create("cmdDispatcherNoPermission").sendMessage(clientId);
+            return;
+        }
+
         try {
-            Class<?> classLoaded = this.getClass()
+            Command cmdInstance = (Command) this.getClass()
                     .getClassLoader()
-                    .loadClass(commandEnum.getReflectionPath());
-
-            if (!storage.getClient(clientId).hasPermission(commandEnum.getPermission())) {
-                MessageBuilder.create("cmdDispatcherNoPermission").sendMessage(clientId);
-                return;
-            }
-
-            Command cmdInstance = (Command) classLoaded
-                    .getConstructor(int.class, StringArgumentSeparator.class)
-                    .newInstance(clientId, command);
+                    .loadClass(commandEnum.getReflectionPath())
+                    .getConstructor(HalfClient.class, StringArgumentSeparator.class)
+                    .newInstance(sender, command);
 
             cmdInstance.run();
 

@@ -14,7 +14,9 @@ Current features
   - Higher groups automatically inherit all permissions of lower groups
   - Permission changes are always logged
 - Command chat interface with !<command>
-  - Command flood protection
+  - Bot welcomes (server and/or channel) joining clients with private message
+    - Server join message can be disabled
+  - Command flood protection (optional bypass permission)
   - Default command if none supplied is !channel, to make channel creation easier
   - Permission to use command necessary
 - **Commands**

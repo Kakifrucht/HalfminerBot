@@ -1,5 +1,6 @@
 package de.halfminer.hmbot.cmd;
 
+import de.halfminer.hmbot.storage.HalfClient;
 import de.halfminer.hmbot.util.MessageBuilder;
 import de.halfminer.hmbot.util.StringArgumentSeparator;
 
@@ -13,8 +14,8 @@ import de.halfminer.hmbot.util.StringArgumentSeparator;
 @SuppressWarnings("unused")
 public class CmdBroadcast extends Command {
 
-    public CmdBroadcast(int clientId, StringArgumentSeparator command) throws InvalidCommandException {
-        super(clientId, command);
+    public CmdBroadcast(HalfClient client, StringArgumentSeparator command) throws InvalidCommandException {
+        super(client, command);
         if (!command.meetsLength(1)) {
             throw new InvalidCommandException(CommandEnum.BROADCAST);
         }

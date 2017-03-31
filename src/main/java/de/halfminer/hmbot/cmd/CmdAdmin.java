@@ -1,6 +1,7 @@
 package de.halfminer.hmbot.cmd;
 
 import com.github.theholywaffle.teamspeak3.api.wrapper.Client;
+import de.halfminer.hmbot.storage.HalfClient;
 import de.halfminer.hmbot.util.MessageBuilder;
 import de.halfminer.hmbot.util.StringArgumentSeparator;
 
@@ -16,8 +17,8 @@ import java.util.Map;
 @SuppressWarnings("unused")
 public class CmdAdmin extends Command {
 
-    public CmdAdmin(int clientId, StringArgumentSeparator command) throws InvalidCommandException {
-        super(clientId, command);
+    public CmdAdmin(HalfClient client, StringArgumentSeparator command) throws InvalidCommandException {
+        super(client, command);
 
         if (!command.meetsLength(1)) {
             throw new InvalidCommandException(CommandEnum.ADMIN);
@@ -37,7 +38,7 @@ public class CmdAdmin extends Command {
                     sendMessage("cmdAdminStopped");
                 }
                 bot.stop("Bot was " + (restart ? "restarted" : "stopped")
-                        + " via command by client " + api.getClientInfo(clientId).getNickname(), restart);
+                        + " via command by client " + clientInfo.getNickname(), restart);
                 return;
             case "reload":
                 if (bot.reloadConfig()) {
@@ -54,7 +55,6 @@ public class CmdAdmin extends Command {
                     if (id > Integer.MIN_VALUE) {
                         toLookup = api.getClientInfo(id);
                     }
-
 
                     if (toLookup == null) {
                         List<Client> clients = api.getClientsByName(command.getArgument(1));

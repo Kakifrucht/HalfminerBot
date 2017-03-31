@@ -2,6 +2,7 @@ package de.halfminer.hmbot.cmd;
 
 import com.github.theholywaffle.teamspeak3.api.wrapper.ClientInfo;
 import de.halfminer.hmbot.HalfminerBotClass;
+import de.halfminer.hmbot.storage.HalfClient;
 import de.halfminer.hmbot.storage.Storage;
 import de.halfminer.hmbot.util.MessageBuilder;
 import de.halfminer.hmbot.util.StringArgumentSeparator;
@@ -10,16 +11,18 @@ abstract class Command extends HalfminerBotClass {
 
     final Storage storage = bot.getStorage();
 
+    final HalfClient client;
     final int clientId;
     final ClientInfo clientInfo;
 
     final StringArgumentSeparator command;
 
     @SuppressWarnings("WeakerAccess")
-    public Command(int clientId, StringArgumentSeparator command) {
+    public Command(HalfClient client, StringArgumentSeparator command) {
 
-        this.clientId = clientId;
-        this.clientInfo = api.getClientInfo(clientId);
+        this.client = client;
+        this.clientInfo = client.getClientInfo();
+        this.clientId = clientInfo.getId();
 
         this.command = command.removeFirstElement();
     }

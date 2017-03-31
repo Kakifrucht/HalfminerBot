@@ -5,6 +5,7 @@ import com.github.theholywaffle.teamspeak3.api.wrapper.Client;
 import com.github.theholywaffle.teamspeak3.api.wrapper.ClientInfo;
 import de.halfminer.hmbot.HalfminerBotClass;
 import de.halfminer.hmbot.cmd.CmdChannel;
+import de.halfminer.hmbot.util.MessageBuilder;
 
 import java.util.List;
 
@@ -21,6 +22,10 @@ public class HalfClient extends HalfminerBotClass {
     HalfClient(int clientId, HalfGroup group) {
         this.clientId = clientId;
         this.group = group;
+    }
+
+    public ClientInfo getClientInfo() {
+        return api.getClientInfo(clientId);
     }
 
     public boolean hasPermission(String permission) {
@@ -66,7 +71,7 @@ public class HalfClient extends HalfminerBotClass {
             if (user.getChannelId() != channelOfUser.getId()) { //check if user is already in his channel, if not move
                 api.moveClient(clientId, channelOfUser.getId());
             }
-            api.sendPrivateMessage(clientId, "Du hast bereits einen privaten Channel.");
+            MessageBuilder.create("hasChannel").sendMessage(clientId);
             return true;
         }
 

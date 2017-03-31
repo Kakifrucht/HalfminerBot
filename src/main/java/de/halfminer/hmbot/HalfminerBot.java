@@ -8,8 +8,8 @@ import com.github.theholywaffle.teamspeak3.api.exception.TS3ConnectionFailedExce
 import com.github.theholywaffle.teamspeak3.api.reconnect.ConnectionHandler;
 import com.github.theholywaffle.teamspeak3.api.reconnect.ReconnectStrategy;
 import com.github.theholywaffle.teamspeak3.api.wrapper.Channel;
-import de.halfminer.hmbot.config.YamlConfig;
 import de.halfminer.hmbot.config.PasswordYamlConfig;
+import de.halfminer.hmbot.config.YamlConfig;
 import de.halfminer.hmbot.storage.Storage;
 import de.halfminer.hmbot.task.Scheduler;
 import org.slf4j.Logger;

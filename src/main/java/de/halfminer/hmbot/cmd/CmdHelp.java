@@ -16,8 +16,8 @@ import de.halfminer.hmbot.util.StringArgumentSeparator;
 @SuppressWarnings("unused")
 public class CmdHelp extends Command {
 
-    public CmdHelp(int clientId, StringArgumentSeparator command) throws InvalidCommandException {
-        super(clientId, command);
+    public CmdHelp(HalfClient client, StringArgumentSeparator command) throws InvalidCommandException {
+        super(client, command);
     }
 
     @Override
@@ -61,7 +61,6 @@ public class CmdHelp extends Command {
         api.sendPrivateMessage(clientId,
                 "[B]HalfminerBot[/B] v" + HalfminerBot.getVersion() + " - © halfminer.de | Kakifrucht");
 
-        HalfClient client = storage.getClient(clientInfo);
         StringBuilder allCommands = new StringBuilder(MessageBuilder.returnMessage("cmdHelpCommandsTitle"));
         for (CommandEnum cmd : CommandEnum.values()) {
 
