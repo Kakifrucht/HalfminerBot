@@ -48,7 +48,7 @@ public class Cmdhelp extends Command {
 
                 if (!hasGroup) {
                     api.addClientToServerGroup(highestGroup.getId(), clientInfo.getDatabaseId());
-                    sendMessage("cmdhelpSetGroup", "GROUP", highestGroup.getName());
+                    sendMessage("cmdHelpSetGroup", "GROUP", highestGroup.getName());
                     return;
                 }
             }

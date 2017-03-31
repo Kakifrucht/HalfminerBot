@@ -20,7 +20,7 @@ public class Cmdadmin extends Command {
         super(clientId, command);
 
         if (!command.meetsLength(1)) {
-            throw new InvalidCommandException("cmdadminUsage");
+            throw new InvalidCommandException("cmdAdminUsage");
         }
     }
 
@@ -32,18 +32,18 @@ public class Cmdadmin extends Command {
             case "restart":
                 boolean restart = argument.startsWith("r");
                 if (restart) {
-                    sendMessage("cmdadminRestarted");
+                    sendMessage("cmdAdminRestarted");
                 } else {
-                    sendMessage("cmdadminStopped");
+                    sendMessage("cmdAdminStopped");
                 }
                 bot.stop("Bot was " + (restart ? "restarted" : "stopped")
                         + " via command by client " + api.getClientInfo(clientId).getNickname(), restart);
                 return;
             case "reload":
                 if (bot.reloadConfig()) {
-                    sendMessage("cmdadminConfigReloaded");
+                    sendMessage("cmdAdminConfigReloaded");
                 } else {
-                    sendMessage("cmdadminConfigReloadedError");
+                    sendMessage("cmdAdminConfigReloadedError");
                 }
                 return;
             case "lookup":
@@ -71,14 +71,14 @@ public class Cmdadmin extends Command {
                                             .append(client.getNickname())
                                             .append("\n");
                                 }
-                                sendMessage("cmdadminLookupList", "LIST", send.toString());
+                                sendMessage("cmdAdminLookupList", "LIST", send.toString());
                                 return;
                             }
                         }
                     }
 
                     if (toLookup == null) {
-                        sendMessage("cmdadminLookupNotFound");
+                        sendMessage("cmdAdminLookupNotFound");
                         return;
                     }
 
@@ -94,7 +94,7 @@ public class Cmdadmin extends Command {
                     return;
                 }
             default:
-                throw new InvalidCommandException("cmdadminUsage");
+                throw new InvalidCommandException("cmdAdminUsage");
         }
     }
 }

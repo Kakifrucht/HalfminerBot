@@ -37,7 +37,7 @@ public class Cmdchannel extends Command {
         super(clientId, command);
 
         if (!this.command.meetsLength(2)) {
-            throw new InvalidCommandException("cmdchannelUsage");
+            throw new InvalidCommandException("cmdChannelUsage");
         }
 
         botChannel = api.getChannelInfo(api.whoAmI().getChannelId());
@@ -57,30 +57,8 @@ public class Cmdchannel extends Command {
                 updateChannel();
                 break;
             default:
-                throw new InvalidCommandException("cmdchannelUsage");
+                throw new InvalidCommandException("cmdChannelUsage");
         }
-    }
-
-    private void updateChannel() {
-        Channel channel = client.getChannel();
-        if (channel == null) {
-            sendMessage("cmdchannelUpdateError");
-            return;
-        }
-
-        String password = command.getArgument(1);
-        api.editChannel(channel.getId(), Collections.singletonMap(ChannelProperty.CHANNEL_PASSWORD, password));
-
-        for (Client client : api.getClients()) {
-            // kick if not admin before changing password
-            if (client.getChannelId() == channel.getId()
-                    && client.getChannelGroupId() != channelGroupAdminId
-                    && !storage.getClient(client).hasPermission("cmd.channel.update.exempt.kick")) {
-                api.kickClientFromChannel(client.getId());
-            }
-        }
-
-        sendMessage("cmdchannelUpdateSuccess", "PASSWORD", password);
     }
 
     private void createChannel() {
@@ -91,13 +69,15 @@ public class Cmdchannel extends Command {
         }
 
 
-        String channelCreateName = MessageBuilder.create("cmdchannelCreateFormat")
+        String channelCreateName = MessageBuilder.create("cmdChannelCreateFormat")
                 .addPlaceholderReplace("NICKNAME", clientInfo.getNickname())
                 .returnMessage();
-        String password = command.getArgument(1);
-        if (password.length() > 20) {
-            password = password.substring(0, 20);
+
+        if (channelCreateName.length() > 40) {
+            channelCreateName = channelCreateName.substring(0, 40);
         }
+
+        String password = getPassword();
 
         Map<ChannelProperty, String> channelCreateProperty = new HashMap<>();
         channelCreateProperty.put(ChannelProperty.CPID, Integer.toString(botChannel.getParentChannelId()));
@@ -106,8 +86,8 @@ public class Cmdchannel extends Command {
         channelCreateProperty.put(ChannelProperty.CHANNEL_FLAG_SEMI_PERMANENT, "1");
 
         String dateFormat = new SimpleDateFormat(
-                MessageBuilder.returnMessage("cmdchannelCreateTopicFormat")).format(new Date());
-        String channelTopic = MessageBuilder.create("cmdchannelCreateTopic")
+                MessageBuilder.returnMessage("cmdChannelCreateTopicFormat")).format(new Date());
+        String channelTopic = MessageBuilder.create("cmdChannelCreateTopic")
                 .addPlaceholderReplace("FORMAT", dateFormat)
                 .returnMessage();
 
@@ -130,10 +110,40 @@ public class Cmdchannel extends Command {
                     config.getString("command.channel.channelDeleteDelay"));
             api.editChannel(channelCreateID, channelCreateProperty);
 
-            sendMessage("cmdchannelCreateSuccess", "PASSWORD", password);
+            sendMessage("cmdChannelCreateSuccess", "PASSWORD", password);
             logger.info("Channel created: {}", channelCreateName);
         } else {
-            sendMessage("cmdchannelCreateError");
+            sendMessage("cmdChannelCreateError");
         }
+    }
+
+    private void updateChannel() {
+        Channel channel = client.getChannel();
+        if (channel == null) {
+            sendMessage("cmdChannelUpdateError");
+            return;
+        }
+
+        String password = getPassword();
+        api.editChannel(channel.getId(), Collections.singletonMap(ChannelProperty.CHANNEL_PASSWORD, password));
+
+        for (Client client : api.getClients()) {
+            // kick if not admin before changing password
+            if (client.getChannelId() == channel.getId()
+                    && client.getChannelGroupId() != channelGroupAdminId
+                    && !storage.getClient(client).hasPermission("cmd.channel.update.exempt.kick")) {
+                api.kickClientFromChannel(client.getId());
+            }
+        }
+
+        sendMessage("cmdChannelUpdateSuccess", "PASSWORD", password);
+    }
+
+    private String getPassword() {
+        String password = command.getArgument(1);
+        if (password.length() > 20) {
+            password = password.substring(0, 20);
+        }
+        return password;
     }
 }

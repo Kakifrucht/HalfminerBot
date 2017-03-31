@@ -16,7 +16,7 @@ public class Cmdbroadcast extends Command {
     public Cmdbroadcast(int clientId, StringArgumentSeparator command) throws InvalidCommandException {
         super(clientId, command);
         if (!command.meetsLength(1)) {
-            throw new InvalidCommandException("cmdbroadcastUsage");
+            throw new InvalidCommandException("cmdBroadcastUsage");
         }
     }
 
@@ -37,7 +37,7 @@ public class Cmdbroadcast extends Command {
             messageToBroadcast = command.getConcatenatedString();
         }
 
-        MessageBuilder.create("cmdbroadcastFormat")
+        MessageBuilder.create("cmdBroadcastFormat")
                 .addPlaceholderReplace("GROUP", api.getServerGroupsByClient(clientInfo).get(0).getName())
                 .addPlaceholderReplace("NICKNAME", clientInfo.getNickname())
                 .addPlaceholderReplace("MESSAGE", messageToBroadcast)
