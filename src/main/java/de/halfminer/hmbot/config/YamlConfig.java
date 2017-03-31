@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory;
 import org.yaml.snakeyaml.Yaml;
 
 import java.io.*;
+import java.util.Collections;
 import java.util.Map;
 
 /**
@@ -41,6 +42,7 @@ public class YamlConfig {
     public boolean reloadConfig() {
 
         if (configFile.exists() && configFile.lastModified() == lastModified) {
+            logger.info("Configuration {} was not reloaded, as it wasn't modified", configFile.getName());
             return false;
         }
 
@@ -97,11 +99,11 @@ public class YamlConfig {
             throw new ConfigurationException("Could not read config file", e);
         }
 
-        if (loaded instanceof Map) {
+        if (loaded == null || loaded instanceof Map) {
             try {
                 //noinspection unchecked
-                configParsed = (Map) loaded;
-                logger.info("Configuration at \"{}\" loaded successfully from file", configFile.getAbsolutePath());
+                configParsed = loaded != null ? (Map) loaded : Collections.emptyMap();
+                logger.info("Configuration at {} loaded successfully from file", configFile.getName());
             } catch (ClassCastException e) {
                 throw new ConfigurationException("Config file is in invalid format", e);
             }
