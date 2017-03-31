@@ -7,19 +7,21 @@ import de.halfminer.hmbot.util.StringArgumentSeparator;
  * - Broadcast a given message to all client
  * - Optional talk power requirement can be passed as flag
  *   - Example: "!broadcast -200 hi this will be broadcast" will broadcast to everybody with at least 200 talk power
+ * - Broadcast format configurable via locale file
+ *   - Adds server group and broadcaster to message
  */
 @SuppressWarnings("unused")
 public class Cmdbroadcast extends Command {
 
-    public Cmdbroadcast(int clientId, StringArgumentSeparator command) throws InvalidCommandLineException {
+    public Cmdbroadcast(int clientId, StringArgumentSeparator command) throws InvalidCommandException {
         super(clientId, command);
         if (!command.meetsLength(1)) {
-            throw new InvalidCommandLineException("!broadcast [-talkpower] <message>");
+            throw new InvalidCommandException("cmdbroadcastUsage");
         }
     }
 
     @Override
-    void run() throws CommandNotCompletedException {
+    void run() {
         int minimumTalkPower = 0;
         String messageToBroadcast;
 
@@ -35,8 +37,10 @@ public class Cmdbroadcast extends Command {
             messageToBroadcast = command.getConcatenatedString();
         }
 
-        MessageBuilder.create(messageToBroadcast)
-                .setDirectString()
+        MessageBuilder.create("cmdbroadcastFormat")
+                .addPlaceholderReplace("GROUP", api.getServerGroupsByClient(clientInfo).get(0).getName())
+                .addPlaceholderReplace("NICKNAME", clientInfo.getNickname())
+                .addPlaceholderReplace("MESSAGE", messageToBroadcast)
                 .broadcastMessage(false, minimumTalkPower);
     }
 }

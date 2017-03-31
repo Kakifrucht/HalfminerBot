@@ -38,8 +38,8 @@ public class StringArgumentSeparator {
         if (!meetsLength(fromArg)) return "";
         String concatenated = "";
 
-        for (String subString : arguments) {
-            concatenated += subString + separator;
+        for (int i = fromArg; i < arguments.length; i++) {
+            concatenated += arguments[i] + separator;
         }
 
         return concatenated.substring(0, concatenated.length() - 1);

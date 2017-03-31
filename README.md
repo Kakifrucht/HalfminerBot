@@ -5,7 +5,8 @@ Connecting to query via [API](https://github.com/TheHolyWaffle/TeamSpeak-3-Java-
 Current features
 -------
 - Configurable via YAML based config file
-  - Query password can either be passed as command line argument or always be set via config
+  - Query password can either be passed as command line argument or be set via config
+- Bot messages are fully configurable/localizable
 - Automatic reconnect if connection is lost
 - Define channel for bot to join, stays persistent if moved out
 - Permission system
@@ -26,6 +27,8 @@ Current features
     - Broadcast a given message to all clients
     - Optional talk power requirement can be passed as flag
       - Example: "!broadcast -200 hi this will be broadcast" will broadcast to everybody with at least 200 talk power
+    - Broadcast format configurable via locale file
+      - Adds server group and broadcaster to message
   - !channel
     - Create channels for users
       - Gives channel admin to the creating user

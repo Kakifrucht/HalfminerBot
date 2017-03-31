@@ -1,6 +1,7 @@
 package de.halfminer.hmbot.cmd;
 
 import com.github.theholywaffle.teamspeak3.api.wrapper.Client;
+import de.halfminer.hmbot.util.MessageBuilder;
 import de.halfminer.hmbot.util.StringArgumentSeparator;
 
 import java.util.List;
@@ -15,30 +16,34 @@ import java.util.Map;
 @SuppressWarnings("unused")
 public class Cmdadmin extends Command {
 
-    public Cmdadmin(int clientId, StringArgumentSeparator command) throws InvalidCommandLineException {
+    public Cmdadmin(int clientId, StringArgumentSeparator command) throws InvalidCommandException {
         super(clientId, command);
 
         if (!command.meetsLength(1)) {
-            throw new InvalidCommandLineException("!admin <lookup|reload|restart|stop|stopserver> [username/id]");
+            throw new InvalidCommandException("cmdadminUsage");
         }
     }
 
     @Override
-    void run() throws CommandNotCompletedException {
+    void run() throws InvalidCommandException {
         String argument = command.getArgument(0);
         switch (argument.toLowerCase()) {
             case "stop":
             case "restart":
                 boolean restart = argument.startsWith("r");
-                sendMessage("Bot is " + (restart ? "restarting." : "stopping."));
+                if (restart) {
+                    sendMessage("cmdadminRestarted");
+                } else {
+                    sendMessage("cmdadminStopped");
+                }
                 bot.stop("Bot was " + (restart ? "restarted" : "stopped")
                         + " via command by client " + api.getClientInfo(clientId).getNickname(), restart);
                 return;
             case "reload":
                 if (bot.reloadConfig()) {
-                    sendMessage("Configuration was reloaded.");
+                    sendMessage("cmdadminConfigReloaded");
                 } else {
-                    sendMessage("Configuration was not reloaded, either because it wasn't modified or because it is not in valid format (see console for details)");
+                    sendMessage("cmdadminConfigReloadedError");
                 }
                 return;
             case "lookup":
@@ -58,7 +63,7 @@ public class Cmdadmin extends Command {
                                 toLookup = clients.get(0);
                             } else {
 
-                                StringBuilder send = new StringBuilder("Mehrere Clients mit diesem Namen wurden gefunden:\n");
+                                StringBuilder send = new StringBuilder();
                                 for (Client client : clients) {
                                     send.append(" ID: ")
                                             .append(client.getId())
@@ -66,14 +71,14 @@ public class Cmdadmin extends Command {
                                             .append(client.getNickname())
                                             .append("\n");
                                 }
-                                sendMessage(send.toString());
+                                sendMessage("cmdadminLookupList", "LIST", send.toString());
                                 return;
                             }
                         }
                     }
 
                     if (toLookup == null) {
-                        sendMessage("Kein Client gefunden mit diesem Namen oder ID.");
+                        sendMessage("cmdadminLookupNotFound");
                         return;
                     }
 
@@ -83,20 +88,13 @@ public class Cmdadmin extends Command {
                         send.append(" ").append(entry.getKey()).append("=").append(entry.getValue()).append("\n");
                     }
 
-                    // send in 1024 character chunks
-                    int CHUNK_SIZE = 1024;
-                    String toSend = send.toString();
-                    for (int i = 0; i < toSend.length(); i += CHUNK_SIZE) {
-                        sendMessage(toSend.substring(i, Math.min(i + CHUNK_SIZE, toSend.length())));
-                    }
+                    MessageBuilder.create(send.toString())
+                            .setDirectString()
+                            .sendMessage(clientId);
                     return;
                 }
             default:
-                sendUsage();
+                throw new InvalidCommandException("cmdadminUsage");
         }
-    }
-
-    private void sendUsage() {
-        sendMessage("Verwendung: !admin <lookup|reload|restart|stop|stopserver>");
     }
 }

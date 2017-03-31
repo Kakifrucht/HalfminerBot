@@ -5,6 +5,7 @@ import com.github.theholywaffle.teamspeak3.api.wrapper.Channel;
 import com.github.theholywaffle.teamspeak3.api.wrapper.ChannelInfo;
 import com.github.theholywaffle.teamspeak3.api.wrapper.Client;
 import de.halfminer.hmbot.storage.HalfClient;
+import de.halfminer.hmbot.util.MessageBuilder;
 import de.halfminer.hmbot.util.StringArgumentSeparator;
 
 import java.text.SimpleDateFormat;
@@ -32,18 +33,18 @@ public class Cmdchannel extends Command {
 
     private int channelGroupAdminId;
 
-    public Cmdchannel(int clientId, StringArgumentSeparator command) throws InvalidCommandLineException {
+    public Cmdchannel(int clientId, StringArgumentSeparator command) throws InvalidCommandException {
         super(clientId, command);
 
         if (!this.command.meetsLength(2)) {
-            throw new InvalidCommandLineException("!channel <create|update> <password>");
+            throw new InvalidCommandException("cmdchannelUsage");
         }
 
         botChannel = api.getChannelInfo(api.whoAmI().getChannelId());
     }
 
     @Override
-    void run() throws CommandNotCompletedException {
+    void run() throws InvalidCommandException {
 
         client = storage.getClient(clientInfo);
 
@@ -56,14 +57,14 @@ public class Cmdchannel extends Command {
                 updateChannel();
                 break;
             default:
-                sendMessage("Verwendung: !channel <create|update> <password>");
+                throw new InvalidCommandException("cmdchannelUsage");
         }
     }
 
     private void updateChannel() {
         Channel channel = client.getChannel();
         if (channel == null) {
-            sendMessage("Du hast keinen eigenen Channel, erstelle einen indem du dein gewünschtes Passwort eingibst.");
+            sendMessage("cmdchannelUpdateError");
             return;
         }
 
@@ -79,26 +80,38 @@ public class Cmdchannel extends Command {
             }
         }
 
-        sendMessage("Der Channel wurde geleert und das Passwort zu \"" + password + "\" geändert.");
+        sendMessage("cmdchannelUpdateSuccess", "PASSWORD", password);
     }
 
-    private void createChannel() throws CommandNotCompletedException {
+    private void createChannel() {
 
         // move if user has channel already
         if (client.moveToChannel()) {
             return;
         }
 
-        String channelCreateName = clientInfo.getNickname() + "'s Channel";
+
+        String channelCreateName = MessageBuilder.create("cmdchannelCreateFormat")
+                .addPlaceholderReplace("NICKNAME", clientInfo.getNickname())
+                .returnMessage();
         String password = command.getArgument(1);
+        if (password.length() > 20) {
+            password = password.substring(0, 20);
+        }
 
         Map<ChannelProperty, String> channelCreateProperty = new HashMap<>();
+        channelCreateProperty.put(ChannelProperty.CPID, Integer.toString(botChannel.getParentChannelId()));
         channelCreateProperty.put(ChannelProperty.CHANNEL_CODEC_QUALITY, "10");
         channelCreateProperty.put(ChannelProperty.CHANNEL_PASSWORD, password);
         channelCreateProperty.put(ChannelProperty.CHANNEL_FLAG_SEMI_PERMANENT, "1");
-        channelCreateProperty.put(ChannelProperty.CHANNEL_TOPIC,
-                "Channel Erstelldatum: " + new SimpleDateFormat("dd.MM / HH:mm").format(new Date()));
-        channelCreateProperty.put(ChannelProperty.CPID, Integer.toString(botChannel.getParentChannelId()));
+
+        String dateFormat = new SimpleDateFormat(
+                MessageBuilder.returnMessage("cmdchannelCreateTopicFormat")).format(new Date());
+        String channelTopic = MessageBuilder.create("cmdchannelCreateTopic")
+                .addPlaceholderReplace("FORMAT", dateFormat)
+                .returnMessage();
+
+        channelCreateProperty.put(ChannelProperty.CHANNEL_TOPIC, channelTopic);
 
         int channelCreateID = api.createChannel(channelCreateName, channelCreateProperty);
 
@@ -117,12 +130,10 @@ public class Cmdchannel extends Command {
                     config.getString("command.channel.channelDeleteDelay"));
             api.editChannel(channelCreateID, channelCreateProperty);
 
-            sendMessage("Dein Channel wurde erfolgreich erstellt, das Passwort lautet \"" + password + "\". " +
-                    "Du kannst das Passwort mit dem Kommando \"!channel update <passwort>\" ändern (kickt alle Spieler).");
+            sendMessage("cmdchannelCreateSuccess", "PASSWORD", password);
             logger.info("Channel created: {}", channelCreateName);
         } else {
-            throw new CommandNotCompletedException(this, "Channel already exists",
-                    "Der Channel konnte nicht erstellt werden, da es bereits einen Channel mit deinem Namen gibt.");
+            sendMessage("cmdchannelCreateError");
         }
     }
 }

@@ -4,6 +4,7 @@ import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import de.halfminer.hmbot.HalfminerBotClass;
 import de.halfminer.hmbot.storage.Storage;
+import de.halfminer.hmbot.util.MessageBuilder;
 import de.halfminer.hmbot.util.StringArgumentSeparator;
 
 import java.lang.reflect.InvocationTargetException;
@@ -13,17 +14,18 @@ public class CommandDispatcher extends HalfminerBotClass {
 
     private final Storage storage = bot.getStorage();
     private final Cache<Integer, Boolean> floodProtection = CacheBuilder.newBuilder()
+            .concurrencyLevel(2)
             .expireAfterWrite(2, TimeUnit.SECONDS)
             .build();
 
     public void dispatchCommand(String clientName, int clientId, String commandUnparsed) {
 
         if (floodProtection.getIfPresent(clientId) != null) {
-            api.sendPrivateMessage(clientId, "Bitte warte einen kurzen Moment und versuche es danach erneut.");
+            MessageBuilder.create("cmdDispatcherFloodLimit").sendMessage(clientId);
             return;
         }
 
-        // set default command to !channel
+        // set default command to !channel create
         String commandUnparsedEdit = commandUnparsed;
         if (!commandUnparsed.startsWith("!")) {
             commandUnparsedEdit = "!channel create " + commandUnparsed;
@@ -43,7 +45,7 @@ public class CommandDispatcher extends HalfminerBotClass {
                     .loadClass("de.halfminer.hmbot.cmd." + className);
 
             if (!storage.getClient(clientId).hasPermission("cmd." + commandRefl)) {
-                api.sendPrivateMessage(clientId, "Du hast keine Berechtigung dies zu nutzen");
+                MessageBuilder.create("cmdDispatcherNoPermission").sendMessage(clientId);
                 return;
             }
 
@@ -55,30 +57,29 @@ public class CommandDispatcher extends HalfminerBotClass {
 
         } catch (InvocationTargetException e) {
 
-            if (e.getCause() instanceof InvalidCommandLineException) {
-                InvalidCommandLineException ex = (InvalidCommandLineException) e.getCause();
-                api.sendPrivateMessage(clientId, "Verwendung: " + ex.getCorrectUsage());
+            if (e.getCause() instanceof InvalidCommandException) {
+                sendUsage((InvalidCommandException) e.getCause(), clientId);
             } else {
-                errorLogAndTell(e, clientId);
+                logErrorAndMessage(e, clientId);
             }
 
-        } catch (CommandNotCompletedException e) {
-
-            if (e.doTellUser()) {
-                api.sendPrivateMessage(clientId, e.toTellUser());
-            }
-
-            logger.warn(e.getError());
-
+        } catch (InvalidCommandException e) {
+            sendUsage(e, clientId);
         } catch (ClassNotFoundException e) {
-            api.sendPrivateMessage(clientId, "Unbekanntes Kommando. Verwende !help für eine Befehlsübersicht.");
+            MessageBuilder.create("cmdDispatcherUnknownCmd").sendMessage(clientId);
         } catch (Throwable e) {
-            errorLogAndTell(e, clientId);
+            logErrorAndMessage(e, clientId);
         }
     }
 
-    private void errorLogAndTell(Throwable e, int clientId) {
+    private void sendUsage(InvalidCommandException e, int clientId) {
+        MessageBuilder.create("cmdDispatcherUsage")
+                .addPlaceholderReplace("USAGE", e.getUsage())
+                .sendMessage(clientId);
+    }
+
+    private void logErrorAndMessage(Throwable e, int clientId) {
         logger.error("Exception during newInstance() of command", e);
-        api.sendPrivateMessage(clientId, "Ein unbekannter Fehler ist aufgetreten. Bitte wende dich an ein Teammitglied.");
+        MessageBuilder.create("cmdDispatchedUnknownError").sendMessage(clientId);
     }
 }

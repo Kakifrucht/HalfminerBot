@@ -3,6 +3,7 @@ package de.halfminer.hmbot.task;
 import com.github.theholywaffle.teamspeak3.api.wrapper.Channel;
 import com.github.theholywaffle.teamspeak3.api.wrapper.Client;
 import de.halfminer.hmbot.storage.Storage;
+import de.halfminer.hmbot.util.MessageBuilder;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -55,7 +56,7 @@ class InactivityTask extends Task {
                     || (!isExempt && (client.isOutputMuted() && ((client.getIdleTime() / 1000) > idleTimeUntilMove))))) {
 
                 api.moveClient(client, afkChannel);
-                api.sendPrivateMessage(client.getId(), "Du wurdest in die AFK Lounge verschoben, da du abwesend warst.");
+                MessageBuilder.create("taskInactivityMoved").sendMessage(client);
                 logger.info("{} is away and has been moved into AFK channel", client.getNickname());
             }
         }
@@ -76,7 +77,7 @@ class InactivityTask extends Task {
             }
 
             for (Client afk : afkClients) {
-                String message = "Der Server ist aktuell voll. Du wurdest wegen Inaktivität gekickt.";
+                String message = MessageBuilder.returnMessage("taskInactivityKicked");
                 api.kickClientFromServer(message, afk);
                 api.sendPrivateMessage(afk.getId(), message);
             }

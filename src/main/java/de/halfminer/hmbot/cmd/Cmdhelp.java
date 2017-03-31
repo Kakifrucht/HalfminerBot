@@ -12,7 +12,7 @@ import de.halfminer.hmbot.util.StringArgumentSeparator;
 @SuppressWarnings("unused")
 public class Cmdhelp extends Command {
 
-    public Cmdhelp(int clientId, StringArgumentSeparator command) {
+    public Cmdhelp(int clientId, StringArgumentSeparator command) throws InvalidCommandException {
         super(clientId, command);
     }
 
@@ -48,13 +48,17 @@ public class Cmdhelp extends Command {
 
                 if (!hasGroup) {
                     api.addClientToServerGroup(highestGroup.getId(), clientInfo.getDatabaseId());
-                    sendMessage("Your group has been set to " + highestGroup.getName() + ".");
+                    sendMessage("cmdhelpSetGroup", "GROUP", highestGroup.getName());
                     return;
                 }
             }
         }
 
-        sendMessage("HalfminerBot v" + HalfminerBot.getVersion() + " von Kakifrucht - © halfminer.de\n \n" +
+        api.sendPrivateMessage(clientId,
+                "[B]HalfminerBot[/B] v" + HalfminerBot.getVersion() + " - © halfminer.de | Kakifrucht");
+
+        //TODO get command list programmatically
+        api.sendPrivateMessage(clientId,
                 "Verfügbare Kommandos: \n!channel <create|update> <passwort> -> erstelle einen eigenen Channel");
     }
 }

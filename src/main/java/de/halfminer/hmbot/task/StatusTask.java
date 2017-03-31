@@ -6,6 +6,7 @@ import java.net.URL;
 
 /**
  * Sends the current user count to REST API.
+ * Leave disabled, as the API is private.
  */
 class StatusTask extends Task {
 
@@ -39,12 +40,8 @@ class StatusTask extends Task {
                     lastConnectSuccess = false;
                 }
             } else lastConnectSuccess = true;
-        } catch (Throwable e) {
-            logWarning(e);
+        } catch (Exception e) {
+            logger.error("Could not update Teamspeak status", e);
         }
-    }
-
-    private void logWarning(Throwable toLog) {
-        logger.error("Could not update Teamspeak status", toLog);
     }
 }

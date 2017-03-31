@@ -10,6 +10,7 @@ import com.github.theholywaffle.teamspeak3.api.wrapper.ClientInfo;
 import com.github.theholywaffle.teamspeak3.api.wrapper.ServerQueryInfo;
 import de.halfminer.hmbot.cmd.CommandDispatcher;
 import de.halfminer.hmbot.storage.Storage;
+import de.halfminer.hmbot.util.MessageBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -74,9 +75,9 @@ class HalfminerBotListeners extends TS3EventAdapter {
     private void clientEnterMessageAndMove(int clientId) {
         if (!storage.getClient(clientId).moveToChannel()) {
             TS3Api api = bot.getApi();
-            api.sendPrivateMessage(clientId, "Hallo " + api.getClientInfo(clientId).getNickname()
-                    + "!\n \n"
-                    + "Antworte mit deinem gewünschten Passwort, um einen eigenen Channel mit Passwort zu erhalten.");
+            MessageBuilder.create("joinMessage")
+                    .addPlaceholderReplace("NICKNAME", api.getClientInfo(clientId).getNickname())
+                    .sendMessage(clientId);
         }
     }
 }

@@ -25,6 +25,7 @@ public class MessageBuilder extends HalfminerBotClass {
     }
 
     private final static char PLACEHOLDER_CHARACTER = '%';
+    private final static int MAX_MESSAGE_SIZE = 1024;
 
     private final String lang;
     private final Map<String, String> placeholders = new HashMap<>();
@@ -52,7 +53,7 @@ public class MessageBuilder extends HalfminerBotClass {
         return this;
     }
 
-    private String returnMessage() {
+    public String returnMessage() {
 
         String toReturn;
         if (getFromLocale) {
@@ -64,13 +65,17 @@ public class MessageBuilder extends HalfminerBotClass {
             toReturn = lang;
         }
 
-        return placeholderReplace(toReturn);
+        return placeholderReplace(toReturn.replace("\\n", "\n"));
+    }
+
+    public void sendMessage(Client client) {
+        sendMessage(client.getId());
     }
 
     public void sendMessage(int clientId) {
         String messageToSend = returnMessage();
         if (messageToSend.length() > 0 || !getFromLocale) {
-            api.sendPrivateMessage(clientId, returnMessage());
+            doChunkedSend(clientId, messageToSend);
         }
     }
 
@@ -83,13 +88,19 @@ public class MessageBuilder extends HalfminerBotClass {
         if (messageToBroadcast.length() > 0) {
             for (Client client : api.getClients()) {
                 if (client.getTalkPower() >= minimumTalkPower) {
-                    api.sendPrivateMessage(client.getId(), messageToBroadcast);
+                    doChunkedSend(client.getId(), messageToBroadcast);
                 }
             }
         }
 
         if (log) {
             logger.info(messageToBroadcast);
+        }
+    }
+
+    private void doChunkedSend(int recipient, String message) {
+        for (int i = 0; i < message.length(); i += MAX_MESSAGE_SIZE) {
+            api.sendPrivateMessage(recipient, message.substring(i, Math.min(i + MAX_MESSAGE_SIZE, message.length())));
         }
     }
 

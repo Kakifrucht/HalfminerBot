@@ -3,6 +3,7 @@ package de.halfminer.hmbot.cmd;
 import com.github.theholywaffle.teamspeak3.api.wrapper.ClientInfo;
 import de.halfminer.hmbot.HalfminerBotClass;
 import de.halfminer.hmbot.storage.Storage;
+import de.halfminer.hmbot.util.MessageBuilder;
 import de.halfminer.hmbot.util.StringArgumentSeparator;
 
 abstract class Command extends HalfminerBotClass {
@@ -12,35 +13,27 @@ abstract class Command extends HalfminerBotClass {
     final int clientId;
     final ClientInfo clientInfo;
 
-    private final String commandFull;
     final StringArgumentSeparator command;
 
     @SuppressWarnings("WeakerAccess")
-    public Command(int clientId, StringArgumentSeparator command) {
+    public Command(int clientId, StringArgumentSeparator command) throws InvalidCommandException {
 
         this.clientId = clientId;
         this.clientInfo = api.getClientInfo(clientId);
 
-        this.commandFull = command.getConcatenatedString();
         this.command = command.removeFirstElement();
     }
 
     /**
-     * Run instantianted Action.
-     *
-     * @throws CommandNotCompletedException when the action wasn't completed properly
+     * Execute command.
      */
-    abstract void run() throws CommandNotCompletedException;
+    abstract void run() throws InvalidCommandException;
 
-    void sendMessage(String message) {
-        api.sendPrivateMessage(clientId, message);
-    }
-
-    String getCommand() {
-        return commandFull;
-    }
-
-    ClientInfo getClientInfo() {
-        return this.clientInfo;
+    void sendMessage(String messageKey, String... placeholders) {
+        MessageBuilder builder = MessageBuilder.create(messageKey);
+        for (int i = 0; i < placeholders.length - 1; i += 2) {
+            builder.addPlaceholderReplace(placeholders[i], placeholders[i + 1]);
+        }
+        builder.sendMessage(clientId);
     }
 }
