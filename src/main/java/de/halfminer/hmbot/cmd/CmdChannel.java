@@ -26,18 +26,18 @@ import java.util.Map;
  *   - Will kick all players from channel after changing password
  */
 @SuppressWarnings("unused")
-public class Cmdchannel extends Command {
+public class CmdChannel extends Command {
 
     private final ChannelInfo botChannel;
     private HalfClient client;
 
     private int channelGroupAdminId;
 
-    public Cmdchannel(int clientId, StringArgumentSeparator command) throws InvalidCommandException {
+    public CmdChannel(int clientId, StringArgumentSeparator command) throws InvalidCommandException {
         super(clientId, command);
 
         if (!this.command.meetsLength(2)) {
-            throw new InvalidCommandException("cmdChannelUsage");
+            throw new InvalidCommandException(CommandEnum.CHANNEL);
         }
 
         botChannel = api.getChannelInfo(api.whoAmI().getChannelId());
@@ -57,7 +57,7 @@ public class Cmdchannel extends Command {
                 updateChannel();
                 break;
             default:
-                throw new InvalidCommandException("cmdChannelUsage");
+                throw new InvalidCommandException(CommandEnum.CHANNEL);
         }
     }
 

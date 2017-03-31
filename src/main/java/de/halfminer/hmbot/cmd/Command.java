@@ -16,7 +16,7 @@ abstract class Command extends HalfminerBotClass {
     final StringArgumentSeparator command;
 
     @SuppressWarnings("WeakerAccess")
-    public Command(int clientId, StringArgumentSeparator command) throws InvalidCommandException {
+    public Command(int clientId, StringArgumentSeparator command) {
 
         this.clientId = clientId;
         this.clientInfo = api.getClientInfo(clientId);

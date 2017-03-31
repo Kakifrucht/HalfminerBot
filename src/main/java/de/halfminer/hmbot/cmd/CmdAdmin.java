@@ -14,13 +14,13 @@ import java.util.Map;
  * - Restart (full reconnect) or stop the bot entirely
  */
 @SuppressWarnings("unused")
-public class Cmdadmin extends Command {
+public class CmdAdmin extends Command {
 
-    public Cmdadmin(int clientId, StringArgumentSeparator command) throws InvalidCommandException {
+    public CmdAdmin(int clientId, StringArgumentSeparator command) throws InvalidCommandException {
         super(clientId, command);
 
         if (!command.meetsLength(1)) {
-            throw new InvalidCommandException("cmdAdminUsage");
+            throw new InvalidCommandException(CommandEnum.ADMIN);
         }
     }
 
@@ -94,7 +94,7 @@ public class Cmdadmin extends Command {
                     return;
                 }
             default:
-                throw new InvalidCommandException("cmdAdminUsage");
+                throw new InvalidCommandException(CommandEnum.ADMIN);
         }
     }
 }

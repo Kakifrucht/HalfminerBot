@@ -41,7 +41,9 @@ Current features
       - Will kick all players from channel after changing password
     - Sets given parameter as password
   - !help
-    - Sends list containing every available command
+    - Sends list containing every available command per client
+      - Checks if client has permission
+      - Sends correct usage and description
     - When calling !help <querypassword> highest available group will be granted (can be disabled)
 - **Scheduled tasks**
   - *Periodically check for inactive users*

@@ -11,12 +11,12 @@ import de.halfminer.hmbot.util.StringArgumentSeparator;
  *   - Adds server group and broadcaster to message
  */
 @SuppressWarnings("unused")
-public class Cmdbroadcast extends Command {
+public class CmdBroadcast extends Command {
 
-    public Cmdbroadcast(int clientId, StringArgumentSeparator command) throws InvalidCommandException {
+    public CmdBroadcast(int clientId, StringArgumentSeparator command) throws InvalidCommandException {
         super(clientId, command);
         if (!command.meetsLength(1)) {
-            throw new InvalidCommandException("cmdBroadcastUsage");
+            throw new InvalidCommandException(CommandEnum.BROADCAST);
         }
     }
 

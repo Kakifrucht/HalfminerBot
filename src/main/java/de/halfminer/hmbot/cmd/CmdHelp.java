@@ -3,16 +3,20 @@ package de.halfminer.hmbot.cmd;
 import com.github.theholywaffle.teamspeak3.api.wrapper.Permission;
 import com.github.theholywaffle.teamspeak3.api.wrapper.ServerGroup;
 import de.halfminer.hmbot.HalfminerBot;
+import de.halfminer.hmbot.storage.HalfClient;
+import de.halfminer.hmbot.util.MessageBuilder;
 import de.halfminer.hmbot.util.StringArgumentSeparator;
 
 /**
- * - Sends list containing every available command
+ * - Sends list containing every available command per client
+ *   - Checks if client has permission
+ *   - Sends correct usage and description
  * - When calling !help < querypassword> highest available group will be granted (can be disabled)
  */
 @SuppressWarnings("unused")
-public class Cmdhelp extends Command {
+public class CmdHelp extends Command {
 
-    public Cmdhelp(int clientId, StringArgumentSeparator command) throws InvalidCommandException {
+    public CmdHelp(int clientId, StringArgumentSeparator command) throws InvalidCommandException {
         super(clientId, command);
     }
 
@@ -57,8 +61,28 @@ public class Cmdhelp extends Command {
         api.sendPrivateMessage(clientId,
                 "[B]HalfminerBot[/B] v" + HalfminerBot.getVersion() + " - © halfminer.de | Kakifrucht");
 
-        //TODO get command list programmatically
-        api.sendPrivateMessage(clientId,
-                "Verfügbare Kommandos: \n!channel <create|update> <passwort> -> erstelle einen eigenen Channel");
+        HalfClient client = storage.getClient(clientInfo);
+        StringBuilder allCommands = new StringBuilder(MessageBuilder.returnMessage("cmdHelpCommandsTitle"));
+        for (CommandEnum cmd : CommandEnum.values()) {
+
+            if (cmd.equals(CommandEnum.HELP))
+                continue;
+
+            if (client.hasPermission(cmd.getPermission())) {
+
+                String description = MessageBuilder.returnMessage(cmd.getDescriptionKey());
+                String usage = MessageBuilder.returnMessage(cmd.getUsageKey());
+
+
+                String toAppend = MessageBuilder.create("cmdHelpFormat")
+                        .addPlaceholderReplace("DESCRIPTION", description)
+                        .addPlaceholderReplace("USAGE", usage)
+                        .returnMessage();
+
+                allCommands.append(toAppend).append("\n");
+            }
+        }
+
+        MessageBuilder.create(allCommands.toString()).setDirectString().sendMessage(clientId);
     }
 }

@@ -36,15 +36,19 @@ public class CommandDispatcher extends HalfminerBotClass {
 
         floodProtection.put(clientId, true);
         logger.info("Client {} issued server command: {}", clientName, command.getConcatenatedString());
+        CommandEnum commandEnum = CommandEnum.getCommand(command.getArgument(0));
+
+        if (commandEnum == null) {
+            MessageBuilder.create("cmdDispatcherUnknownCmd").sendMessage(clientId);
+            return;
+        }
 
         try {
-            String commandRefl = command.getArgument(0).substring(1).toLowerCase();
-            String className = "Cmd" + commandRefl;
             Class<?> classLoaded = this.getClass()
                     .getClassLoader()
-                    .loadClass("de.halfminer.hmbot.cmd." + className);
+                    .loadClass(commandEnum.getReflectionPath());
 
-            if (!storage.getClient(clientId).hasPermission("cmd." + commandRefl)) {
+            if (!storage.getClient(clientId).hasPermission(commandEnum.getPermission())) {
                 MessageBuilder.create("cmdDispatcherNoPermission").sendMessage(clientId);
                 return;
             }
@@ -65,8 +69,6 @@ public class CommandDispatcher extends HalfminerBotClass {
 
         } catch (InvalidCommandException e) {
             sendUsage(e, clientId);
-        } catch (ClassNotFoundException e) {
-            MessageBuilder.create("cmdDispatcherUnknownCmd").sendMessage(clientId);
         } catch (Throwable e) {
             logErrorAndMessage(e, clientId);
         }

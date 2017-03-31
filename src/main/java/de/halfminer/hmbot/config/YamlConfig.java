@@ -109,7 +109,7 @@ public class YamlConfig {
             }
 
         } else {
-            throw new ConfigurationException("Config file is in invalid format");
+            throw new ConfigurationException();
         }
     }
 
@@ -166,8 +166,8 @@ public class YamlConfig {
 
     private class ConfigurationException extends RuntimeException {
 
-        ConfigurationException(String error) {
-            super(error);
+        ConfigurationException() {
+            super("Config file is in invalid format");
         }
 
         ConfigurationException(String error, Throwable cause) {
