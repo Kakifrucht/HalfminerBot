@@ -70,17 +70,17 @@ public class HalfminerBot {
 
     // -- Static End -- //
 
-    private final PasswordYamlConfig botConfig;
+    private final PasswordYamlConfig config;
     private final YamlConfig locale = new YamlConfig("locale.yml");
     private final TS3Query query;
     private Scheduler scheduler;
     private TS3Api api;
     private Storage storage;
 
-    private HalfminerBot(PasswordYamlConfig botConfig) {
+    private HalfminerBot(PasswordYamlConfig config) {
 
         instance = this;
-        this.botConfig = botConfig;
+        this.config = config;
         if (!locale.reloadConfig()) {
             query = null;
             stop("Couldn't read locale file, quitting...", false);
@@ -88,11 +88,11 @@ public class HalfminerBot {
         }
 
         // configure API
-        String host = botConfig.getString("host");
+        String host = config.getString("host");
         TS3Config apiConfig = new TS3Config();
         apiConfig.setHost(host);
-        apiConfig.setQueryPort(botConfig.getInt("ports.queryPort"));
-        if (host.equals("localhost") || botConfig.getBoolean("isWhitelisted")) {
+        apiConfig.setQueryPort(config.getInt("ports.queryPort"));
+        if (host.equals("localhost") || config.getBoolean("isWhitelisted")) {
             apiConfig.setFloodRate(FloodRate.UNLIMITED);
         } else {
             apiConfig.setFloodRate(FloodRate.DEFAULT);
@@ -139,14 +139,14 @@ public class HalfminerBot {
         this.api = query.getApi();
 
         // login to server
-        if (api.login(botConfig.getString("credentials.username"), botConfig.getPassword())) {
+        if (api.login(config.getString("credentials.username"), config.getPassword())) {
 
-            if (!api.selectVirtualServerByPort(botConfig.getInt("ports.serverPort"))) {
+            if (!api.selectVirtualServerByPort(config.getInt("ports.serverPort"))) {
                 stop("The provided server port is not valid, quitting...", false);
                 return false;
             }
 
-            String nickName = botConfig.getString("botName");
+            String nickName = config.getString("botName");
             if (!api.setNickname(nickName)) {
                 boolean nicknameWasSet = false;
                 for (int i = 1; i < 10; i++) {
@@ -165,7 +165,7 @@ public class HalfminerBot {
             }
 
             // move bot into channel
-            List<Channel> channels = api.getChannelsByName(botConfig.getString("botChannelName"));
+            List<Channel> channels = api.getChannelsByName(config.getString("botChannelName"));
             if (channels == null
                     || channels.isEmpty()
                     || !api.moveClient(api.whoAmI().getId(), channels.get(0).getId())) {
@@ -192,7 +192,7 @@ public class HalfminerBot {
 
     public boolean reloadConfig() {
         boolean localeReloaded = locale.reloadConfig();
-        if (botConfig.reloadConfig()) {
+        if (config.reloadConfig()) {
             logger.info("Config file was reloaded");
             scheduler.configWasReloaded();
             storage.configWasReloaded();
@@ -218,8 +218,8 @@ public class HalfminerBot {
         }
     }
 
-    YamlConfig getBotConfig() {
-        return botConfig;
+    YamlConfig getConfig() {
+        return config;
     }
 
     public YamlConfig getLocale() {

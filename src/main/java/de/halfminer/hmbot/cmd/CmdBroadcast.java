@@ -11,8 +11,7 @@ import de.halfminer.hmbot.util.StringArgumentSeparator;
  * - Broadcast format configurable via locale file
  *   - Adds server group and broadcaster to message
  */
-@SuppressWarnings("unused")
-public class CmdBroadcast extends Command {
+class CmdBroadcast extends Command {
 
     public CmdBroadcast(HalfClient client, StringArgumentSeparator command) throws InvalidCommandException {
         super(client, command);

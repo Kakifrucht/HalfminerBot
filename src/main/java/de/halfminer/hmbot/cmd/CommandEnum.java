@@ -1,5 +1,9 @@
 package de.halfminer.hmbot.cmd;
 
+import de.halfminer.hmbot.storage.HalfClient;
+import de.halfminer.hmbot.util.StringArgumentSeparator;
+
+import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -8,13 +12,31 @@ import java.util.Map;
  */
 public enum CommandEnum {
 
-    ADMIN,
-    BROADCAST,
-    CHANNEL,
-    HELP;
+    ADMIN       (CmdAdmin.class),
+    BROADCAST   (CmdBroadcast.class),
+    CHANNEL     (CmdChannel.class),
+    HELP        (CmdHelp.class),
+    RANK        (CmdRank.class);
 
-    String getReflectionPath() {
-        return "de.halfminer.hmbot.cmd." + "Cmd" + getNameFirstUppercase();
+    private Class<?> aClass;
+
+    CommandEnum(Class aClass) {
+        this.aClass = aClass;
+    }
+
+    Command getInstance(HalfClient sender, StringArgumentSeparator command) throws InvalidCommandException {
+        try {
+            return (Command) aClass
+                    .getConstructor(HalfClient.class, StringArgumentSeparator.class)
+                    .newInstance(sender, command);
+        } catch (InvocationTargetException e) {
+            if (e.getCause() instanceof InvalidCommandException) {
+                throw (InvalidCommandException) e.getCause();
+            }
+            throw new InvalidCommandException(this, e.getCause());
+        } catch (Throwable e) {
+            throw new InvalidCommandException(this, e);
+        }
     }
 
     String getPermission() {
@@ -35,7 +57,7 @@ public enum CommandEnum {
         return sb.toString();
     }
 
-    private static final Map<String, CommandEnum> aliases;
+    private final static Map<String, CommandEnum> aliases;
 
     static {
         aliases = new HashMap<>();
@@ -43,6 +65,7 @@ public enum CommandEnum {
         putAliases(BROADCAST, "bc");
         putAliases(CHANNEL, "c", "create");
         putAliases(HELP, "h", "?", "version", "ver", "hilfe");
+        putAliases(RANK, "rang", "premium", "vip", "freischalten");
     }
 
     private static void putAliases(CommandEnum command, String... aliasesToPut) {

@@ -65,3 +65,4 @@ permissions:
   default:
   - cmd.channel
   - cmd.help
+  - cmd.rank

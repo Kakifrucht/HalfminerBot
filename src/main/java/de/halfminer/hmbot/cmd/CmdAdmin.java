@@ -14,8 +14,7 @@ import java.util.Map;
  *   - Won't reload if file was not modified or if it is in invalid format
  * - Restart (full reconnect) or stop the bot entirely
  */
-@SuppressWarnings("unused")
-public class CmdAdmin extends Command {
+class CmdAdmin extends Command {
 
     public CmdAdmin(HalfClient client, StringArgumentSeparator command) throws InvalidCommandException {
         super(client, command);

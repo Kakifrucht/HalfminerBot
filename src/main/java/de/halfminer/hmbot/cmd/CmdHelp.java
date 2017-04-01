@@ -13,10 +13,9 @@ import de.halfminer.hmbot.util.StringArgumentSeparator;
  *   - Sends correct usage and description
  * - When calling !help < querypassword> highest available group will be granted (can be disabled)
  */
-@SuppressWarnings("unused")
-public class CmdHelp extends Command {
+class CmdHelp extends Command {
 
-    public CmdHelp(HalfClient client, StringArgumentSeparator command) throws InvalidCommandException {
+    public CmdHelp(HalfClient client, StringArgumentSeparator command) {
         super(client, command);
     }
 

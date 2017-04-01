@@ -20,7 +20,7 @@ class HalfminerBotListeners extends TS3EventAdapter {
     private final static Logger logger = LoggerFactory.getLogger(HalfminerBotListeners.class);
 
     private final HalfminerBot bot = HalfminerBot.getInstance();
-    private final YamlConfig config = bot.getBotConfig();
+    private final YamlConfig config = bot.getConfig();
     private final TS3Api api = bot.getApi();
     private final Storage storage = bot.getStorage();
     private final CommandDispatcher cmd = new CommandDispatcher();

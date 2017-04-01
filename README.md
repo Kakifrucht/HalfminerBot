@@ -47,6 +47,8 @@ Current features
       - Checks if client has permission
       - Sends correct usage and description
     - When calling !help <querypassword> highest available group will be granted (can be disabled)
+  - !rank
+    - Automatic retrieval of ranks after querying Halfminer REST API for privileges
 - **Scheduled tasks**
   - *Periodically check for inactive users*
     - Move them into AFK channel

@@ -12,7 +12,7 @@ import org.slf4j.LoggerFactory;
 public class HalfminerBotClass {
 
     protected final HalfminerBot bot = HalfminerBot.getInstance();
-    protected final YamlConfig config = bot.getBotConfig();
+    protected final YamlConfig config = bot.getConfig();
     protected final Scheduler scheduler = bot.getScheduler();
     protected final TS3Api api = bot.getApi();
 

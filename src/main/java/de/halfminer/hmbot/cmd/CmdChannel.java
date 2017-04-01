@@ -25,8 +25,7 @@ import java.util.Map;
  * - Update a users channel password
  *   - Will kick all players from channel after changing password
  */
-@SuppressWarnings("unused")
-public class CmdChannel extends Command {
+class CmdChannel extends Command {
 
     private final ChannelInfo botChannel;
     private int channelGroupAdminId;

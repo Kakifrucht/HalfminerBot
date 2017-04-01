@@ -8,7 +8,6 @@ import de.halfminer.hmbot.storage.Storage;
 import de.halfminer.hmbot.util.MessageBuilder;
 import de.halfminer.hmbot.util.StringArgumentSeparator;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.concurrent.TimeUnit;
 
 public class CommandDispatcher extends HalfminerBotClass {
@@ -57,26 +56,15 @@ public class CommandDispatcher extends HalfminerBotClass {
         }
 
         try {
-            Command cmdInstance = (Command) this.getClass()
-                    .getClassLoader()
-                    .loadClass(commandEnum.getReflectionPath())
-                    .getConstructor(HalfClient.class, StringArgumentSeparator.class)
-                    .newInstance(sender, command);
-
-            cmdInstance.run();
-
-        } catch (InvocationTargetException e) {
-
-            if (e.getCause() instanceof InvalidCommandException) {
-                sendUsage((InvalidCommandException) e.getCause(), clientId);
-            } else {
-                logErrorAndMessage(e, clientId);
-            }
-
+            Command cmd = commandEnum.getInstance(sender, command);
+            cmd.run();
         } catch (InvalidCommandException e) {
-            sendUsage(e, clientId);
-        } catch (Throwable e) {
-            logErrorAndMessage(e, clientId);
+            if (e.hasCause()) {
+                logger.error("Exception during newInstance() of command", e);
+                MessageBuilder.create("cmdDispatchedUnknownError").sendMessage(clientId);
+            } else {
+                sendUsage(e, clientId);
+            }
         }
     }
 
@@ -84,10 +72,5 @@ public class CommandDispatcher extends HalfminerBotClass {
         MessageBuilder.create("cmdDispatcherUsage")
                 .addPlaceholderReplace("USAGE", e.getUsage())
                 .sendMessage(clientId);
-    }
-
-    private void logErrorAndMessage(Throwable e, int clientId) {
-        logger.error("Exception during newInstance() of command", e);
-        MessageBuilder.create("cmdDispatchedUnknownError").sendMessage(clientId);
     }
 }
