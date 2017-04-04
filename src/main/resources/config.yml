@@ -57,6 +57,7 @@ permissions:
   admin:
   - cmd.admin
   - cmd.broadcast
+  - cmd.bypass.cooldown
   - cmd.bypass.flood
   moderator:
   - task.inactivity.exempt.move

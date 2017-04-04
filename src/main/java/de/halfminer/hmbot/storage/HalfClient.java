@@ -7,6 +7,8 @@ import de.halfminer.hmbot.HalfminerBotClass;
 import de.halfminer.hmbot.util.MessageBuilder;
 
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Client class managed by {@link Storage}.
@@ -15,6 +17,7 @@ public class HalfClient extends HalfminerBotClass {
 
     private int clientId;
     private HalfGroup group;
+    private final Map<Class, Long> commandCooldown = new ConcurrentHashMap<>();
 
     private int channelId = Integer.MIN_VALUE;
 
@@ -31,11 +34,23 @@ public class HalfClient extends HalfminerBotClass {
         return group.hasPermission(permission);
     }
 
+    public long getCooldown(Class commandClass) {
+        clearCommandCooldown();
+        if (!hasPermission("cmd.bypass.cooldown") && commandCooldown.containsKey(commandClass)) {
+            return commandCooldown.get(commandClass) - (System.currentTimeMillis() / 1000);
+        }
+        return 0;
+    }
+
+    public void addCooldown(Class commandClass, int cooldown) {
+        commandCooldown.put(commandClass, (System.currentTimeMillis() / 1000) + cooldown);
+    }
+
     boolean canBeEvicted(List<Client> clients) {
         boolean isOnline = clients.stream()
                 .map(Client::getId)
                 .anyMatch(id -> id == clientId);
-        return !isOnline && getChannel() == null;
+        return !isOnline && getChannel() == null && clearCommandCooldown();
     }
 
     void updateClient(int clientId, HalfGroup group) {
@@ -75,6 +90,12 @@ public class HalfClient extends HalfminerBotClass {
         }
 
         return false;
+    }
+
+    private boolean clearCommandCooldown() {
+        long currentTime = System.currentTimeMillis() / 1000;
+        commandCooldown.values().removeIf(timeStamp -> timeStamp < currentTime);
+        return commandCooldown.size() == 0;
     }
 
     @Override

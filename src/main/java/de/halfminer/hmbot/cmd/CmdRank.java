@@ -36,7 +36,7 @@ class CmdRank extends Command {
             Response putResponse = null;
             try {
                 Request request = new Request.Builder()
-                        .url(RESTHelper.getBaseUrl("pins/" + pin))
+                        .url(RESTHelper.getBaseUrl("storage/pins/" + pin))
                         .get()
                         .build();
 
@@ -59,7 +59,7 @@ class CmdRank extends Command {
 
                     String putString = "expiry=0&identity=" + clientInfo.getUniqueIdentifier() + "&rank=" + rank;
                     Request putRequest = new Request.Builder()
-                            .url(RESTHelper.getBaseUrl("ranks/teamspeak/" + uuid))
+                            .url(RESTHelper.getBaseUrl("storage/ranks/teamspeak/" + uuid))
                             .put(RESTHelper.getRequestBody(putString))
                             .build();
 
@@ -87,8 +87,8 @@ class CmdRank extends Command {
                             DatabaseClientInfo oldClient = api.getDatabaseClientByUId(oldIdentity);
                             boolean removed = api.removeClientFromServerGroup(oldGroup.getId(), oldClient.getDatabaseId());
                             if (removed) {
-                                logger.info("Removed client with database ID {} from group {}",
-                                        oldClient.getDatabaseId(), oldGroup.getName());
+                                logger.info("Removed client {} (dbid: {}) from group '{}'",
+                                        oldClient.getNickname(), oldClient.getDatabaseId(), oldGroup.getName());
                             }
                         } else {
                             logger.warn("Couldn't remove client from old group {}, as it couldn't be found", oldGroupName);
@@ -97,13 +97,14 @@ class CmdRank extends Command {
 
                     ServerGroup newGroup = getMatchingGroup(groupList, rank);
                     if (newGroup != null) {
+                        client.addCooldown(CmdRank.class, 900);
                         boolean added = api.addClientToServerGroup(newGroup.getId(), clientInfo.getDatabaseId());
                         MessageBuilder.create("cmdRankSet")
                                 .addPlaceholderReplace("GROUPNAME", newGroup.getName())
                                 .sendMessage(clientInfo);
 
                         if (added) {
-                            logger.info("Set group for client {} to {}", clientInfo.getNickname(), newGroup.getName());
+                            logger.info("Set group for client {} to '{}'", clientInfo.getNickname(), newGroup.getName());
                         }
                     } else {
                         logger.error("No group found with name {}", rank);

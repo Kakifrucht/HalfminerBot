@@ -17,6 +17,7 @@ Current features
   - Bot welcomes (server and/or channel) joining clients with private message
     - Server join message can be disabled
   - Command flood protection (optional bypass permission)
+    - Custom cooldowns available additionally, for example for *!channel update*
   - Default command if none supplied is !channel, to make channel creation easier
   - Permission to use command necessary
 - **Commands**

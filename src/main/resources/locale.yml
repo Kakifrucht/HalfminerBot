@@ -5,6 +5,7 @@
 #  Keys are not automatically added when new ones are added to the bot
 hasChannel: 'You already have a private channel.'
 joinMessage: 'Hi %NICKNAME%!\n \nAnswer with your desired [B]password[/B] to receive a private channel.'
+cmdDispatcherCooldown: 'You cannot use this command for another %TIME% seconds.'
 cmdDispatcherFloodLimit: 'Please wait a moment and try again.'
 cmdDispatcherNoPermission: 'You have no permission to use this command.'
 cmdDispatcherUnknownCmd: 'Unknown command. Use [I]!help[/I] to get a list with all available commands.'

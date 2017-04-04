@@ -131,6 +131,7 @@ class CmdChannel extends Command {
         }
 
         sendMessage("cmdChannelUpdateSuccess", "PASSWORD", password);
+        client.addCooldown(CmdChannel.class, 300);
     }
 
     private String getPassword() {

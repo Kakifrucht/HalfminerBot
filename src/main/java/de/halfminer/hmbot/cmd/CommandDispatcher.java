@@ -57,7 +57,16 @@ public class CommandDispatcher extends HalfminerBotClass {
 
         try {
             Command cmd = commandEnum.getInstance(sender, command);
+            long cooldown = sender.getCooldown(cmd.getClass());
+            if (cooldown > 0) {
+                MessageBuilder.create("cmdDispatcherCooldown")
+                        .addPlaceholderReplace("TIME", String.valueOf(cooldown))
+                        .sendMessage(clientId);
+                return;
+            }
+
             cmd.run();
+
         } catch (InvalidCommandException e) {
             if (e.hasCause()) {
                 logger.error("Exception during newInstance() of command", e);
