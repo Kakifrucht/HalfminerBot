@@ -15,6 +15,9 @@ import de.halfminer.hmbot.util.MessageBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Event listeners for bot. Passes commands to {@link CommandDispatcher} and contacts the client on server/channel join.
+ */
 class HalfminerBotListeners extends TS3EventAdapter {
 
     private final static Logger logger = LoggerFactory.getLogger(HalfminerBotListeners.class);

@@ -10,6 +10,11 @@ import de.halfminer.hmbot.util.StringArgumentSeparator;
 
 import java.util.concurrent.TimeUnit;
 
+/**
+ * Command dispatcher, parses given chat input and executes the corresponding {@link Command}.
+ * Also does permission, flood and command limit checks, logs commands, sets default command
+ * and sends correct command usage, if invalid, to client.
+ */
 public class CommandDispatcher extends HalfminerBotClass {
 
     private final Storage storage = bot.getStorage();
@@ -72,14 +77,10 @@ public class CommandDispatcher extends HalfminerBotClass {
                 logger.error("Exception during newInstance() of command", e);
                 MessageBuilder.create("cmdDispatchedUnknownError").sendMessage(clientId);
             } else {
-                sendUsage(e, clientId);
+                MessageBuilder.create("cmdDispatcherUsage")
+                        .addPlaceholderReplace("USAGE", e.getUsage())
+                        .sendMessage(clientId);
             }
         }
-    }
-
-    private void sendUsage(InvalidCommandException e, int clientId) {
-        MessageBuilder.create("cmdDispatcherUsage")
-                .addPlaceholderReplace("USAGE", e.getUsage())
-                .sendMessage(clientId);
     }
 }

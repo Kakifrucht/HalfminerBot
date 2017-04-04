@@ -7,6 +7,9 @@ import de.halfminer.hmbot.storage.Storage;
 import de.halfminer.hmbot.util.MessageBuilder;
 import de.halfminer.hmbot.util.StringArgumentSeparator;
 
+/**
+ * Command base class dispatched by {@link CommandDispatcher}.
+ */
 abstract class Command extends HalfminerBotClass {
 
     final Storage storage = bot.getStorage();
