@@ -65,7 +65,7 @@ public enum CommandEnum {
         putAliases(BROADCAST, "bc");
         putAliases(CHANNEL, "c", "create");
         putAliases(HELP, "h", "?", "version", "ver", "hilfe");
-        putAliases(RANK, "rang", "premium", "vip", "freischalten");
+        putAliases(RANK, "rang", "premium", "vip", "freischalten", "pin");
     }
 
     private static void putAliases(CommandEnum command, String... aliasesToPut) {

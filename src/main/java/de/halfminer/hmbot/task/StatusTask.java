@@ -1,8 +1,7 @@
 package de.halfminer.hmbot.task;
 
-import java.io.OutputStreamWriter;
-import java.net.HttpURLConnection;
-import java.net.URL;
+import de.halfminer.hmbot.util.RESTHelper;
+import okhttp3.*;
 
 /**
  * Sends the current user count to REST API.
@@ -10,6 +9,7 @@ import java.net.URL;
  */
 class StatusTask extends Task {
 
+    private final OkHttpClient client = new OkHttpClient();
     private boolean lastConnectSuccess = true;
 
     @Override
@@ -20,28 +20,29 @@ class StatusTask extends Task {
     @Override
     public void execute() {
 
+        Response response = null;
         try {
-            URL apiURL = new URL("https://api.halfminer.de/storage/status");
+            String status = "expiry=240&teamspeak=" + api.getServerInfo().getClientsOnline();
+            Request request = new Request.Builder()
+                    .url(RESTHelper.getBaseUrl("storage/status"))
+                    .put(RESTHelper.getRequestBody(status))
+                    .build();
 
-            HttpURLConnection connection = (HttpURLConnection) apiURL.openConnection();
-            connection.setDoOutput(true);
-            connection.setRequestMethod("PUT");
-            connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+            response = client.newCall(request).execute();
 
-            OutputStreamWriter out = new OutputStreamWriter(connection.getOutputStream());
-            out.write("expiry=240&teamspeak=" + api.getServerInfo().getClientsOnline());
-            out.close();
-
-            int responseCode = connection.getResponseCode();
-            if (responseCode >= 300 || responseCode < 200) {
+            if (!response.isSuccessful()) {
                 // only log warning once in a row
                 if (lastConnectSuccess) {
-                    logger.warn("Received response code {} on HTTP PUT of user count", responseCode);
+                    logger.warn("Received response code {} on HTTP PUT of user count", response.code());
                     lastConnectSuccess = false;
                 }
             } else lastConnectSuccess = true;
         } catch (Exception e) {
             logger.error("Could not update Teamspeak status", e);
+        } finally {
+            if (response != null) {
+                response.close();
+            }
         }
     }
 }

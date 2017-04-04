@@ -6,6 +6,7 @@ import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
 import de.halfminer.hmbot.storage.HalfClient;
 import de.halfminer.hmbot.util.MessageBuilder;
+import de.halfminer.hmbot.util.RESTHelper;
 import de.halfminer.hmbot.util.StringArgumentSeparator;
 import okhttp3.*;
 
@@ -20,8 +21,6 @@ import java.util.Map;
  */
 class CmdRank extends Command {
 
-    private final static String url = "https://api.halfminer.de/storage/";
-
     private final OkHttpClient httpClient = new OkHttpClient();
 
     public CmdRank(HalfClient client, StringArgumentSeparator command) {
@@ -33,14 +32,14 @@ class CmdRank extends Command {
 
         if (command.meetsLength(1)) {
             String pin = command.getArgument(0);
-            Request request = new Request.Builder()
-                    .url(url + "pins/" + pin)
-                    .get()
-                    .build();
-
             Response response = null;
             Response putResponse = null;
             try {
+                Request request = new Request.Builder()
+                        .url(RESTHelper.getBaseUrl("pins/" + pin))
+                        .get()
+                        .build();
+
                 response = httpClient.newCall(request).execute();
                 if (response.isSuccessful()) {
 
@@ -60,8 +59,8 @@ class CmdRank extends Command {
 
                     String putString = "expiry=0&identity=" + clientInfo.getUniqueIdentifier() + "&rank=" + rank;
                     Request putRequest = new Request.Builder()
-                            .url(url + "ranks/teamspeak/" + uuid)
-                            .put(RequestBody.create(MediaType.parse("application/x-www-form-urlencoded"), putString))
+                            .url(RESTHelper.getBaseUrl("ranks/teamspeak/" + uuid))
+                            .put(RESTHelper.getRequestBody(putString))
                             .build();
 
                     putResponse = httpClient.newCall(putRequest).execute();
@@ -77,6 +76,7 @@ class CmdRank extends Command {
                         Map<String, String> jsonPut = gson.fromJson(putResponse.body().string(), type);
                         String oldIdentity = jsonPut.get("ranks.teamspeak." + uuid + ".identity") + '=';
                         String oldGroupName = jsonPut.get("ranks.teamspeak." + uuid + ".rank");
+
                         if (rank.equals(oldGroupName) && oldIdentity.equals(clientInfo.getUniqueIdentifier())) {
                             MessageBuilder.create("cmdRankAlreadyGiven").sendMessage(clientInfo);
                             return;
@@ -85,18 +85,26 @@ class CmdRank extends Command {
                         ServerGroup oldGroup = getMatchingGroup(groupList, oldGroupName);
                         if (oldGroup != null) {
                             DatabaseClientInfo oldClient = api.getDatabaseClientByUId(oldIdentity);
-                            api.removeClientFromServerGroup(oldGroup.getId(), oldClient.getDatabaseId());
+                            boolean removed = api.removeClientFromServerGroup(oldGroup.getId(), oldClient.getDatabaseId());
+                            if (removed) {
+                                logger.info("Removed client with database ID {} from group {}",
+                                        oldClient.getDatabaseId(), oldGroup.getName());
+                            }
                         } else {
-                            logger.warn("Couldn't remove client from old group {}, as it doesn't exist anymore", oldGroupName);
+                            logger.warn("Couldn't remove client from old group {}, as it couldn't be found", oldGroupName);
                         }
                     }
 
                     ServerGroup newGroup = getMatchingGroup(groupList, rank);
                     if (newGroup != null) {
-                        api.addClientToServerGroup(newGroup.getId(), clientInfo.getDatabaseId());
+                        boolean added = api.addClientToServerGroup(newGroup.getId(), clientInfo.getDatabaseId());
                         MessageBuilder.create("cmdRankSet")
                                 .addPlaceholderReplace("GROUPNAME", newGroup.getName())
                                 .sendMessage(clientInfo);
+
+                        if (added) {
+                            logger.info("Set group for client {} to {}", clientInfo.getNickname(), newGroup.getName());
+                        }
                     } else {
                         logger.error("No group found with name {}", rank);
                         MessageBuilder.create("cmdDispatcherUnknownError").sendMessage(clientInfo);
