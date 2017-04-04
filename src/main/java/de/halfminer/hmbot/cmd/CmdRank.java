@@ -99,12 +99,15 @@ class CmdRank extends Command {
                     if (newGroup != null) {
                         client.addCooldown(CmdRank.class, 900);
                         boolean added = api.addClientToServerGroup(newGroup.getId(), clientInfo.getDatabaseId());
-                        MessageBuilder.create("cmdRankSet")
-                                .addPlaceholderReplace("GROUPNAME", newGroup.getName())
-                                .sendMessage(clientInfo);
 
                         if (added) {
+                            MessageBuilder.create("cmdRankSet")
+                                    .addPlaceholderReplace("GROUPNAME", newGroup.getName())
+                                    .sendMessage(clientInfo);
                             logger.info("Set group for client {} to '{}'", clientInfo.getNickname(), newGroup.getName());
+                        } else {
+                            logger.error("Couldn't add client {} to group '{}'", clientInfo.getNickname(), newGroup.getName());
+                            MessageBuilder.create("cmdDispatcherUnknownError").sendMessage(clientInfo);
                         }
                     } else {
                         logger.error("No group found with name {}", rank);
