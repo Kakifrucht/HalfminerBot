@@ -4,7 +4,6 @@ import com.github.theholywaffle.teamspeak3.api.wrapper.Channel;
 import com.github.theholywaffle.teamspeak3.api.wrapper.Client;
 import com.github.theholywaffle.teamspeak3.api.wrapper.ClientInfo;
 import de.halfminer.hmbot.HalfminerBotClass;
-import de.halfminer.hmbot.cmd.CmdChannel;
 import de.halfminer.hmbot.util.MessageBuilder;
 
 import java.util.List;
@@ -58,7 +57,7 @@ public class HalfClient extends HalfminerBotClass {
     }
 
     /**
-     * Move client to his channel if he created one via {@link CmdChannel},
+     * Move client to his channel if he created one via {@link de.halfminer.hmbot.cmd.CmdChannel},
      * used on join, when joining the bots channel or when trying to create a channel if player already has one.
      *
      * @return true if user was moved to own channel, false if he doesn't have a channel

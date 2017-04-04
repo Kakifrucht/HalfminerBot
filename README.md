@@ -49,6 +49,7 @@ Current features
     - When calling !help <querypassword> highest available group will be granted (can be disabled)
   - !rank
     - Automatic retrieval of ranks after querying Halfminer REST API for privileges
+    - Removes old server group, even if a different identity was used
 - **Scheduled tasks**
   - *Periodically check for inactive users*
     - Move them into AFK channel

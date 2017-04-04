@@ -103,7 +103,7 @@ public class YamlConfig {
             try {
                 //noinspection unchecked
                 configParsed = loaded != null ? (Map) loaded : Collections.emptyMap();
-                logger.info("Configuration at {} loaded successfully from file", configFile.getName());
+                logger.info("Configuration file {} loaded successfully", configFile.getName());
             } catch (ClassCastException e) {
                 throw new ConfigurationException("Config file is in invalid format", e);
             }
