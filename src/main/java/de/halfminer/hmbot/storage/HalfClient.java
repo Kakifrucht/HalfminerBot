@@ -42,8 +42,8 @@ public class HalfClient extends HalfminerBotClass {
         return 0;
     }
 
-    public void addCooldown(Class commandClass, int cooldown) {
-        commandCooldown.put(commandClass, (System.currentTimeMillis() / 1000) + cooldown);
+    public void addCooldown(Class commandClass, int cooldownSeconds) {
+        commandCooldown.put(commandClass, (System.currentTimeMillis() / 1000) + cooldownSeconds);
     }
 
     boolean canBeEvicted(List<Client> clients) {

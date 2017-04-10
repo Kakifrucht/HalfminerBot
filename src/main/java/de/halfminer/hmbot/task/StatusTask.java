@@ -13,11 +13,6 @@ class StatusTask extends Task {
     private boolean lastConnectSuccess = true;
 
     @Override
-    boolean checkIfEnabled() {
-        return true;
-    }
-
-    @Override
     public void execute() {
 
         Response response = null;

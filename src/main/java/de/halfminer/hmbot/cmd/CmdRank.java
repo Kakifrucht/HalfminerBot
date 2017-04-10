@@ -41,6 +41,7 @@ class CmdRank extends Command {
                         .build();
 
                 response = httpClient.newCall(request).execute();
+                client.addCooldown(getClass(), 10);
                 if (response.isSuccessful()) {
 
                     Gson gson = new Gson();
@@ -79,6 +80,7 @@ class CmdRank extends Command {
 
                         if (rank.equals(oldGroupName) && oldIdentity.equals(clientInfo.getUniqueIdentifier())) {
                             MessageBuilder.create("cmdRankAlreadyGiven").sendMessage(clientInfo);
+                            client.addCooldown(getClass(), 300);
                             return;
                         }
 
@@ -97,7 +99,7 @@ class CmdRank extends Command {
 
                     ServerGroup newGroup = getMatchingGroup(groupList, rank);
                     if (newGroup != null) {
-                        client.addCooldown(CmdRank.class, 900);
+                        client.addCooldown(getClass(), 900);
                         boolean added = api.addClientToServerGroup(newGroup.getId(), clientInfo.getDatabaseId());
 
                         if (added) {
