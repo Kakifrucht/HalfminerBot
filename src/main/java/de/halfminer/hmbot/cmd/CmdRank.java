@@ -31,7 +31,20 @@ class CmdRank extends Command {
     void run() throws InvalidCommandException {
 
         if (command.meetsLength(1)) {
+
             String pin = command.getArgument(0);
+            if (pin.length() != 4) {
+                sendInvalidPinMessage();
+                return;
+            }
+
+            for (char c : pin.toCharArray()) {
+                if (!Character.isDigit(c)) {
+                    sendInvalidPinMessage();
+                    return;
+                }
+            }
+
             Response response = null;
             Response putResponse = null;
             try {
@@ -54,7 +67,7 @@ class CmdRank extends Command {
                     boolean isUpgraded = GETMap.get("pins." + pin + ".isUpgraded").equalsIgnoreCase("true");
 
                     if (!isUpgraded || !ip.equals(clientInfo.getIp())) {
-                        MessageBuilder.create("cmdRankInvalidPin").sendMessage(clientInfo);
+                        sendInvalidPinMessage();
                         return;
                     }
 
@@ -117,7 +130,7 @@ class CmdRank extends Command {
                     }
 
                 } else {
-                    MessageBuilder.create("cmdRankInvalidPin").sendMessage(clientInfo);
+                    sendInvalidPinMessage();
                 }
 
             } catch (IOException e) {
@@ -143,5 +156,9 @@ class CmdRank extends Command {
             }
         }
         return null;
+    }
+
+    private void sendInvalidPinMessage() {
+        MessageBuilder.create("cmdRankInvalidPin").sendMessage(clientInfo);
     }
 }
