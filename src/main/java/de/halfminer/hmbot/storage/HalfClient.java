@@ -63,11 +63,17 @@ public class HalfClient extends HalfminerBotClass {
     }
 
     public Channel getChannel() {
-        for (Channel channel : api.getChannels()) {
-            if (channel.getId() == channelId) {
-                return channel;
+
+        if (channelId > Integer.MIN_VALUE) {
+            for (Channel channel : api.getChannels()) {
+                if (channel.getId() == channelId) {
+                    return channel;
+                }
             }
+            // if none was found, remove
+            channelId = Integer.MIN_VALUE;
         }
+
         return null;
     }
 

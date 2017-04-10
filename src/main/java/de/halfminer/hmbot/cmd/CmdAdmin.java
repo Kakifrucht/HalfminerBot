@@ -52,26 +52,33 @@ class CmdAdmin extends Command {
                     Client toLookup = null;
                     int id = command.getArgumentInt(1);
                     if (id > Integer.MIN_VALUE) {
+                        // lookup by id
                         toLookup = api.getClientInfo(id);
                     }
 
                     if (toLookup == null) {
-                        List<Client> clients = api.getClientsByName(command.getArgument(1));
-                        if (clients != null) {
-                            if (clients.size() == 1) {
-                                toLookup = clients.get(0);
-                            } else {
 
-                                StringBuilder send = new StringBuilder();
-                                for (Client client : clients) {
-                                    send.append(" ID: ")
-                                            .append(client.getId())
-                                            .append(" - Nickname: ")
-                                            .append(client.getNickname())
-                                            .append("\n");
+                        String query = command.getArgument(1);
+                        if (query.length() == 28) {
+                            toLookup = api.getClientByUId(query);
+                        } else {
+                            List<Client> clients = api.getClientsByName(query);
+                            if (clients != null) {
+                                if (clients.size() == 1) {
+                                    toLookup = api.getClientInfo(clients.get(0).getId());
+                                } else {
+
+                                    StringBuilder send = new StringBuilder();
+                                    for (Client client : clients) {
+                                        send.append(" ID: ")
+                                                .append(client.getId())
+                                                .append(" - Nickname: ")
+                                                .append(client.getNickname())
+                                                .append("\n");
+                                    }
+                                    sendMessage("cmdAdminLookupList", "LIST", send.toString());
+                                    return;
                                 }
-                                sendMessage("cmdAdminLookupList", "LIST", send.toString());
-                                return;
                             }
                         }
                     }
