@@ -23,6 +23,8 @@ Current features
 - **Commands**
   - !admin
     - Lookup player information via username or client id
+      - Supports client, database and unique id as parameters
+      - Checks database for offline client with given database or unique id, if no player was found
     - Reload the config file
       - Won't reload if file was not modified or if it is in invalid format
     - Restart (full reconnect) or shut the bot down

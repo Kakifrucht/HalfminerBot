@@ -25,7 +25,7 @@ public class MessageBuilder extends HalfminerBotClass {
     }
 
     private final static char PLACEHOLDER_CHARACTER = '%';
-    private final static int MAX_MESSAGE_SIZE = 1024;
+    private final static int MAX_MESSAGE_SIZE = 1020;
 
     private final String lang;
     private final Map<String, String> placeholders = new HashMap<>();

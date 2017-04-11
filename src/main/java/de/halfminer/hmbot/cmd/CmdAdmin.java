@@ -1,6 +1,7 @@
 package de.halfminer.hmbot.cmd;
 
 import com.github.theholywaffle.teamspeak3.api.wrapper.Client;
+import com.github.theholywaffle.teamspeak3.api.wrapper.DatabaseClientInfo;
 import de.halfminer.hmbot.storage.HalfClient;
 import de.halfminer.hmbot.util.MessageBuilder;
 import de.halfminer.hmbot.util.StringArgumentSeparator;
@@ -10,11 +11,15 @@ import java.util.Map;
 
 /**
  * - Lookup player information via username or client id
+ *   - Supports client, database and unique id as parameters
+ *   - Checks database for offline client with given database or unique id, if no player was found
  * - Reload the config file
  *   - Won't reload if file was not modified or if it is in invalid format
  * - Restart (full reconnect) or stop the bot entirely
  */
 class CmdAdmin extends Command {
+
+    private String lookupArg;
 
     public CmdAdmin(HalfClient client, StringArgumentSeparator command) throws InvalidCommandException {
         super(client, command);
@@ -49,7 +54,12 @@ class CmdAdmin extends Command {
             case "lookup":
                 if (command.meetsLength(2)) {
 
+                    lookupArg = command.getArgument(1);
+
                     Client toLookup = null;
+                    Map<String, String> mapToSend;
+                    String nickName;
+
                     int id = command.getArgumentInt(1);
                     if (id > Integer.MIN_VALUE) {
                         // lookup by id
@@ -58,11 +68,10 @@ class CmdAdmin extends Command {
 
                     if (toLookup == null) {
 
-                        String query = command.getArgument(1);
-                        if (query.length() == 28) {
-                            toLookup = api.getClientByUId(query);
+                        if (isUniqueID()) {
+                            toLookup = api.getClientByUId(lookupArg);
                         } else {
-                            List<Client> clients = api.getClientsByName(query);
+                            List<Client> clients = api.getClientsByName(lookupArg);
                             if (clients != null) {
                                 if (clients.size() == 1) {
                                     toLookup = api.getClientInfo(clients.get(0).getId());
@@ -83,13 +92,30 @@ class CmdAdmin extends Command {
                         }
                     }
 
-                    if (toLookup == null) {
-                        sendMessage("cmdAdminLookupNotFound");
-                        return;
+                    if (toLookup != null) {
+                        mapToSend = toLookup.getMap();
+                        nickName = toLookup.getNickname();
+                    } else {
+
+                        // no online user was found, check database
+                        DatabaseClientInfo toLookupOffline;
+                        if (isUniqueID()) {
+                            toLookupOffline = api.getDatabaseClientByUId(lookupArg);
+                        } else {
+                            toLookupOffline = api.getDatabaseClientInfo(command.getArgumentInt(1));
+                        }
+
+                        if (toLookupOffline != null) {
+                            mapToSend = toLookupOffline.getMap();
+                            nickName = toLookupOffline.getNickname();
+                        } else {
+                            sendMessage("cmdAdminLookupNotFound");
+                            return;
+                        }
                     }
 
-                    StringBuilder send = new StringBuilder(toLookup.getNickname() + ":\n");
-                    for (Map.Entry<String, String> entry : toLookup.getMap().entrySet()) {
+                    StringBuilder send = new StringBuilder(nickName + ":\n");
+                    for (Map.Entry<String, String> entry : mapToSend.entrySet()) {
                         if (entry.getValue().length() == 0) continue;
                         send.append(" ").append(entry.getKey()).append("=").append(entry.getValue()).append("\n");
                     }
@@ -102,5 +128,9 @@ class CmdAdmin extends Command {
             default:
                 throw new InvalidCommandException(CommandEnum.ADMIN);
         }
+    }
+
+    private boolean isUniqueID() {
+        return lookupArg.length() == 28 && lookupArg.endsWith("=");
     }
 }

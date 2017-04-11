@@ -97,7 +97,7 @@ public class Storage extends HalfminerBotClass {
             clientJoinedOrReloaded(client);
         }
 
-        // debug currently held clients
+        // log currently held clients
         if (clientsOnline.size() > 0) {
 
             StringBuilder sb = new StringBuilder("Clients currently online (")
