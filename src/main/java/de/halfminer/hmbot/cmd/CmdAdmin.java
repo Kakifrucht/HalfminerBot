@@ -114,7 +114,7 @@ class CmdAdmin extends Command {
                         }
                     }
 
-                    StringBuilder send = new StringBuilder(nickName + ":\n");
+                    StringBuilder send = new StringBuilder("======= ").append(nickName).append(" =======\n");
                     for (Map.Entry<String, String> entry : mapToSend.entrySet()) {
                         if (entry.getValue().length() == 0) continue;
                         send.append(" ").append(entry.getKey()).append("=").append(entry.getValue()).append("\n");

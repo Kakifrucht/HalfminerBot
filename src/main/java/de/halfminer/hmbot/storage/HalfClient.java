@@ -1,29 +1,32 @@
 package de.halfminer.hmbot.storage;
 
 import com.github.theholywaffle.teamspeak3.api.wrapper.Channel;
-import com.github.theholywaffle.teamspeak3.api.wrapper.Client;
 import com.github.theholywaffle.teamspeak3.api.wrapper.ClientInfo;
-import de.halfminer.hmbot.HalfminerBotClass;
+import de.halfminer.hmbot.BotClass;
 import de.halfminer.hmbot.util.MessageBuilder;
 
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Client class managed by {@link Storage}.
  */
-public class HalfClient extends HalfminerBotClass {
+public class HalfClient extends BotClass {
 
     private int clientId;
     private HalfGroup group;
+
+    private boolean isOnline;
     private final Map<Class, Long> commandCooldown = new ConcurrentHashMap<>();
 
     private int channelId = Integer.MIN_VALUE;
 
     HalfClient(int clientId, HalfGroup group) {
-        this.clientId = clientId;
-        this.group = group;
+        updateClient(clientId, group);
+    }
+
+    int getClientId() {
+        return clientId;
     }
 
     public ClientInfo getClientInfo() {
@@ -46,20 +49,30 @@ public class HalfClient extends HalfminerBotClass {
         commandCooldown.put(commandClass, (System.currentTimeMillis() / 1000) + cooldownSeconds);
     }
 
-    boolean canBeEvicted(List<Client> clients) {
-        boolean isOnline = clients.stream()
-                .map(Client::getId)
-                .anyMatch(id -> id == clientId);
-        return !isOnline && getChannel() == null && clearCommandCooldown();
+    boolean doSaveToDisk() {
+        return getChannel() != null;
+    }
+
+    boolean isOnline() {
+        return isOnline;
     }
 
     void updateClient(int clientId, HalfGroup group) {
         this.clientId = clientId;
         this.group = group;
+        this.isOnline = true;
+    }
+
+    void setOffline() {
+        isOnline = false;
     }
 
     public void setChannelId(int channelId) {
         this.channelId = channelId;
+    }
+
+    int getChannelId() {
+        return channelId;
     }
 
     public Channel getChannel() {
@@ -98,10 +111,9 @@ public class HalfClient extends HalfminerBotClass {
         return false;
     }
 
-    private boolean clearCommandCooldown() {
+    private void clearCommandCooldown() {
         long currentTime = System.currentTimeMillis() / 1000;
         commandCooldown.values().removeIf(timeStamp -> timeStamp < currentTime);
-        return commandCooldown.size() == 0;
     }
 
     @Override

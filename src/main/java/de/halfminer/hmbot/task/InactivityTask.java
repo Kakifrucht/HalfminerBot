@@ -2,11 +2,13 @@ package de.halfminer.hmbot.task;
 
 import com.github.theholywaffle.teamspeak3.api.wrapper.Channel;
 import com.github.theholywaffle.teamspeak3.api.wrapper.Client;
+import de.halfminer.hmbot.storage.HalfClient;
 import de.halfminer.hmbot.storage.Storage;
 import de.halfminer.hmbot.util.MessageBuilder;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Will be run at fixed interval and move AFK users to AFK channel.
@@ -43,14 +45,14 @@ class InactivityTask extends Task {
             return;
         }
 
-        List<Client> clients = api.getClients();
+        Map<Client, HalfClient> clientMap = storage.getOnlineClients();
+        for (Map.Entry<Client, HalfClient> clientEntry : clientMap.entrySet()) {
 
-        for (Client client : clients) {
-
-            if (!client.isRegularClient()) continue;
+            Client client = clientEntry.getKey();
+            HalfClient hClient = clientEntry.getValue();
 
             int idleTimeUntilMove = config.getInt("task.inactivity.idleTimeUntilMove");
-            boolean isExempt = storage.getClient(client).hasPermission("task.inactivity.exempt.move");
+            boolean isExempt = hClient.hasPermission("task.inactivity.exempt.move");
             if (client.getChannelId() != afkChannel.getId()
                     && (client.isAway()
                     || (!isExempt && (client.isOutputMuted() && ((client.getIdleTime() / 1000) > idleTimeUntilMove))))) {
@@ -67,12 +69,11 @@ class InactivityTask extends Task {
             List<Client> afkClients = new ArrayList<>();
             int clientsToKick = config.getInt("task.inactivity.clientsToKickIfFull");
             int count = 0;
-            for (Client client : clients) {
-                if (client.isRegularClient()
-                        && client.getChannelId() == afkChannel.getId()
-                        && !storage.getClient(client).hasPermission("task.inactivity.exempt.kick")) {
+            for (Map.Entry<Client, HalfClient> clientEntry : clientMap.entrySet()) {
+                if (clientEntry.getKey().getChannelId() == afkChannel.getId()
+                        && !clientEntry.getValue().hasPermission("task.inactivity.exempt.kick")) {
                     if (count++ >= clientsToKick) break;
-                    afkClients.add(client);
+                    afkClients.add(clientEntry.getKey());
                 }
             }
 

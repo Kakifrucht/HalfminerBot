@@ -9,6 +9,9 @@ Current features
 - Bot messages are fully configurable/localizable
 - Automatic reconnect if connection is lost
 - Define channel for bot to join, stays persistent if moved out
+- Storage system
+  - Regulary stores client data to disk, if necessary
+  - Bot can be restarted without losing state, like the clients channel id
 - Permission system
   - Define what client belongs to which group via their talk power
   - Higher groups automatically inherit all permissions of lower groups

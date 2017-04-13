@@ -2,7 +2,7 @@ package de.halfminer.hmbot.cmd;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
-import de.halfminer.hmbot.HalfminerBotClass;
+import de.halfminer.hmbot.BotClass;
 import de.halfminer.hmbot.storage.HalfClient;
 import de.halfminer.hmbot.storage.Storage;
 import de.halfminer.hmbot.util.MessageBuilder;
@@ -15,7 +15,7 @@ import java.util.concurrent.TimeUnit;
  * Also does permission, flood and command limit checks, logs commands, sets default command
  * and sends correct command usage, if invalid, to client.
  */
-public class CommandDispatcher extends HalfminerBotClass {
+public class CommandDispatcher extends BotClass {
 
     private final Storage storage = bot.getStorage();
     private final Cache<Integer, Boolean> floodProtection = CacheBuilder.newBuilder()

@@ -2,10 +2,7 @@ package de.halfminer.hmbot;
 
 import com.github.theholywaffle.teamspeak3.TS3Api;
 import com.github.theholywaffle.teamspeak3.api.TextMessageTargetMode;
-import com.github.theholywaffle.teamspeak3.api.event.ClientJoinEvent;
-import com.github.theholywaffle.teamspeak3.api.event.ClientMovedEvent;
-import com.github.theholywaffle.teamspeak3.api.event.TS3EventAdapter;
-import com.github.theholywaffle.teamspeak3.api.event.TextMessageEvent;
+import com.github.theholywaffle.teamspeak3.api.event.*;
 import com.github.theholywaffle.teamspeak3.api.wrapper.ClientInfo;
 import com.github.theholywaffle.teamspeak3.api.wrapper.ServerQueryInfo;
 import de.halfminer.hmbot.cmd.CommandDispatcher;
@@ -18,9 +15,9 @@ import org.slf4j.LoggerFactory;
 /**
  * Event listeners for bot. Passes commands to {@link CommandDispatcher} and contacts the client on server/channel join.
  */
-class HalfminerBotListeners extends TS3EventAdapter {
+class BotListeners extends TS3EventAdapter {
 
-    private final static Logger logger = LoggerFactory.getLogger(HalfminerBotListeners.class);
+    private final static Logger logger = LoggerFactory.getLogger(BotListeners.class);
 
     private final HalfminerBot bot = HalfminerBot.getInstance();
     private final YamlConfig config = bot.getConfig();
@@ -31,7 +28,7 @@ class HalfminerBotListeners extends TS3EventAdapter {
     private final int idOfBot;
     private final int channelOfBot;
 
-    HalfminerBotListeners() {
+    BotListeners() {
         ServerQueryInfo info = api.whoAmI();
         idOfBot = info.getId();
         channelOfBot = info.getChannelId();
@@ -59,6 +56,11 @@ class HalfminerBotListeners extends TS3EventAdapter {
     }
 
     @Override
+    public void onClientLeave(ClientLeaveEvent e) {
+        storage.clientLeft(e.getClientId());
+    }
+
+    @Override
     public void onClientMoved(ClientMovedEvent e) {
 
         if (!isRegularClient(e.getClientId()))
@@ -80,11 +82,14 @@ class HalfminerBotListeners extends TS3EventAdapter {
     }
 
     private void clientEnterMessageAndMove(int clientId) {
-        if (!storage.getClient(clientId).moveToChannel()) {
-            TS3Api api = bot.getApi();
+        clientEnterMessageAndMove(api.getClientInfo(clientId));
+    }
+
+    private void clientEnterMessageAndMove(ClientInfo client) {
+        if (!storage.getClient(client).moveToChannel()) {
             MessageBuilder.create("joinMessage")
-                    .addPlaceholderReplace("NICKNAME", api.getClientInfo(clientId).getNickname())
-                    .sendMessage(clientId);
+                    .addPlaceholderReplace("NICKNAME", client.getNickname())
+                    .sendMessage(client.getId());
         }
     }
 }

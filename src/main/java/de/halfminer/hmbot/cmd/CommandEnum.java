@@ -10,7 +10,7 @@ import java.util.Map;
 /**
  * Access to {@link Command command's} class name and their usage and description key for messaging.
  */
-public enum CommandEnum {
+enum CommandEnum {
 
     ADMIN       (CmdAdmin.class),
     BROADCAST   (CmdBroadcast.class),

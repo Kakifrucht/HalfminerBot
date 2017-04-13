@@ -1,7 +1,7 @@
 package de.halfminer.hmbot.cmd;
 
 import com.github.theholywaffle.teamspeak3.api.wrapper.ClientInfo;
-import de.halfminer.hmbot.HalfminerBotClass;
+import de.halfminer.hmbot.BotClass;
 import de.halfminer.hmbot.storage.HalfClient;
 import de.halfminer.hmbot.storage.Storage;
 import de.halfminer.hmbot.util.MessageBuilder;
@@ -10,7 +10,7 @@ import de.halfminer.hmbot.util.StringArgumentSeparator;
 /**
  * Command base class dispatched by {@link CommandDispatcher}.
  */
-abstract class Command extends HalfminerBotClass {
+abstract class Command extends BotClass {
 
     final Storage storage = bot.getStorage();
 

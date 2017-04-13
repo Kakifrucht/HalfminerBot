@@ -1,7 +1,7 @@
 package de.halfminer.hmbot.util;
 
 import com.github.theholywaffle.teamspeak3.api.wrapper.Client;
-import de.halfminer.hmbot.HalfminerBotClass;
+import de.halfminer.hmbot.BotClass;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -12,7 +12,7 @@ import java.util.Map;
  * Class containing a builder used for placeholder replacements and messaging.
  */
 @SuppressWarnings("ALL")
-public class MessageBuilder extends HalfminerBotClass {
+public class MessageBuilder extends BotClass {
 
     private final static Logger logger = LoggerFactory.getLogger(MessageBuilder.class);
 
@@ -24,8 +24,13 @@ public class MessageBuilder extends HalfminerBotClass {
         return create(lang).returnMessage();
     }
 
+    /**
+     * You can only send 1024 bytes of data via the client, however there is no easy way to determine said length
+     * without breaking characters in between messages. The current value is a random compromise that should ensure
+     * that we have enough bytes left, without manually checking.
+     */
+    private final static int MAX_MESSAGE_SIZE = 768;
     private final static char PLACEHOLDER_CHARACTER = '%';
-    private final static int MAX_MESSAGE_SIZE = 1020;
 
     private final String lang;
     private final Map<String, String> placeholders = new HashMap<>();

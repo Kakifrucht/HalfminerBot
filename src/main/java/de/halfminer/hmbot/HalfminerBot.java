@@ -179,7 +179,7 @@ public class HalfminerBot {
             }
 
             api.registerAllEvents();
-            api.addTS3Listeners(new HalfminerBotListeners());
+            api.addTS3Listeners(new BotListeners());
             scheduler.registerAllTasks();
 
             logger.info("HalfminerBot connected successfully and ready as {}", nickName);
@@ -203,7 +203,9 @@ public class HalfminerBot {
     public void stop(String message, boolean restart) {
 
         logger.info(message.length() > 0 ? message : "Bot quitting...");
+
         if (scheduler != null) scheduler.shutdown();
+        if (storage != null) storage.doSaveOnDisk();
         if (query != null) {
             try {
                 query.exit();

@@ -1,6 +1,6 @@
 package de.halfminer.hmbot.task;
 
-import de.halfminer.hmbot.HalfminerBotClass;
+import de.halfminer.hmbot.BotClass;
 import de.halfminer.hmbot.util.StringArgumentSeparator;
 
 import java.util.concurrent.TimeUnit;
@@ -8,7 +8,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * Tasks scheduled by {@link java.util.concurrent.ExecutorService ExecutorService} in {@link Scheduler}.
  */
-abstract class Task extends HalfminerBotClass implements Runnable {
+abstract class Task extends BotClass implements Runnable {
 
     private int initialDelay;
     private int period;

@@ -9,7 +9,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Base inheritance class, keeping references to commonly used object instances.
  */
-public class HalfminerBotClass {
+public class BotClass {
 
     protected final HalfminerBot bot = HalfminerBot.getInstance();
     protected final YamlConfig config = bot.getConfig();
