@@ -142,7 +142,7 @@ public class Storage extends BotClass {
         // log currently held clients
         if (clients.size() > 0) {
 
-            StringBuilder sb = new StringBuilder("Clients currently online (")
+            StringBuilder sb = new StringBuilder("Clients currently loaded (")
                     .append(clients.size())
                     .append("): ");
 
@@ -222,7 +222,7 @@ public class Storage extends BotClass {
 
         try {
             new Yaml().dump(toStore, new FileWriter(storageFile));
-            logger.info("Storage was saved to disk");
+            logger.debug("Storage was saved to disk");
         } catch (IOException e) {
             logger.error("Couldn't write storage save file to disk", e);
         }

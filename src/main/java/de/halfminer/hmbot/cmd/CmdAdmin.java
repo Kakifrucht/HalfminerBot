@@ -94,7 +94,7 @@ class CmdAdmin extends Command {
 
                     if (toLookup != null) {
                         mapToSend = toLookup.getMap();
-                        nickName = toLookup.getNickname();
+                        nickName = toLookup.getNickname() + " (ID: " + toLookup.getId() + ")";
                     } else {
 
                         // no online user was found, check database
@@ -114,7 +114,10 @@ class CmdAdmin extends Command {
                         }
                     }
 
-                    StringBuilder send = new StringBuilder("======= ").append(nickName).append(" =======\n");
+                    StringBuilder send = new StringBuilder("======= ")
+                            .append(nickName)
+                            .append(" =======\n");
+
                     for (Map.Entry<String, String> entry : mapToSend.entrySet()) {
                         if (entry.getValue().length() == 0) continue;
                         send.append(" ").append(entry.getKey()).append("=").append(entry.getValue()).append("\n");

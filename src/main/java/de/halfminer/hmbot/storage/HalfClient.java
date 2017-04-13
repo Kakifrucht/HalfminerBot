@@ -118,6 +118,6 @@ public class HalfClient extends BotClass {
 
     @Override
     public String toString() {
-        return "ClientID: " + clientId + " - Group: [" + group.toString() + "]";
+        return "ClientID: " + clientId + " - Group: [" + (group != null ? group.toString() : "unknown") + "]";
     }
 }

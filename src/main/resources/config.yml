@@ -26,7 +26,7 @@ command:
     channelDeleteDelay: 180
     #Same as above, clients with permission "cmd.channel.donator" will receive this delay instead (default: 24 hours)
     channelDeleteDelayDonator: 86400
-    #Channel group to add the player to
+    #Channel group to add the player to (you can get it from the channel group panel in brackets behind the group name)
     channelGroupAdminID: 2
     #Same as above, clients with permission "cmd.channel.donator" will receive this group instead
     channelGroupAdminIDDonator: 3
