@@ -107,9 +107,21 @@ public class Storage extends BotClass {
         }
 
         if (groups.isEmpty()) {
-            groups.add(new HalfGroup("default", 0, Collections.emptySet()));
+            groups.add(getDefaultGroup());
             logger.warn("No groups or permissions were loaded, please check your config file");
+
         } else {
+            boolean hasDefaultGroup = false;
+            for (HalfGroup group : groups) {
+                if (group.getTalkPower() <= 0) {
+                    hasDefaultGroup = true;
+                    break;
+                }
+            }
+
+            if (!hasDefaultGroup) {
+                groups.add(getDefaultGroup());
+            }
 
             for (int i = groups.size() - 1; i > 0; i--) {
                 HalfGroup group = groups.get(i);
@@ -214,5 +226,9 @@ public class Storage extends BotClass {
         } catch (IOException e) {
             logger.error("Couldn't write storage save file to disk", e);
         }
+    }
+
+    private HalfGroup getDefaultGroup() {
+        return new HalfGroup("default", 0, Collections.emptySet());
     }
 }

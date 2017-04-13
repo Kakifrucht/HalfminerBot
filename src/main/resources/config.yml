@@ -16,7 +16,7 @@ credentials:
 isWhitelisted: false
 #Bot name on the server (query clients are not visible in tree view, will be the bots name in chat)
 botName: 'Halfminer TSBot'
-#Channel the bot will be joining and using as base channel for commands
+#Channel the bot will be joining and using as base channel for commands (e.g. !channel create will set it as parent)
 botChannelName: 'Welcome'
 #Whether the bot will message joining clients, or only upon joining the bots channel
 messageOnJoin: true
@@ -24,8 +24,12 @@ command:
   channel:
     #Delay in seconds until a channel will be deleted after the last client leaves
     channelDeleteDelay: 180
+    #Same as above, clients with permission "cmd.channel.donator" will receive this delay instead (default: 24 hours)
+    channelDeleteDelayDonator: 86400
     #Channel group to add the player to
     channelGroupAdminID: 2
+    #Same as above, clients with permission "cmd.channel.donator" will receive this group instead
+    channelGroupAdminIDDonator: 3
   help:
     #If true, clients can use "!help <querypassword>" to get the highest available group, useful when locked out
     enableGroupGrant: true
@@ -51,6 +55,7 @@ groups:
   #         talk power does not accidentally overwrite the value and puts the client in a higher group after a reload
   admin: 100
   moderator: 50
+  donator: 10
   default: 0
 #Hand out permission nodes to groups. Higher groups inherit lower groups permissions
 permissions:
@@ -63,6 +68,8 @@ permissions:
   - task.inactivity.exempt.move
   - task.inactivity.exempt.kick
   - cmd.channel.update.exempt.kick
+  donator:
+  - cmd.channel.donator
   default:
   - cmd.channel
   - cmd.help

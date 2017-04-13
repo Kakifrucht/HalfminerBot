@@ -28,6 +28,7 @@ import java.util.Map;
 class CmdChannel extends Command {
 
     private final ChannelInfo botChannel;
+    private String channelDeleteDelay;
     private int channelGroupAdminId;
 
     public CmdChannel(HalfClient client, StringArgumentSeparator command) throws InvalidCommandException {
@@ -43,7 +44,9 @@ class CmdChannel extends Command {
     @Override
     void run() throws InvalidCommandException {
 
-        channelGroupAdminId = config.getInt("command.channel.channelGroupAdminID");
+        boolean isDonator = client.hasPermission("cmd.channel.donator");
+        channelDeleteDelay = config.getString("command.channel.channelDeleteDelay" + (isDonator ? "Donator" : ""));
+        channelGroupAdminId = config.getInt("command.channel.channelGroupAdminID" + (isDonator ? "Donator" : ""));
         switch (command.getArgument(0).toLowerCase()) {
             case "create":
                 createChannel();
@@ -100,8 +103,7 @@ class CmdChannel extends Command {
             channelCreateProperty.clear();
             channelCreateProperty.put(ChannelProperty.CHANNEL_FLAG_SEMI_PERMANENT, "0");
             channelCreateProperty.put(ChannelProperty.CHANNEL_FLAG_TEMPORARY, "1");
-            channelCreateProperty.put(ChannelProperty.CHANNEL_DELETE_DELAY,
-                    config.getString("command.channel.channelDeleteDelay"));
+            channelCreateProperty.put(ChannelProperty.CHANNEL_DELETE_DELAY, channelDeleteDelay);
             api.editChannel(channelCreateID, channelCreateProperty);
 
             sendMessage("cmdChannelCreateSuccess", "PASSWORD", password);

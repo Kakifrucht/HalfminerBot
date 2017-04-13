@@ -12,6 +12,7 @@ Current features
 - Cold storage as flat file
   - Regulary stores client data to disk, if necessary
   - Bot can be restarted without losing state, like the clients channel id
+    - Use command *!admin stop/restart* to safe state before shutdown
 - Permission system
   - Define what client belongs to which group via their talk power
   - Higher groups automatically inherit all permissions of lower groups
@@ -41,9 +42,11 @@ Current features
     - Create channels for users
       - Gives channel admin to the creating user
         - Set group ID via config
+          - Custom group for donators assignable
       - Adds username to the channelname
       - Sets the channel as temporary
         - Stays persistent for set amount of seconds (config)
+          - Custom time for donators assignable
         - Detect if user already has a channel, automatically move user to his channel on join/chat/move
     - Update a users channel password
       - Will kick all players from channel after changing password
