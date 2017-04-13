@@ -121,12 +121,17 @@ class CmdChannel extends Command {
         String password = getPassword();
         api.editChannel(channel.getId(), Collections.singletonMap(ChannelProperty.CHANNEL_PASSWORD, password));
 
-        for (Client client : api.getClients()) {
-            // kick if not admin before changing password
+        // kick if not admin before changing password
+        for (Map.Entry<Client, HalfClient> clientEntry : storage.getOnlineClients().entrySet()) {
+            Client client = clientEntry.getKey();
+            HalfClient hClient = clientEntry.getValue();
             if (client.getChannelId() == channel.getId()
                     && client.getChannelGroupId() != channelGroupAdminId
-                    && !storage.getClient(client).hasPermission("cmd.channel.update.exempt.kick")) {
+                    && !hClient.hasPermission("cmd.channel.update.exempt.kick")) {
                 api.kickClientFromChannel(client.getId());
+                MessageBuilder.create("cmdChannelUpdateKicked")
+                        .addPlaceholderReplace("NICKNAME", clientInfo.getNickname())
+                        .sendMessage(client);
             }
         }
 

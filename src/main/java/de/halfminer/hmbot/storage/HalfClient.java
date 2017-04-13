@@ -16,7 +16,7 @@ public class HalfClient extends BotClass {
     private int clientId;
     private HalfGroup group;
 
-    private boolean isOnline;
+    private boolean isOnline = false;
     private final Map<Class, Long> commandCooldown = new ConcurrentHashMap<>();
 
     private int channelId = Integer.MIN_VALUE;

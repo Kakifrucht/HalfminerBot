@@ -172,7 +172,7 @@ public class Storage extends BotClass {
                 if (!next.doSaveToDisk()) {
                     it.remove();
                 }
-                break;
+                return;
             }
         }
     }
@@ -188,7 +188,9 @@ public class Storage extends BotClass {
     public Map<Client, HalfClient> getOnlineClients() {
         Map<Client, HalfClient> toReturn = new HashMap<>();
         for (Client client : api.getClients()) {
-            toReturn.put(client, clients.get(client.getDatabaseId()));
+            if (client.isRegularClient()) {
+                toReturn.put(client, clients.get(client.getDatabaseId()));
+            }
         }
         return toReturn;
     }

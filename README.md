@@ -9,7 +9,7 @@ Current features
 - Bot messages are fully configurable/localizable
 - Automatic reconnect if connection is lost
 - Define channel for bot to join, stays persistent if moved out
-- Storage system
+- Cold storage as flat file
   - Regulary stores client data to disk, if necessary
   - Bot can be restarted without losing state, like the clients channel id
 - Permission system
