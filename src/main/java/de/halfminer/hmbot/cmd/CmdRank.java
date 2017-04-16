@@ -61,10 +61,10 @@ class CmdRank extends Command {
 
                     Type type = new TypeToken<Map<String, String>>(){}.getType();
                     Map<String, String> GETMap = new Gson().fromJson(response.body().string(), type);
-                    String rank = GETMap.get("pins." + pin + ".rank");
-                    String uuid = GETMap.get("pins." + pin + ".uuid");
-                    String ip = GETMap.get("pins." + pin + ".ip");
-                    boolean isUpgraded = GETMap.get("pins." + pin + ".isUpgraded").equalsIgnoreCase("true");
+                    String rank = GETMap.get("rank");
+                    String uuid = GETMap.get("uuid");
+                    String ip = GETMap.get("ip");
+                    boolean isUpgraded = GETMap.get("isUpgraded").equalsIgnoreCase("true");
 
                     if (!isUpgraded || !ip.equals(clientInfo.getIp())) {
                         sendInvalidPinMessage();
@@ -88,8 +88,8 @@ class CmdRank extends Command {
                     // remove old group if client already has rank on server
                     if (putResponse.code() != 201) {
                         Map<String, String> jsonPut = gson.fromJson(putResponse.body().string(), type);
-                        String oldIdentity = jsonPut.get("ranks.teamspeak." + uuid + ".identity") + '=';
-                        String oldGroupName = jsonPut.get("ranks.teamspeak." + uuid + ".rank");
+                        String oldIdentity = jsonPut.get("identity") + '=';
+                        String oldGroupName = jsonPut.get("rank");
 
                         if (rank.equals(oldGroupName) && oldIdentity.equals(clientInfo.getUniqueIdentifier())) {
                             MessageBuilder.create("cmdRankAlreadyGiven").sendMessage(clientInfo);

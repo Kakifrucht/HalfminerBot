@@ -21,7 +21,7 @@ public class Storage extends BotClass {
     public Storage() {
 
         if (storageFile.exists()) {
-            try (FileReader reader = new FileReader(storageFile)){
+            try (FileReader reader = new FileReader(storageFile)) {
                 Object loaded = new Yaml().load(reader);
                 if (loaded instanceof Map) {
                     for (Map.Entry o : ((Map<?, ?>) loaded).entrySet()) {

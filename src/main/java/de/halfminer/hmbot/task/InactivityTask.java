@@ -26,7 +26,6 @@ class InactivityTask extends Task {
 
     @Override
     boolean checkIfEnabled() {
-        // suppose that first channel containing the word afk is the designated one
         for (Channel channel : api.getChannelsByName(config.getString("task.inactivity.channelNameContains"))) {
             if (channel.getNeededTalkPower() > 0) {
                 afkChannel = channel;
