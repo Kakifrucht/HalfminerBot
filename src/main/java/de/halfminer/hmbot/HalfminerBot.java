@@ -122,7 +122,9 @@ public class HalfminerBot {
             @Override
             public void onDisconnect(TS3Query ts3Query) {
                 logger.warn("Bot lost connection to server, trying to reconnect...");
-                scheduler.shutdown();
+                if(scheduler != null) {
+                    scheduler.shutdown();
+                }
             }
         });
 
@@ -206,12 +208,8 @@ public class HalfminerBot {
 
         if (scheduler != null) scheduler.shutdown();
         if (storage != null) storage.doSaveOnDisk();
-        if (query != null) {
-            try {
-                query.exit();
-            } catch (NullPointerException ignored) {
-                // if exiting from query without successful connect NullPointerEx is thrown, we cannot check beforehand
-            }
+        if (query != null && query.isConnected()) {
+            query.exit();
         }
 
         synchronized (monitor) {

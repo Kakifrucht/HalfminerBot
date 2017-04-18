@@ -13,9 +13,13 @@
         </Async>
     </Appenders>
     <Loggers>
-        <Root level="debug">
-            <AppenderRef ref="consoleAppender" level="debug"/>
-            <AppenderRef ref="asyncFileAppender" level="info"/>
+        <Logger name="com.github.theholywaffle.teamspeak3.SocketReader" level="debug" additivity="false">
+            <AppenderRef ref="consoleAppender" level="error"/>
+            <AppenderRef ref="asyncFileAppender" level="error"/>
+        </Logger>
+        <Root level="info">
+            <AppenderRef ref="consoleAppender"/>
+            <AppenderRef ref="asyncFileAppender"/>
         </Root>
     </Loggers>
 </Configuration>

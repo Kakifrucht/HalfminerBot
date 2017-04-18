@@ -60,7 +60,7 @@ class CmdRank extends Command {
                     Gson gson = new Gson();
 
                     Type type = new TypeToken<Map<String, String>>(){}.getType();
-                    Map<String, String> GETMap = new Gson().fromJson(response.body().string(), type);
+                    Map<String, String> GETMap = gson.fromJson(response.body().string(), type);
                     String rank = GETMap.get("rank");
                     String uuid = GETMap.get("uuid");
                     String ip = GETMap.get("ip");

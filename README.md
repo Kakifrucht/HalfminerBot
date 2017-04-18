@@ -1,6 +1,6 @@
 # Halfminer Bot
 Teamspeak 3 Bot for Minecraft Server [Two and a half Miner](https://halfminer.de).
-Connecting to query via [API](https://github.com/TheHolyWaffle/TeamSpeak-3-Java-API).
+Connecting to query via [this API](https://github.com/TheHolyWaffle/TeamSpeak-3-Java-API).
 
 Current features
 -------
@@ -22,7 +22,7 @@ Current features
     - Server join message can be disabled
   - Command flood protection (optional bypass permission)
     - Custom cooldowns available additionally, for example for *!channel update*
-  - Default command if none supplied is !channel, to make channel creation easier
+  - Default command if none supplied is *!channel create*, to make channel creation easier
   - Permission to use command necessary
 - **Commands**
   - !admin
