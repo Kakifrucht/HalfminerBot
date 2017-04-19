@@ -22,6 +22,7 @@ public class Storage extends BotClass {
 
         if (storageFile.exists()) {
             try (FileReader reader = new FileReader(storageFile)) {
+
                 Object loaded = new Yaml().load(reader);
                 if (loaded instanceof Map) {
                     for (Map.Entry o : ((Map<?, ?>) loaded).entrySet()) {
@@ -29,6 +30,7 @@ public class Storage extends BotClass {
                             Map<?, ?> currentMap = (Map) o.getValue();
                             int clientID = (Integer) currentMap.get("clientID");
                             int channelID = (Integer) currentMap.get("channelID");
+
                             HalfClient currentClient = new HalfClient(clientID, null);
                             currentClient.setChannelId(channelID);
                             clients.put((int) o.getKey(), currentClient);
@@ -37,6 +39,7 @@ public class Storage extends BotClass {
                 } else if (loaded != null) {
                     logger.warn("Storage file is in invalid format and was ignored");
                 }
+
             } catch (Exception e) {
                 logger.warn("Couldn't read storage file", e);
             }
@@ -169,7 +172,7 @@ public class Storage extends BotClass {
 
         int databaseId = client.getDatabaseId();
         if (clients.containsKey(databaseId)) {
-            clients.get(databaseId).updateClient(client.getId(), clientGroup);
+            clients.get(databaseId).clientJoined(client.getId(), clientGroup);
         } else {
             clients.put(databaseId, new HalfClient(client.getId(), clientGroup));
         }
@@ -178,10 +181,10 @@ public class Storage extends BotClass {
     public void clientLeft(int clientId) {
         Iterator<HalfClient> it = clients.values().iterator();
         while (it.hasNext()) {
-            HalfClient next = it.next();
-            if (next.getClientId() == clientId) {
-                next.setOffline();
-                if (!next.doSaveToDisk()) {
+            HalfClient currentClient = it.next();
+            if (currentClient.getClientId() == clientId) {
+                currentClient.clientLeft();
+                if (!currentClient.isOnline() && !currentClient.doSaveToDisk()) {
                     it.remove();
                 }
                 return;

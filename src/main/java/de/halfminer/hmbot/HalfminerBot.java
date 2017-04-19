@@ -114,15 +114,15 @@ public class HalfminerBot {
                         attempts = 0;
                     }
                 } else {
-                    startBot();
                     hasConnected = true;
+                    startBot();
                 }
             }
 
             @Override
             public void onDisconnect(TS3Query ts3Query) {
                 logger.warn("Bot lost connection to server, trying to reconnect...");
-                if(scheduler != null) {
+                if (scheduler != null) {
                     scheduler.shutdown();
                 }
             }

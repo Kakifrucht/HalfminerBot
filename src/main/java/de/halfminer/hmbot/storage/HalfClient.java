@@ -16,17 +16,17 @@ public class HalfClient extends BotClass {
     private int clientId;
     private HalfGroup group;
 
-    private boolean isOnline = false;
+    private int onlineCount = 0;
     private final Map<Class, Long> commandCooldown = new ConcurrentHashMap<>();
 
     private int channelId = Integer.MIN_VALUE;
 
     HalfClient(int clientId, HalfGroup group) {
-        updateClient(clientId, group);
-    }
-
-    int getClientId() {
-        return clientId;
+        clientJoined(clientId, group);
+        // client is currently offline
+        if (group == null) {
+            onlineCount--;
+        }
     }
 
     public ClientInfo getClientInfo() {
@@ -49,30 +49,8 @@ public class HalfClient extends BotClass {
         commandCooldown.put(commandClass, (System.currentTimeMillis() / 1000) + cooldownSeconds);
     }
 
-    boolean doSaveToDisk() {
-        return getChannel() != null;
-    }
-
-    boolean isOnline() {
-        return isOnline;
-    }
-
-    void updateClient(int clientId, HalfGroup group) {
-        this.clientId = clientId;
-        this.group = group;
-        this.isOnline = true;
-    }
-
-    void setOffline() {
-        isOnline = false;
-    }
-
     public void setChannelId(int channelId) {
         this.channelId = channelId;
-    }
-
-    int getChannelId() {
-        return channelId;
     }
 
     public Channel getChannel() {
@@ -109,6 +87,32 @@ public class HalfClient extends BotClass {
         }
 
         return false;
+    }
+
+    int getClientId() {
+        return clientId;
+    }
+
+    int getChannelId() {
+        return channelId;
+    }
+
+    boolean doSaveToDisk() {
+        return getChannel() != null;
+    }
+
+    boolean isOnline() {
+        return onlineCount > 0;
+    }
+
+    void clientJoined(int clientId, HalfGroup group) {
+        this.clientId = clientId;
+        this.group = group;
+        this.onlineCount++;
+    }
+
+    void clientLeft() {
+        onlineCount--;
     }
 
     private void clearCommandCooldown() {
