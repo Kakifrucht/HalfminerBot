@@ -48,14 +48,14 @@ Current features
         - Stays persistent for set amount of seconds (config)
           - Custom time for donators assignable
         - Detect if user already has a channel, automatically move user to his channel on join/chat/move
+    - Sets given parameter as password
     - Update a users channel password
       - Will kick all players from channel after changing password
-    - Sets given parameter as password
   - !help
     - Sends list containing every available command per client
       - Checks if client has permission
       - Sends correct usage and description
-    - When calling !help <querypassword> highest available group will be granted (can be disabled)
+    - When calling !help *querypassword* highest available group will be granted (can be disabled)
   - !rank
     - Automatic retrieval of ranks after querying Halfminer REST API for privileges
     - Removes old server group, even if a different identity was used

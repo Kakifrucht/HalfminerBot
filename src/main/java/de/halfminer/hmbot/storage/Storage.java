@@ -19,7 +19,16 @@ public class Storage extends BotClass {
     private final File storageFile = new File("hmbot/", "storage.yml");
 
     public Storage() {
+        doFullReload();
+    }
 
+    public void doFullReload() {
+
+        if (clients.size() > 0) {
+            doSaveOnDisk();
+        }
+
+        clients.clear();
         if (storageFile.exists()) {
             try (FileReader reader = new FileReader(storageFile)) {
 
@@ -48,9 +57,9 @@ public class Storage extends BotClass {
         configWasReloaded();
 
         // check for dead client objects every hour
-        scheduler.scheduleRunnable(() ->
-                clients.values().removeIf(c -> !c.doSaveToDisk() && !c.isOnline()),
-                1, 1, TimeUnit.HOURS);
+        scheduler.scheduleRunnable(
+                () -> clients.values().removeIf(c -> !c.doSaveToDisk() && !c.isOnline()), 1, 1, TimeUnit.HOURS
+        );
 
         scheduler.scheduleRunnable(this::doSaveOnDisk, 15, 15, TimeUnit.MINUTES);
     }

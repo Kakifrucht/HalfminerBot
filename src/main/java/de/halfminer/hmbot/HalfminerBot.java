@@ -50,7 +50,7 @@ public class HalfminerBot {
         // setting startBot to true before stopping threads will restart the bot
         while (startBot) {
             startBot = false;
-            new Thread(() -> new HalfminerBot(config), "launch-bot").start();
+            new Thread(() -> new HalfminerBot(config), "bot-launch").start();
             synchronized (monitor) {
                 try {
                     monitor.wait();
@@ -77,6 +77,7 @@ public class HalfminerBot {
     private Scheduler scheduler;
     private TS3Api api;
     private Storage storage;
+    private BotListeners listeners;
 
     private HalfminerBot(PasswordYamlConfig config) {
 
@@ -110,7 +111,6 @@ public class HalfminerBot {
 
             @Override
             public void onDisconnect(TS3Query ts3Query) {
-                logger.warn("Bot lost connection to server, trying to reconnect...");
                 if (scheduler != null) {
                     scheduler.shutdown();
                 }
@@ -160,7 +160,7 @@ public class HalfminerBot {
             if (channels == null
                     || channels.isEmpty()
                     || !api.moveClient(api.whoAmI().getId(), channels.get(0).getId())) {
-                logger.error("The provided channelname does not exist or can't be accessed, staying in default channel");
+                logger.warn("The provided channelname does not exist or can't be accessed, staying in default channel");
             }
 
             if (scheduler == null) {
@@ -172,11 +172,17 @@ public class HalfminerBot {
             if (storage == null) {
                 this.storage = new Storage();
             } else {
-                storage.configWasReloaded();
+                storage.doFullReload();
             }
 
+            if (listeners != null) {
+                api.removeTS3Listeners(listeners);
+            }
+
+            listeners = new BotListeners();
+            api.addTS3Listeners(listeners);
             api.registerAllEvents();
-            api.addTS3Listeners(new BotListeners());
+
             scheduler.registerAllTasks();
 
             logger.info("HalfminerBot connected successfully and ready as {}", nickName);

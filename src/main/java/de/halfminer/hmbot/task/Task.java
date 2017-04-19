@@ -94,7 +94,7 @@ abstract class Task extends BotClass implements Runnable {
     private void executeWithCatchAll() {
         try {
             execute();
-        } catch (Throwable e) {
+        } catch (Exception e) {
             logger.error("Unhandled exception caught upon task execution", e);
         }
     }
