@@ -82,7 +82,7 @@ public class HalfClient extends BotClass {
             if (user.getChannelId() != channelOfUser.getId()) { //check if user is already in his channel, if not move
                 api.moveClient(clientId, channelOfUser.getId());
             }
-            MessageBuilder.create("hasChannel").sendMessage(clientId);
+            MessageBuilder.create("movedToChannel").sendMessage(clientId);
             return true;
         }
 

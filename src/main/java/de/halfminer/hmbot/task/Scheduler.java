@@ -12,19 +12,23 @@ import java.util.concurrent.*;
  */
 public class Scheduler {
 
-    private final ScheduledExecutorService service;
-    private final Map<Task, ScheduledFuture> registeredTasks = new ConcurrentHashMap<>();
+    private ScheduledExecutorService service;
+    private Map<Task, ScheduledFuture> registeredTasks;
 
     private List<Task> allTasks;
 
     public Scheduler() {
+        createNewThreadPool();
+    }
 
+    public void createNewThreadPool() {
         ThreadFactory threadFactory = new ThreadFactoryBuilder()
                 .setNameFormat("tasks-%d")
                 .setDaemon(true)
                 .build();
 
         service = Executors.newScheduledThreadPool(4, threadFactory);
+        registeredTasks = new ConcurrentHashMap<>();
     }
 
     public void registerAllTasks() {
@@ -40,6 +44,7 @@ public class Scheduler {
 
     public void shutdown() {
         service.shutdownNow();
+        registeredTasks.clear();
     }
 
     public void configWasReloaded() {

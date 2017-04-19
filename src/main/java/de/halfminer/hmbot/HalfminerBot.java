@@ -73,6 +73,7 @@ public class HalfminerBot {
     private final PasswordYamlConfig config;
     private final YamlConfig locale = new YamlConfig("locale.yml");
     private final TS3Query query;
+
     private Scheduler scheduler;
     private TS3Api api;
     private Storage storage;
@@ -102,21 +103,9 @@ public class HalfminerBot {
         apiConfig.setReconnectStrategy(ReconnectStrategy.exponentialBackoff());
         apiConfig.setConnectionHandler(new ConnectionHandler() {
 
-            private boolean hasConnected = false;
-            private int attempts = 0;
-
             @Override
             public void onConnect(TS3Query ts3Query) {
-                scheduler = new Scheduler();
-                if (hasConnected) {
-                    logger.info("Reconnect attempt #{}", ++attempts);
-                    if (startBot()) {
-                        attempts = 0;
-                    }
-                } else {
-                    hasConnected = true;
-                    startBot();
-                }
+                startBot();
             }
 
             @Override
@@ -137,7 +126,7 @@ public class HalfminerBot {
         }
     }
 
-    private boolean startBot() {
+    private void startBot() {
         this.api = query.getApi();
 
         // login to server
@@ -145,7 +134,7 @@ public class HalfminerBot {
 
             if (!api.selectVirtualServerByPort(config.getInt("ports.serverPort"))) {
                 stop("The provided server port is not valid, quitting...", false);
-                return false;
+                return;
             }
 
             String nickName = config.getString("botName");
@@ -153,8 +142,8 @@ public class HalfminerBot {
                 boolean nicknameWasSet = false;
                 for (int i = 1; i < 10; i++) {
                     if (api.setNickname(nickName + i)) {
-                        logger.warn("The provided botname is already in use or invalid, logged in as {}", nickName + i);
                         nickName = nickName + i;
+                        logger.warn("The provided botname is already in use or invalid, using {} as nickname", nickName);
                         nicknameWasSet = true;
                         break;
                     }
@@ -162,7 +151,7 @@ public class HalfminerBot {
 
                 if (!nicknameWasSet) {
                     stop("The provided botname is already in use or invalid, quitting...", false);
-                    return false;
+                    return;
                 }
             }
 
@@ -172,6 +161,12 @@ public class HalfminerBot {
                     || channels.isEmpty()
                     || !api.moveClient(api.whoAmI().getId(), channels.get(0).getId())) {
                 logger.error("The provided channelname does not exist or can't be accessed, staying in default channel");
+            }
+
+            if (scheduler == null) {
+                scheduler = new Scheduler();
+            } else {
+                scheduler.createNewThreadPool();
             }
 
             if (storage == null) {
@@ -185,10 +180,8 @@ public class HalfminerBot {
             scheduler.registerAllTasks();
 
             logger.info("HalfminerBot connected successfully and ready as {}", nickName);
-            return true;
         } else {
             stop("The provided password is not valid, quitting...", false);
-            return false;
         }
     }
 
