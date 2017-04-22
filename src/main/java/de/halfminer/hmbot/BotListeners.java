@@ -7,6 +7,7 @@ import com.github.theholywaffle.teamspeak3.api.wrapper.ClientInfo;
 import com.github.theholywaffle.teamspeak3.api.wrapper.ServerQueryInfo;
 import de.halfminer.hmbot.cmd.CommandDispatcher;
 import de.halfminer.hmbot.config.YamlConfig;
+import de.halfminer.hmbot.storage.HalfClient;
 import de.halfminer.hmbot.storage.Storage;
 import de.halfminer.hmbot.util.MessageBuilder;
 import org.slf4j.Logger;
@@ -86,7 +87,9 @@ class BotListeners extends TS3EventAdapter {
     }
 
     private void clientEnterMessageAndMove(ClientInfo client) {
-        if (!storage.getClient(client).moveToChannel(client.getId())) {
+        HalfClient hClient = storage.getClient(client);
+        if (hClient.hasPermission("bot.chat")
+                && !hClient.moveToChannel(client.getId())) {
             MessageBuilder.create("joinMessage")
                     .addPlaceholderReplace("NICKNAME", client.getNickname())
                     .sendMessage(client.getId());

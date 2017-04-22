@@ -31,13 +31,19 @@ public class CommandDispatcher extends BotClass {
             return;
         }
 
-        // set default command to !channel create
-        String commandUnparsedEdit = commandUnparsed;
+        // set default command
+        String commandUnparsedEdited = commandUnparsed;
         if (!commandUnparsed.startsWith("!")) {
-            commandUnparsedEdit = "!channel create " + commandUnparsed;
+            String commandUnparsedFromLocale = MessageBuilder.create("cmdDispatcherDefaultCommand")
+                    .addPlaceholderReplace("%MESSAGE%", commandUnparsed)
+                    .returnMessage();
+
+            if (commandUnparsedFromLocale.startsWith("!")) {
+                commandUnparsedEdited = commandUnparsedFromLocale;
+            }
         }
 
-        StringArgumentSeparator command = new StringArgumentSeparator(commandUnparsedEdit);
+        StringArgumentSeparator command = new StringArgumentSeparator(commandUnparsedEdited);
         if (!command.meetsLength(1)) {
             return;
         }

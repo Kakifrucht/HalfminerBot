@@ -6,6 +6,7 @@
 joinMessage: 'Hi %NICKNAME%!\n \nAnswer with your desired [B]password[/B] to receive a private channel.'
 movedToChannel: 'You were moved to your channel. Use "[I]!channel update <password>[/I]" to reset it''s password and kick all clients.'
 cmdDispatcherCooldown: 'You cannot use this command for another %TIME% seconds.'
+cmdDispatcherDefaultCommand: '!channel create %MESSAGE%'
 cmdDispatcherFloodLimit: 'Please wait a moment and try again.'
 cmdDispatcherNoPermission: 'You have no permission to use this command.'
 cmdDispatcherUnknownCmd: 'Unknown command. Use [I]!help[/I] to get a list with all available commands.'

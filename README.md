@@ -22,7 +22,7 @@ Current features
     - Server join message can be disabled
   - Command flood protection (optional bypass permission)
     - Custom cooldowns available additionally, for example for *!channel update*
-  - Default command if none supplied is *!channel create*, to make channel creation easier
+  - Default command configurable via locale file, *!channel create* by default
   - Permission to use command necessary
 - **Commands**
   - !admin

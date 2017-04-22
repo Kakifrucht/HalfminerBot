@@ -16,9 +16,9 @@ credentials:
 isWhitelisted: false
 #Bot name on the server (query clients are not visible in tree view, will be the bots name in chat)
 botName: 'Halfminer TSBot'
-#Channel the bot will be joining and using as base channel for commands (e.g. !channel create will set it as parent)
+#Channel the bot will be joining and using as base channel for commands (e.g. !channel create will use it as parent)
 botChannelName: 'Welcome'
-#Whether the bot will message joining clients, or only upon joining the bots channel
+#Whether the bot will message joining clients, or only upon joining the bots channel ('bot.chat' permission required)
 messageOnJoin: true
 command:
   channel:
@@ -71,6 +71,7 @@ permissions:
   donator:
   - cmd.channel.donator
   default:
+  - bot.chat
   - cmd.channel
   - cmd.help
   - cmd.rank
