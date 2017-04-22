@@ -15,16 +15,16 @@ abstract class Command extends BotClass {
     final Storage storage = bot.getStorage();
 
     final HalfClient client;
-    final int clientId;
     final ClientInfo clientInfo;
+    final int clientId;
 
     final StringArgumentSeparator command;
 
     @SuppressWarnings("WeakerAccess")
-    public Command(HalfClient client, StringArgumentSeparator command) {
+    public Command(HalfClient client, ClientInfo clientInfo, StringArgumentSeparator command) {
 
         this.client = client;
-        this.clientInfo = client.getClientInfo();
+        this.clientInfo = clientInfo;
         this.clientId = clientInfo.getId();
 
         this.command = command.removeFirstElement();

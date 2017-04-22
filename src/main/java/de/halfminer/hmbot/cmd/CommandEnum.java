@@ -1,5 +1,6 @@
 package de.halfminer.hmbot.cmd;
 
+import com.github.theholywaffle.teamspeak3.api.wrapper.ClientInfo;
 import de.halfminer.hmbot.storage.HalfClient;
 import de.halfminer.hmbot.util.StringArgumentSeparator;
 
@@ -24,11 +25,11 @@ enum CommandEnum {
         this.aClass = aClass;
     }
 
-    Command getInstance(HalfClient sender, StringArgumentSeparator command) throws InvalidCommandException {
+    Command getInstance(HalfClient client, ClientInfo clientInfo, StringArgumentSeparator command) throws InvalidCommandException {
         try {
             return (Command) aClass
-                    .getConstructor(HalfClient.class, StringArgumentSeparator.class)
-                    .newInstance(sender, command);
+                    .getConstructor(HalfClient.class, ClientInfo.class, StringArgumentSeparator.class)
+                    .newInstance(client, clientInfo, command);
         } catch (InvocationTargetException e) {
             if (e.getCause() instanceof InvalidCommandException) {
                 throw (InvalidCommandException) e.getCause();

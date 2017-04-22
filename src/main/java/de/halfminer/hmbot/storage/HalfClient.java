@@ -13,7 +13,7 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class HalfClient extends BotClass {
 
-    private int clientId;
+    private final int databaseId;
     private HalfGroup group;
 
     private int onlineCount = 0;
@@ -21,16 +21,14 @@ public class HalfClient extends BotClass {
 
     private int channelId = Integer.MIN_VALUE;
 
-    HalfClient(int clientId, HalfGroup group) {
-        clientJoined(clientId, group);
-        // client is currently offline
-        if (group == null) {
-            onlineCount--;
-        }
-    }
+    HalfClient(int databaseId, HalfGroup group) {
+        this.databaseId = databaseId;
 
-    public ClientInfo getClientInfo() {
-        return api.getClientInfo(clientId);
+        // client is currently online
+        if (group != null) {
+            this.group = group;
+            onlineCount++;
+        }
     }
 
     public boolean hasPermission(String permission) {
@@ -70,16 +68,18 @@ public class HalfClient extends BotClass {
 
     /**
      * Move client to his channel if he created one via {@link de.halfminer.hmbot.cmd.CmdChannel},
-     * used on join, when joining the bots channel or when trying to create a channel if player already has one.
+     * used on join, when joining the bots channel or when trying to create a channel new channel.
      *
+     * @param clientId id of exact client (one {@link HalfClient} can map to multiple clients online)
      * @return true if user was moved to own channel, false if he doesn't have a channel
      */
-    public boolean moveToChannel() {
+    public boolean moveToChannel(int clientId) {
 
         Channel channelOfUser = getChannel();
         if (channelOfUser != null) {
             ClientInfo user = api.getClientInfo(clientId);
-            if (user.getChannelId() != channelOfUser.getId()) { //check if user is already in his channel, if not move
+            // check if user is already in his channel, if not move
+            if (user.getChannelId() != channelOfUser.getId()) {
                 api.moveClient(clientId, channelOfUser.getId());
             }
             MessageBuilder.create("movedToChannel").sendMessage(clientId);
@@ -87,10 +87,6 @@ public class HalfClient extends BotClass {
         }
 
         return false;
-    }
-
-    int getClientId() {
-        return clientId;
     }
 
     int getChannelId() {
@@ -101,12 +97,11 @@ public class HalfClient extends BotClass {
         return getChannel() != null;
     }
 
-    boolean isOnline() {
-        return onlineCount > 0;
+    boolean doDispose() {
+        return onlineCount == 0 && !doSaveToDisk();
     }
 
-    void clientJoined(int clientId, HalfGroup group) {
-        this.clientId = clientId;
+    void clientJoined(HalfGroup group) {
         this.group = group;
         this.onlineCount++;
     }
@@ -122,6 +117,6 @@ public class HalfClient extends BotClass {
 
     @Override
     public String toString() {
-        return "ClientID: " + clientId + " - Group: [" + (group != null ? group.toString() : "unknown") + "]";
+        return "DatabaseID: " + databaseId + " - Group: [" + (group != null ? group.toString() : "unknown") + "]";
     }
 }

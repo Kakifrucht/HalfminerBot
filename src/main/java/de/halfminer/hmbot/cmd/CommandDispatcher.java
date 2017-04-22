@@ -1,5 +1,6 @@
 package de.halfminer.hmbot.cmd;
 
+import com.github.theholywaffle.teamspeak3.api.wrapper.ClientInfo;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import de.halfminer.hmbot.BotClass;
@@ -43,10 +44,12 @@ public class CommandDispatcher extends BotClass {
 
         logger.info("Client {} issued server command: {}", clientName, command.getConcatenatedString());
 
-        HalfClient sender = storage.getClient(clientId);
+        ClientInfo clientInfo = api.getClientInfo(clientId);
+        HalfClient client = storage.getClient(clientInfo);
+
         CommandEnum commandEnum = CommandEnum.getCommand(command.getArgument(0));
 
-        if (!sender.hasPermission("cmd.bypass.flood")) {
+        if (!client.hasPermission("cmd.bypass.flood")) {
             floodProtection.put(clientId, true);
         }
 
@@ -55,14 +58,14 @@ public class CommandDispatcher extends BotClass {
             return;
         }
 
-        if (!sender.hasPermission(commandEnum.getPermission())) {
+        if (!client.hasPermission(commandEnum.getPermission())) {
             MessageBuilder.create("cmdDispatcherNoPermission").sendMessage(clientId);
             return;
         }
 
         try {
-            Command cmd = commandEnum.getInstance(sender, command);
-            long cooldown = sender.getCooldown(cmd.getClass());
+            Command cmd = commandEnum.getInstance(client, clientInfo, command);
+            long cooldown = client.getCooldown(cmd.getClass());
             if (cooldown > 0) {
                 MessageBuilder.create("cmdDispatcherCooldown")
                         .addPlaceholderReplace("TIME", String.valueOf(cooldown))

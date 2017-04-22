@@ -1,5 +1,6 @@
 package de.halfminer.hmbot.cmd;
 
+import com.github.theholywaffle.teamspeak3.api.wrapper.ClientInfo;
 import com.github.theholywaffle.teamspeak3.api.wrapper.DatabaseClientInfo;
 import com.github.theholywaffle.teamspeak3.api.wrapper.ServerGroup;
 import com.google.common.reflect.TypeToken;
@@ -8,7 +9,9 @@ import de.halfminer.hmbot.storage.HalfClient;
 import de.halfminer.hmbot.util.MessageBuilder;
 import de.halfminer.hmbot.util.RESTHelper;
 import de.halfminer.hmbot.util.StringArgumentSeparator;
-import okhttp3.*;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
@@ -23,8 +26,8 @@ class CmdRank extends Command {
 
     private final OkHttpClient httpClient = new OkHttpClient();
 
-    public CmdRank(HalfClient client, StringArgumentSeparator command) {
-        super(client, command);
+    public CmdRank(HalfClient client, ClientInfo clientInfo, StringArgumentSeparator command) {
+        super(client, clientInfo, command);
     }
 
     @Override

@@ -1,5 +1,6 @@
 package de.halfminer.hmbot.cmd;
 
+import com.github.theholywaffle.teamspeak3.api.wrapper.ClientInfo;
 import com.github.theholywaffle.teamspeak3.api.wrapper.Permission;
 import com.github.theholywaffle.teamspeak3.api.wrapper.ServerGroup;
 import de.halfminer.hmbot.HalfminerBot;
@@ -15,8 +16,8 @@ import de.halfminer.hmbot.util.StringArgumentSeparator;
  */
 class CmdHelp extends Command {
 
-    public CmdHelp(HalfClient client, StringArgumentSeparator command) {
-        super(client, command);
+    public CmdHelp(HalfClient client, ClientInfo clientInfo, StringArgumentSeparator command) {
+        super(client, clientInfo, command);
     }
 
     @Override

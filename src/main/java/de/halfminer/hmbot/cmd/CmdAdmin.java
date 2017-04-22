@@ -1,6 +1,7 @@
 package de.halfminer.hmbot.cmd;
 
 import com.github.theholywaffle.teamspeak3.api.wrapper.Client;
+import com.github.theholywaffle.teamspeak3.api.wrapper.ClientInfo;
 import com.github.theholywaffle.teamspeak3.api.wrapper.DatabaseClientInfo;
 import de.halfminer.hmbot.storage.HalfClient;
 import de.halfminer.hmbot.util.MessageBuilder;
@@ -21,8 +22,8 @@ class CmdAdmin extends Command {
 
     private String lookupArg;
 
-    public CmdAdmin(HalfClient client, StringArgumentSeparator command) throws InvalidCommandException {
-        super(client, command);
+    public CmdAdmin(HalfClient client, ClientInfo clientInfo, StringArgumentSeparator command) throws InvalidCommandException {
+        super(client, clientInfo, command);
 
         if (!command.meetsLength(1)) {
             throw new InvalidCommandException(CommandEnum.ADMIN);

@@ -4,6 +4,7 @@ import com.github.theholywaffle.teamspeak3.api.ChannelProperty;
 import com.github.theholywaffle.teamspeak3.api.wrapper.Channel;
 import com.github.theholywaffle.teamspeak3.api.wrapper.ChannelInfo;
 import com.github.theholywaffle.teamspeak3.api.wrapper.Client;
+import com.github.theholywaffle.teamspeak3.api.wrapper.ClientInfo;
 import de.halfminer.hmbot.storage.HalfClient;
 import de.halfminer.hmbot.util.MessageBuilder;
 import de.halfminer.hmbot.util.StringArgumentSeparator;
@@ -31,8 +32,8 @@ class CmdChannel extends Command {
     private String channelDeleteDelay;
     private int channelGroupAdminId;
 
-    public CmdChannel(HalfClient client, StringArgumentSeparator command) throws InvalidCommandException {
-        super(client, command);
+    public CmdChannel(HalfClient client, ClientInfo clientInfo, StringArgumentSeparator command) throws InvalidCommandException {
+        super(client, clientInfo, command);
 
         if (!this.command.meetsLength(2)) {
             throw new InvalidCommandException(CommandEnum.CHANNEL);
@@ -62,7 +63,7 @@ class CmdChannel extends Command {
     private void createChannel() {
 
         // move if user has channel already
-        if (client.moveToChannel()) {
+        if (client.moveToChannel(clientId)) {
             return;
         }
 

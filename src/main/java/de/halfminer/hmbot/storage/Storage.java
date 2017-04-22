@@ -2,21 +2,14 @@ package de.halfminer.hmbot.storage;
 
 import com.github.theholywaffle.teamspeak3.api.wrapper.Client;
 import de.halfminer.hmbot.BotClass;
-import org.yaml.snakeyaml.Yaml;
 
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
 public class Storage extends BotClass {
 
-    private final Map<Integer, HalfClient> clients = new ConcurrentHashMap<>();
+    private final ClientMap clients = new ClientMap();
     private final List<HalfGroup> groups = Collections.synchronizedList(new ArrayList<>());
-    private final File storageFile = new File("hmbot/", "storage.yml");
 
     public Storage() {
         doFullReload();
@@ -24,44 +17,12 @@ public class Storage extends BotClass {
 
     public void doFullReload() {
 
-        if (clients.size() > 0) {
-            doSaveOnDisk();
-        }
-
-        clients.clear();
-        if (storageFile.exists()) {
-            try (FileReader reader = new FileReader(storageFile)) {
-
-                Object loaded = new Yaml().load(reader);
-                if (loaded instanceof Map) {
-                    for (Map.Entry o : ((Map<?, ?>) loaded).entrySet()) {
-                        if (o.getValue() instanceof Map) {
-                            Map<?, ?> currentMap = (Map) o.getValue();
-                            int clientID = (Integer) currentMap.get("clientID");
-                            int channelID = (Integer) currentMap.get("channelID");
-
-                            HalfClient currentClient = new HalfClient(clientID, null);
-                            currentClient.setChannelId(channelID);
-                            clients.put((int) o.getKey(), currentClient);
-                        }
-                    }
-                } else if (loaded != null) {
-                    logger.warn("Storage file is in invalid format and was ignored");
-                }
-
-            } catch (Exception e) {
-                logger.warn("Couldn't read storage file", e);
-            }
-        }
-
+        clients.reload();
         configWasReloaded();
 
-        // check for dead client objects every hour
-        scheduler.scheduleRunnable(
-                () -> clients.values().removeIf(c -> !c.doSaveToDisk() && !c.isOnline()), 1, 1, TimeUnit.HOURS
-        );
-
-        scheduler.scheduleRunnable(this::doSaveOnDisk, 15, 15, TimeUnit.MINUTES);
+        // check for dead client objects every hour, save on disk every 15 minutes
+        scheduler.scheduleRunnable(clients::doCleanup, 1, 1, TimeUnit.HOURS);
+        scheduler.scheduleRunnable(clients::saveData, 15, 15, TimeUnit.MINUTES);
     }
 
     public void configWasReloaded() {
@@ -151,20 +112,7 @@ public class Storage extends BotClass {
             clientJoinedOrReloaded(client);
         }
 
-        // log currently held clients
-        if (clients.size() > 0) {
-
-            StringBuilder sb = new StringBuilder("Clients currently loaded (")
-                    .append(clients.size())
-                    .append("): ");
-
-            for (HalfClient client : clients.values()) {
-                sb.append(client.toString()).append(", ");
-            }
-
-            sb.setLength(sb.length() - 2);
-            logger.debug(sb.toString());
-        }
+        clients.doDebugLog();
     }
 
     public void clientJoinedOrReloaded(Client client) {
@@ -179,65 +127,23 @@ public class Storage extends BotClass {
             }
         }
 
-        int databaseId = client.getDatabaseId();
-        if (clients.containsKey(databaseId)) {
-            clients.get(databaseId).clientJoined(client.getId(), clientGroup);
-        } else {
-            clients.put(databaseId, new HalfClient(client.getId(), clientGroup));
-        }
+        clients.clientJoined(client, clientGroup);
     }
 
     public void clientLeft(int clientId) {
-        Iterator<HalfClient> it = clients.values().iterator();
-        while (it.hasNext()) {
-            HalfClient currentClient = it.next();
-            if (currentClient.getClientId() == clientId) {
-                currentClient.clientLeft();
-                if (!currentClient.isOnline() && !currentClient.doSaveToDisk()) {
-                    it.remove();
-                }
-                return;
-            }
-        }
+        clients.clientLeft(clientId);
     }
 
     public HalfClient getClient(Client client) {
-        return clients.get(client.getDatabaseId());
-    }
-
-    public HalfClient getClient(int clientId) {
-        return clients.get(api.getClientInfo(clientId).getDatabaseId());
+        return clients.getClient(client.getDatabaseId());
     }
 
     public Map<Client, HalfClient> getOnlineClients() {
-        Map<Client, HalfClient> toReturn = new HashMap<>();
-        for (Client client : api.getClients()) {
-            if (client.isRegularClient()) {
-                toReturn.put(client, clients.get(client.getDatabaseId()));
-            }
-        }
-        return toReturn;
+        return clients.getOnlineClients(api.getClients());
     }
 
-    public void doSaveOnDisk() {
-
-        Map<Integer, Map<String, Object>> toStore = new HashMap<>();
-        for (Map.Entry<Integer, HalfClient> entry : clients.entrySet()) {
-            HalfClient current = entry.getValue();
-            if (current.doSaveToDisk()) {
-                Map<String, Object> clientData = new HashMap<>();
-                clientData.put("clientID", current.getClientId());
-                clientData.put("channelID", current.getChannelId());
-                toStore.put(entry.getKey(), clientData);
-            }
-        }
-
-        try {
-            new Yaml().dump(toStore, new FileWriter(storageFile));
-            logger.debug("Storage was saved to disk");
-        } catch (IOException e) {
-            logger.error("Couldn't write storage save file to disk", e);
-        }
+    public void saveData() {
+        clients.saveData();
     }
 
     private HalfGroup getDefaultGroup() {

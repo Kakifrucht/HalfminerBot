@@ -86,7 +86,7 @@ class BotListeners extends TS3EventAdapter {
     }
 
     private void clientEnterMessageAndMove(ClientInfo client) {
-        if (!storage.getClient(client).moveToChannel()) {
+        if (!storage.getClient(client).moveToChannel(client.getId())) {
             MessageBuilder.create("joinMessage")
                     .addPlaceholderReplace("NICKNAME", client.getNickname())
                     .sendMessage(client.getId());

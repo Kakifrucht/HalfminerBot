@@ -91,13 +91,15 @@ public class HalfminerBot {
 
         // configure API
         String host = config.getString("host");
-        TS3Config apiConfig = new TS3Config();
-        apiConfig.setHost(host);
-        apiConfig.setQueryPort(config.getInt("ports.queryPort"));
+        int queryPort = config.getInt("ports.queryPort");
+        TS3Config apiConfig = new TS3Config()
+                .setEnableCommunicationsLogging(true)
+                .setHost(host)
+                .setQueryPort(queryPort);
+
         if (host.equals("localhost") || config.getBoolean("isWhitelisted")) {
             apiConfig.setFloodRate(FloodRate.UNLIMITED);
         } else {
-            apiConfig.setFloodRate(FloodRate.DEFAULT);
             logger.info("Command rate is reduced, set isWhitelisted to true in config or connect via localhost");
         }
 
@@ -192,6 +194,7 @@ public class HalfminerBot {
     }
 
     public boolean reloadConfig() {
+
         boolean localeReloaded = locale.reloadConfig();
         if (config.reloadConfig()) {
             logger.info("Config file was reloaded");
@@ -206,7 +209,7 @@ public class HalfminerBot {
         logger.info(message.length() > 0 ? message : "Bot quitting...");
 
         if (scheduler != null) scheduler.shutdown();
-        if (storage != null) storage.doSaveOnDisk();
+        if (storage != null) storage.saveData();
         if (query != null && query.isConnected()) {
             query.exit();
         }
