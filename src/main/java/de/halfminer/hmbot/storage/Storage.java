@@ -17,7 +17,6 @@ public class Storage extends BotClass {
 
     public void doFullReload() {
 
-        clients.reload();
         configWasReloaded();
 
         // check for dead client objects every hour, save on disk every 15 minutes
@@ -26,6 +25,8 @@ public class Storage extends BotClass {
     }
 
     public void configWasReloaded() {
+
+        // load groups and their permissions from config
         groups.clear();
         Map<?, ?> groupYamlMap = (Map) config.get("groups", Map.class);
         for (Map.Entry<?, ?> entry : groupYamlMap.entrySet()) {
@@ -84,6 +85,8 @@ public class Storage extends BotClass {
             logger.warn("No groups or permissions were loaded, please check your config file");
 
         } else {
+
+            // add default group if not supplied
             boolean hasDefaultGroup = false;
             for (HalfGroup group : groups) {
                 if (group.getTalkPower() <= 0) {
@@ -96,11 +99,13 @@ public class Storage extends BotClass {
                 groups.add(getDefaultGroup());
             }
 
+            // inherit permissions of lower groups
             for (int i = groups.size() - 1; i > 0; i--) {
                 HalfGroup group = groups.get(i);
                 groups.get(i - 1).addPermissions(group);
             }
 
+            // log groups
             logger.info("Loaded groups ({}), talk power and permissions: ", groups.size());
             for (HalfGroup group : groups) {
                 logger.info("{}: {}, Permissions: {}",
@@ -108,10 +113,9 @@ public class Storage extends BotClass {
             }
         }
 
-        for (Client client : api.getClients()) {
-            clientJoinedOrReloaded(client);
-        }
-
+        // reload online clients
+        clients.reload();
+        api.getClients().forEach(this::clientJoinedOrReloaded);
         clients.doDebugLog();
     }
 

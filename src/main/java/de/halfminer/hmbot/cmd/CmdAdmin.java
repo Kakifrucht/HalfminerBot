@@ -95,7 +95,12 @@ class CmdAdmin extends Command {
 
                     if (toLookup != null) {
                         mapToSend = toLookup.getMap();
-                        nickName = toLookup.getNickname() + " (ID: " + toLookup.getId() + ")";
+                        nickName = toLookup.getNickname()
+                                + " (ID: "
+                                + toLookup.getId()
+                                + ", DBID: "
+                                + toLookup.getDatabaseId()
+                                + ")";
                     } else {
 
                         // no online user was found, check database
@@ -108,7 +113,7 @@ class CmdAdmin extends Command {
 
                         if (toLookupOffline != null) {
                             mapToSend = toLookupOffline.getMap();
-                            nickName = toLookupOffline.getNickname();
+                            nickName = toLookupOffline.getNickname() + " (Offline)";
                         } else {
                             sendMessage("cmdAdminLookupNotFound");
                             return;
