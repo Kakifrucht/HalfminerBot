@@ -197,11 +197,13 @@ public class HalfminerBot {
 
         boolean localeReloaded = locale.reloadConfig();
         if (config.reloadConfig()) {
-            logger.info("Config file was reloaded");
             scheduler.configWasReloaded();
             storage.configWasReloaded();
+            logger.info("Config file was reloaded");
             return true;
-        } else return localeReloaded;
+        } else {
+            return localeReloaded;
+        }
     }
 
     public void stop(String message, boolean restart) {
@@ -220,7 +222,7 @@ public class HalfminerBot {
         }
     }
 
-    YamlConfig getConfig() {
+    PasswordYamlConfig getConfig() {
         return config;
     }
 

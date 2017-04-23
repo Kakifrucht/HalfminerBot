@@ -1,7 +1,7 @@
 package de.halfminer.hmbot;
 
 import com.github.theholywaffle.teamspeak3.TS3Api;
-import de.halfminer.hmbot.config.YamlConfig;
+import de.halfminer.hmbot.config.PasswordYamlConfig;
 import de.halfminer.hmbot.task.Scheduler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,7 +12,7 @@ import org.slf4j.LoggerFactory;
 public class BotClass {
 
     protected final HalfminerBot bot = HalfminerBot.getInstance();
-    protected final YamlConfig config = bot.getConfig();
+    protected final PasswordYamlConfig config = bot.getConfig();
     protected final Scheduler scheduler = bot.getScheduler();
     protected final TS3Api api = bot.getApi();
 

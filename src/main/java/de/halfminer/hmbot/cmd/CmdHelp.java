@@ -23,10 +23,10 @@ class CmdHelp extends Command {
     @Override
     void run() {
 
-        // hidden command !help <password> sets sender
+        // hidden command !help <password> sets sender to highest server group
         if (command.meetsLength(1)
                 && config.getBoolean("command.help.enableGroupGrant")
-                && command.getArgument(0).equals(config.getString("credentials.password"))) {
+                && config.getPassword().equals(command.getArgument(0))) {
 
             ServerGroup highestGroup = null;
             int highestTalkPower = 0;
