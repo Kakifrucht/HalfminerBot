@@ -31,11 +31,12 @@ abstract class Task extends BotClass implements Runnable {
 
         if (separator.meetsLength(3)) {
             int oldInitialDelay = initialDelay;
-            initialDelay = separator.getArgumentInt(0);
             int oldPeriod = period;
+            TimeUnit oldTimeUnit = timeUnit;
+
+            initialDelay = separator.getArgumentInt(0);
             period = separator.getArgumentInt(1);
 
-            TimeUnit oldTimeUnit = timeUnit;
             String timeUnitString = separator.getArgument(2).toUpperCase().trim();
             if (timeUnitString.equals("DISABLED")) {
                 timeUnit = null;

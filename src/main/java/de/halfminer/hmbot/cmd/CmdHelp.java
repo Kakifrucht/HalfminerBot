@@ -58,8 +58,9 @@ class CmdHelp extends Command {
             }
         }
 
-        api.sendPrivateMessage(clientId,
-                "[B]HalfminerBot[/B] v" + HalfminerBot.getVersion() + " - © halfminer.de | Kakifrucht");
+        MessageBuilder.create("[B]HalfminerBot[/B] v" + HalfminerBot.getVersion() + " - © halfminer.de | Kakifrucht")
+                .setDirectString()
+                .sendMessage(clientId);
 
         StringBuilder allCommands = new StringBuilder(MessageBuilder.returnMessage("cmdHelpCommandsTitle"));
         for (CommandEnum cmd : CommandEnum.values()) {
@@ -71,7 +72,6 @@ class CmdHelp extends Command {
 
                 String description = MessageBuilder.returnMessage(cmd.getDescriptionKey());
                 String usage = MessageBuilder.returnMessage(cmd.getUsageKey());
-
 
                 String toAppend = MessageBuilder.create("cmdHelpFormat")
                         .addPlaceholderReplace("DESCRIPTION", description)
