@@ -1,5 +1,6 @@
 package de.halfminer.hmbot.task;
 
+import com.github.theholywaffle.teamspeak3.api.exception.TS3CommandFailedException;
 import com.github.theholywaffle.teamspeak3.api.wrapper.Channel;
 import com.github.theholywaffle.teamspeak3.api.wrapper.Client;
 import de.halfminer.hmbot.storage.HalfClient;
@@ -26,23 +27,20 @@ class InactivityTask extends Task {
 
     @Override
     boolean checkIfEnabled() {
-        for (Channel channel : api.getChannelsByName(config.getString("task.inactivity.channelNameContains"))) {
-            if (channel.getNeededTalkPower() > 0) {
-                afkChannel = channel;
-                return true;
+        try {
+            for (Channel channel : api.getChannelsByName(config.getString("task.inactivity.channelNameContains"))) {
+                if (channel.getNeededTalkPower() > 0) {
+                    afkChannel = channel;
+                    return true;
+                }
             }
-        }
+        } catch (TS3CommandFailedException ignored) {}
 
         return false;
     }
 
     @Override
     public void execute() {
-
-        if (api.getChannelInfo(afkChannel.getId()) == null) {
-            setTaskDisabled();
-            return;
-        }
 
         Map<Client, HalfClient> clientMap = storage.getOnlineClients();
         for (Map.Entry<Client, HalfClient> clientEntry : clientMap.entrySet()) {
@@ -76,10 +74,10 @@ class InactivityTask extends Task {
                 }
             }
 
+            String message = MessageBuilder.returnMessage("taskInactivityKicked");
             for (Client afk : afkClients) {
-                String message = MessageBuilder.returnMessage("taskInactivityKicked");
-                api.kickClientFromServer(message, afk);
                 api.sendPrivateMessage(afk.getId(), message);
+                api.kickClientFromServer(message, afk);
             }
         }
     }

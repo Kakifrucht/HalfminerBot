@@ -1,5 +1,6 @@
 package de.halfminer.hmbot.cmd;
 
+import com.github.theholywaffle.teamspeak3.api.exception.TS3CommandFailedException;
 import com.github.theholywaffle.teamspeak3.api.wrapper.ClientInfo;
 import com.github.theholywaffle.teamspeak3.api.wrapper.DatabaseClientInfo;
 import com.github.theholywaffle.teamspeak3.api.wrapper.ServerGroup;
@@ -57,7 +58,7 @@ class CmdRank extends Command {
                         .build();
 
                 response = httpClient.newCall(request).execute();
-                client.addCooldown(getClass(), 10);
+                addCooldown(10);
                 if (response.isSuccessful()) {
 
                     Gson gson = new Gson();
@@ -96,18 +97,19 @@ class CmdRank extends Command {
 
                         if (rank.equals(oldGroupName) && oldIdentity.equals(clientInfo.getUniqueIdentifier())) {
                             MessageBuilder.create("cmdRankAlreadyGiven").sendMessage(clientInfo);
-                            client.addCooldown(getClass(), 300);
+                            addCooldown(300);
                             return;
                         }
 
                         ServerGroup oldGroup = getMatchingGroup(groupList, oldGroupName);
                         if (oldGroup != null) {
                             DatabaseClientInfo oldClient = api.getDatabaseClientByUId(oldIdentity);
-                            boolean removed = api.removeClientFromServerGroup(oldGroup.getId(), oldClient.getDatabaseId());
-                            if (removed) {
+                            try {
+                                api.removeClientFromServerGroup(oldGroup.getId(), oldClient.getDatabaseId());
                                 logger.info("Removed client {} (dbid: {}) from group '{}'",
                                         oldClient.getNickname(), oldClient.getDatabaseId(), oldGroup.getName());
-                            }
+                            } catch (TS3CommandFailedException ignored) {}
+
                         } else {
                             logger.warn("Couldn't remove client from old group {}, as it couldn't be found", oldGroupName);
                         }
@@ -115,15 +117,14 @@ class CmdRank extends Command {
 
                     ServerGroup newGroup = getMatchingGroup(groupList, rank);
                     if (newGroup != null) {
-                        client.addCooldown(getClass(), 900);
-                        boolean added = api.addClientToServerGroup(newGroup.getId(), clientInfo.getDatabaseId());
-
-                        if (added) {
+                        addCooldown(900);
+                        try {
+                            api.addClientToServerGroup(newGroup.getId(), clientInfo.getDatabaseId());
                             MessageBuilder.create("cmdRankSet")
                                     .addPlaceholderReplace("GROUPNAME", newGroup.getName())
                                     .sendMessage(clientInfo);
                             logger.info("Set group for client {} to '{}'", clientInfo.getNickname(), newGroup.getName());
-                        } else {
+                        } catch (TS3CommandFailedException e) {
                             logger.error("Couldn't add client {} to group '{}'", clientInfo.getNickname(), newGroup.getName());
                             MessageBuilder.create("cmdDispatcherUnknownError").sendMessage(clientInfo);
                         }

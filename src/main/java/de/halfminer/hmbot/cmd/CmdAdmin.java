@@ -1,5 +1,6 @@
 package de.halfminer.hmbot.cmd;
 
+import com.github.theholywaffle.teamspeak3.api.exception.TS3CommandFailedException;
 import com.github.theholywaffle.teamspeak3.api.wrapper.Client;
 import com.github.theholywaffle.teamspeak3.api.wrapper.ClientInfo;
 import com.github.theholywaffle.teamspeak3.api.wrapper.DatabaseClientInfo;
@@ -64,16 +65,20 @@ class CmdAdmin extends Command {
                     int id = command.getArgumentInt(1);
                     if (id > Integer.MIN_VALUE) {
                         // lookup by id
-                        toLookup = api.getClientInfo(id);
+                        try {
+                            toLookup = api.getClientInfo(id);
+                        } catch (TS3CommandFailedException ignored) {}
                     }
 
                     if (toLookup == null) {
 
                         if (isUniqueID()) {
-                            toLookup = api.getClientByUId(lookupArg);
+                            try {
+                                toLookup = api.getClientByUId(lookupArg);
+                            } catch (TS3CommandFailedException ignored) {}
                         } else {
-                            List<Client> clients = api.getClientsByName(lookupArg);
-                            if (clients != null) {
+                            try {
+                                List<Client> clients = api.getClientsByName(lookupArg);
                                 if (clients.size() == 1) {
                                     toLookup = api.getClientInfo(clients.get(0).getId());
                                 } else {
@@ -89,10 +94,11 @@ class CmdAdmin extends Command {
                                     sendMessage("cmdAdminLookupList", "LIST", send.toString());
                                     return;
                                 }
-                            }
+                            } catch (TS3CommandFailedException ignored) {}
                         }
                     }
 
+                    // if online client lookup was not successful add online data to header, else do offline lookup
                     if (toLookup != null) {
                         mapToSend = toLookup.getMap();
                         nickName = toLookup.getNickname()
@@ -105,16 +111,15 @@ class CmdAdmin extends Command {
 
                         // no online user was found, check database
                         DatabaseClientInfo toLookupOffline;
-                        if (isUniqueID()) {
-                            toLookupOffline = api.getDatabaseClientByUId(lookupArg);
-                        } else {
-                            toLookupOffline = api.getDatabaseClientInfo(command.getArgumentInt(1));
-                        }
-
-                        if (toLookupOffline != null) {
+                        try {
+                            if (isUniqueID()) {
+                                toLookupOffline = api.getDatabaseClientByUId(lookupArg);
+                            } else {
+                                toLookupOffline = api.getDatabaseClientInfo(command.getArgumentInt(1));
+                            }
                             mapToSend = toLookupOffline.getMap();
                             nickName = toLookupOffline.getNickname() + " (Offline)";
-                        } else {
+                        } catch (TS3CommandFailedException e) {
                             sendMessage("cmdAdminLookupNotFound");
                             return;
                         }

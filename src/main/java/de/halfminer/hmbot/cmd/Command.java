@@ -42,4 +42,8 @@ abstract class Command extends BotClass {
         }
         builder.sendMessage(clientId);
     }
+
+    void addCooldown(int cooldownSeconds) {
+        client.addCooldown(getClass(), cooldownSeconds);
+    }
 }

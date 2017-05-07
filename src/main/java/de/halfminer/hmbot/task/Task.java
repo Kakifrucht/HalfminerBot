@@ -15,11 +15,8 @@ abstract class Task extends BotClass implements Runnable {
     private TimeUnit timeUnit;
     private boolean delayHasChanged;
 
-    private boolean isEnabled = true;
-
     Task() {
         configWasReloaded();
-        isEnabled = checkIfEnabled();
     }
 
     void configWasReloaded() {
@@ -60,6 +57,18 @@ abstract class Task extends BotClass implements Runnable {
         }
     }
 
+    int getInitialDelay() {
+        return initialDelay;
+    }
+
+    int getPeriod() {
+        return period;
+    }
+
+    TimeUnit getTimeUnit() {
+        return timeUnit;
+    }
+
     boolean shouldRegisterTask() {
         return initialDelay >= 0 && period > 0 && timeUnit != null;
     }
@@ -79,41 +88,19 @@ abstract class Task extends BotClass implements Runnable {
         return true;
     }
 
-    void setTaskDisabled() {
-        isEnabled = false;
-    }
-
     @Override
     public void run() {
-        if (isEnabled) executeWithCatchAll();
-        else {
-            isEnabled = checkIfEnabled();
-            if (isEnabled) executeWithCatchAll();
-        }
-    }
-
-    private void executeWithCatchAll() {
-        try {
-            execute();
-        } catch (Exception e) {
-            logger.error("Unhandled exception caught upon task execution", e);
+        if (checkIfEnabled()) {
+            try {
+                execute();
+            } catch (Exception e) {
+                logger.error("Unhandled exception caught upon task execution", e);
+            }
         }
     }
 
     /**
-     * Execute the task.
+     * Execute the task. Only called if {@link #checkIfEnabled()} returned true.
      */
     abstract void execute();
-
-    int getInitialDelay() {
-        return initialDelay;
-    }
-
-    int getPeriod() {
-        return period;
-    }
-
-    TimeUnit getTimeUnit() {
-        return timeUnit;
-    }
 }

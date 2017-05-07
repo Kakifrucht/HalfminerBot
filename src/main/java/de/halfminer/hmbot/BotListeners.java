@@ -3,6 +3,7 @@ package de.halfminer.hmbot;
 import com.github.theholywaffle.teamspeak3.TS3Api;
 import com.github.theholywaffle.teamspeak3.api.TextMessageTargetMode;
 import com.github.theholywaffle.teamspeak3.api.event.*;
+import com.github.theholywaffle.teamspeak3.api.exception.TS3CommandFailedException;
 import com.github.theholywaffle.teamspeak3.api.wrapper.ClientInfo;
 import com.github.theholywaffle.teamspeak3.api.wrapper.ServerQueryInfo;
 import de.halfminer.hmbot.cmd.CommandDispatcher;
@@ -71,8 +72,9 @@ class BotListeners extends TS3EventAdapter {
         if (this.channelOfBot == e.getTargetChannelId()) {
             clientEnterMessageAndMove(e.getClientId());
         } else if (e.getClientId() == idOfBot && e.getTargetChannelId() != this.channelOfBot) {
-            boolean moveBackSuccessful = bot.getApi().moveClient(idOfBot, channelOfBot);
-            if (!moveBackSuccessful) {
+            try {
+                bot.getApi().moveQuery(channelOfBot);
+            } catch (TS3CommandFailedException ex) {
                 logger.warn("Couldn't move bot back to his channel");
             }
         }

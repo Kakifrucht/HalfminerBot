@@ -16,6 +16,9 @@ public class HalfClient extends BotClass {
     private final int databaseId;
     private HalfGroup group;
 
+    /**
+     * Counts how many clients with this clients database/unique ID are online, as there can be multiple connections.
+     */
     private int onlineCount = 0;
     private final Map<Class, Long> commandCooldown = new ConcurrentHashMap<>();
 

@@ -115,7 +115,7 @@ class ClientMap {
                 if (toPut != null) {
                     toReturn.put(client, toPut);
                 } else {
-                    logger.warn("Client {} (ID: {}) was not found in storage",
+                    logger.info("Online client {} (ID: {}) was not found in storage, just logged in or out?",
                             client.getNickname(), client.getDatabaseId());
                 }
             }

@@ -1,6 +1,7 @@
 package de.halfminer.hmbot.cmd;
 
 import com.github.theholywaffle.teamspeak3.api.ChannelProperty;
+import com.github.theholywaffle.teamspeak3.api.exception.TS3CommandFailedException;
 import com.github.theholywaffle.teamspeak3.api.wrapper.Channel;
 import com.github.theholywaffle.teamspeak3.api.wrapper.ChannelInfo;
 import com.github.theholywaffle.teamspeak3.api.wrapper.Client;
@@ -91,10 +92,8 @@ class CmdChannel extends Command {
 
         channelCreateProperty.put(ChannelProperty.CHANNEL_TOPIC, channelTopic);
 
-        int channelCreateID = api.createChannel(channelCreateName, channelCreateProperty);
-
-        if (channelCreateID > 0) {
-
+        try {
+            int channelCreateID = api.createChannel(channelCreateName, channelCreateProperty);
             client.setChannelId(channelCreateID);
             api.moveClient(clientInfo.getId(), channelCreateID);
             api.setClientChannelGroup(channelGroupAdminId, channelCreateID, clientInfo.getDatabaseId());
@@ -109,7 +108,7 @@ class CmdChannel extends Command {
 
             sendMessage("cmdChannelCreateSuccess", "PASSWORD", password);
             logger.info("Channel created: {}", channelCreateName);
-        } else {
+        } catch (TS3CommandFailedException e) {
             sendMessage("cmdChannelCreateError");
         }
     }
@@ -139,7 +138,7 @@ class CmdChannel extends Command {
         }
 
         sendMessage("cmdChannelUpdateSuccess", "PASSWORD", password);
-        client.addCooldown(getClass(), 300);
+        addCooldown(300);
     }
 
     private String getPassword() {

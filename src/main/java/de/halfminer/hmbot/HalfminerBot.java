@@ -4,6 +4,7 @@ import com.github.theholywaffle.teamspeak3.TS3Api;
 import com.github.theholywaffle.teamspeak3.TS3Config;
 import com.github.theholywaffle.teamspeak3.TS3Query;
 import com.github.theholywaffle.teamspeak3.TS3Query.FloodRate;
+import com.github.theholywaffle.teamspeak3.api.exception.TS3CommandFailedException;
 import com.github.theholywaffle.teamspeak3.api.exception.TS3ConnectionFailedException;
 import com.github.theholywaffle.teamspeak3.api.reconnect.ConnectionHandler;
 import com.github.theholywaffle.teamspeak3.api.reconnect.ReconnectStrategy;
@@ -25,7 +26,7 @@ import java.util.List;
 public class HalfminerBot {
 
     private final static Logger logger = LoggerFactory.getLogger(HalfminerBot.class);
-    private final static Object monitor = new Object();
+    private final static Object mainThreadLock = new Object();
     private static HalfminerBot instance;
     private static boolean startBot = true;
 
@@ -51,9 +52,9 @@ public class HalfminerBot {
         while (startBot) {
             startBot = false;
             new Thread(() -> new HalfminerBot(config), "bot-launch").start();
-            synchronized (monitor) {
+            synchronized (mainThreadLock) {
                 try {
-                    monitor.wait();
+                    mainThreadLock.wait();
                     Thread.sleep(2000L);
                 } catch (InterruptedException ignored) {}
             }
@@ -131,65 +132,77 @@ public class HalfminerBot {
     private void startBot() {
         this.api = query.getApi();
 
-        // login to server
-        if (api.login(config.getString("credentials.username"), config.getPassword())) {
+        try {
+            api.login(config.getString("credentials.username"), config.getPassword());
+        } catch (TS3CommandFailedException e) {
+            stop("The provided password is not valid, quitting...", false);
+            return;
+        }
 
-            if (!api.selectVirtualServerByPort(config.getInt("ports.serverPort"))) {
-                stop("The provided server port is not valid, quitting...", false);
+        try {
+            api.selectVirtualServerByPort(config.getInt("ports.serverPort"));
+        } catch (TS3CommandFailedException e) {
+            stop("The provided server port is not valid, quitting...", false);
+            return;
+        }
+
+        String nickName = config.getString("botName");
+        if (!setNickname(nickName)) {
+            boolean nicknameWasSet = false;
+            for (int i = 1; i < 10; i++) {
+                if (setNickname(nickName + i)) {
+                    nickName = nickName + i;
+                    logger.warn("The provided botname is already in use or invalid, using {} as nickname", nickName);
+                    nicknameWasSet = true;
+                    break;
+                }
+            }
+
+            if (!nicknameWasSet) {
+                stop("The provided botname is invalid or already in use, quitting...", false);
                 return;
             }
+        }
 
-            String nickName = config.getString("botName");
-            if (!api.setNickname(nickName)) {
-                boolean nicknameWasSet = false;
-                for (int i = 1; i < 10; i++) {
-                    if (api.setNickname(nickName + i)) {
-                        nickName = nickName + i;
-                        logger.warn("The provided botname is already in use or invalid, using {} as nickname", nickName);
-                        nicknameWasSet = true;
-                        break;
-                    }
-                }
-
-                if (!nicknameWasSet) {
-                    stop("The provided botname is already in use or invalid, quitting...", false);
-                    return;
-                }
-            }
-
-            // move bot into channel
+        // move bot into channel
+        try {
             List<Channel> channels = api.getChannelsByName(config.getString("botChannelName"));
-            if (channels == null
-                    || channels.isEmpty()
-                    || !api.moveClient(api.whoAmI().getId(), channels.get(0).getId())) {
-                logger.warn("The provided channelname does not exist or can't be accessed, staying in default channel");
-            }
+            api.moveQuery(channels.get(0));
+        } catch (TS3CommandFailedException e) {
+            logger.warn("The provided channelname does not exist or can't be accessed, staying in default channel");
+        }
 
-            if (scheduler == null) {
-                scheduler = new Scheduler();
-            } else {
-                scheduler.createNewThreadPool();
-            }
-
-            if (storage == null) {
-                this.storage = new Storage();
-            } else {
-                storage.doFullReload();
-            }
-
-            if (listeners != null) {
-                api.removeTS3Listeners(listeners);
-            }
-
-            listeners = new BotListeners();
-            api.addTS3Listeners(listeners);
-            api.registerAllEvents();
-
-            scheduler.registerAllTasks();
-
-            logger.info("HalfminerBot connected successfully and ready as {}", nickName);
+        if (scheduler == null) {
+            scheduler = new Scheduler();
         } else {
-            stop("The provided password is not valid, quitting...", false);
+            scheduler.createNewThreadPool();
+        }
+
+        if (storage == null) {
+            this.storage = new Storage();
+        } else {
+            storage.doFullReload();
+        }
+
+        if (listeners != null) {
+            api.removeTS3Listeners(listeners);
+        }
+
+        listeners = new BotListeners();
+        api.addTS3Listeners(listeners);
+        api.registerAllEvents();
+
+        scheduler.registerAllTasks();
+
+        logger.info("HalfminerBot connected successfully and ready as {}", nickName);
+    }
+
+    private boolean setNickname(String nickName) {
+        try {
+            api.setNickname(nickName);
+            return true;
+        } catch (TS3CommandFailedException e) {
+            return false;
         }
     }
 
@@ -216,9 +229,9 @@ public class HalfminerBot {
             query.exit();
         }
 
-        synchronized (monitor) {
+        synchronized (mainThreadLock) {
             startBot = restart;
-            monitor.notify();
+            mainThreadLock.notify();
         }
     }
 
