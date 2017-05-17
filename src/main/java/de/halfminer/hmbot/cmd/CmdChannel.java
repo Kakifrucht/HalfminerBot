@@ -6,12 +6,12 @@ import com.github.theholywaffle.teamspeak3.api.wrapper.Channel;
 import com.github.theholywaffle.teamspeak3.api.wrapper.ChannelInfo;
 import com.github.theholywaffle.teamspeak3.api.wrapper.Client;
 import com.github.theholywaffle.teamspeak3.api.wrapper.ClientInfo;
+import com.google.common.collect.ImmutableMap;
 import de.halfminer.hmbot.storage.HalfClient;
 import de.halfminer.hmbot.util.MessageBuilder;
 import de.halfminer.hmbot.util.StringArgumentSeparator;
 
 import java.text.SimpleDateFormat;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -68,9 +68,7 @@ class CmdChannel extends Command {
             return;
         }
 
-        String channelCreateName = MessageBuilder.create("cmdChannelCreateFormat")
-                .addPlaceholderReplace("NICKNAME", clientInfo.getNickname())
-                .returnMessage();
+        String channelCreateName = getChannelName();
 
         if (channelCreateName.length() > 40) {
             channelCreateName = channelCreateName.substring(0, 40);
@@ -121,7 +119,11 @@ class CmdChannel extends Command {
         }
 
         String password = getPassword();
-        api.editChannel(channel.getId(), Collections.singletonMap(ChannelProperty.CHANNEL_PASSWORD, password));
+        Map<ChannelProperty, String> editMap = ImmutableMap.of(
+                ChannelProperty.CHANNEL_NAME, getChannelName(),
+                ChannelProperty.CHANNEL_PASSWORD, password
+        );
+        api.editChannel(channel.getId(), editMap);
 
         // kick if not admin before changing password
         for (Map.Entry<Client, HalfClient> clientEntry : storage.getOnlineClients().entrySet()) {
@@ -139,6 +141,12 @@ class CmdChannel extends Command {
 
         sendMessage("cmdChannelUpdateSuccess", "PASSWORD", password);
         addCooldown(300);
+    }
+
+    private String getChannelName() {
+        return MessageBuilder.create("cmdChannelCreateFormat")
+                .addPlaceholderReplace("NICKNAME", clientInfo.getNickname())
+                .returnMessage();
     }
 
     private String getPassword() {
