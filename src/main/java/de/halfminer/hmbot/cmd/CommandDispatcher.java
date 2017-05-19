@@ -1,5 +1,6 @@
 package de.halfminer.hmbot.cmd;
 
+import com.github.theholywaffle.teamspeak3.api.exception.TS3CommandFailedException;
 import com.github.theholywaffle.teamspeak3.api.wrapper.ClientInfo;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
@@ -83,13 +84,16 @@ public class CommandDispatcher extends BotClass {
 
         } catch (InvalidCommandException e) {
             if (e.hasCause()) {
-                logger.error("Exception during newInstance() of command", e);
-                MessageBuilder.create("cmdDispatchedUnknownError").sendMessage(clientId);
+                logger.error("Exception during newInstance() for command '{}'", commandUnparsedEdited, e);
+                MessageBuilder.create("cmdDispatcherUnknownError").sendMessage(clientId);
             } else {
                 MessageBuilder.create("cmdDispatcherUsage")
                         .addPlaceholderReplace("USAGE", e.getUsage())
                         .sendMessage(clientId);
             }
+        } catch (TS3CommandFailedException e) {
+            logger.error("Exception during execution of command '{}'", commandUnparsedEdited, e);
+            MessageBuilder.create("cmdDispatcherUnknownError").sendMessage(clientId);
         }
     }
 }

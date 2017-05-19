@@ -6,7 +6,6 @@ import com.github.theholywaffle.teamspeak3.api.wrapper.Channel;
 import com.github.theholywaffle.teamspeak3.api.wrapper.ChannelInfo;
 import com.github.theholywaffle.teamspeak3.api.wrapper.Client;
 import com.github.theholywaffle.teamspeak3.api.wrapper.ClientInfo;
-import com.google.common.collect.ImmutableMap;
 import de.halfminer.hmbot.storage.HalfClient;
 import de.halfminer.hmbot.util.MessageBuilder;
 import de.halfminer.hmbot.util.StringArgumentSeparator;
@@ -90,12 +89,10 @@ class CmdChannel extends Command {
 
         channelCreateProperty.put(ChannelProperty.CHANNEL_TOPIC, channelTopic);
 
+        int channelCreateID;
         try {
-            int channelCreateID = api.createChannel(channelCreateName, channelCreateProperty);
+            channelCreateID = api.createChannel(channelCreateName, channelCreateProperty);
             client.setChannelId(channelCreateID);
-            api.moveClient(clientInfo.getId(), channelCreateID);
-            api.setClientChannelGroup(channelGroupAdminId, channelCreateID, clientInfo.getDatabaseId());
-            api.addChannelPermission(channelCreateID, "i_icon_id", (int) botChannel.getIconId());
 
             // switch to temporary channel with delete delay, since it can't be set upon creation
             channelCreateProperty.clear();
@@ -104,11 +101,18 @@ class CmdChannel extends Command {
             channelCreateProperty.put(ChannelProperty.CHANNEL_DELETE_DELAY, channelDeleteDelay);
             api.editChannel(channelCreateID, channelCreateProperty);
 
+            api.moveClient(clientInfo.getId(), channelCreateID);
+
             sendMessage("cmdChannelCreateSuccess", "PASSWORD", password);
             logger.info("Channel created: {}", channelCreateName);
+
         } catch (TS3CommandFailedException e) {
             sendMessage("cmdChannelCreateError");
+            return;
         }
+
+        api.setClientChannelGroup(channelGroupAdminId, channelCreateID, clientInfo.getDatabaseId());
+        api.addChannelPermission(channelCreateID, "i_icon_id", (int) botChannel.getIconId());
     }
 
     private void updateChannel() {
@@ -118,11 +122,15 @@ class CmdChannel extends Command {
             return;
         }
 
+        Map<ChannelProperty, String> editMap = new HashMap<>();
+        String newChannelName = getChannelName();
         String password = getPassword();
-        Map<ChannelProperty, String> editMap = ImmutableMap.of(
-                ChannelProperty.CHANNEL_NAME, getChannelName(),
-                ChannelProperty.CHANNEL_PASSWORD, password
-        );
+
+        editMap.put(ChannelProperty.CHANNEL_PASSWORD, password);
+        if (!newChannelName.equals(channel.getName())) {
+            editMap.put(ChannelProperty.CHANNEL_NAME, newChannelName);
+        }
+
         api.editChannel(channel.getId(), editMap);
 
         // kick if not admin before changing password
