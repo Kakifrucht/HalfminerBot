@@ -68,11 +68,6 @@ class CmdChannel extends Command {
         }
 
         String channelCreateName = getChannelName();
-
-        if (channelCreateName.length() > 40) {
-            channelCreateName = channelCreateName.substring(0, 40);
-        }
-
         String password = getPassword();
 
         Map<ChannelProperty, String> channelCreateProperty = new HashMap<>();
@@ -152,9 +147,15 @@ class CmdChannel extends Command {
     }
 
     private String getChannelName() {
-        return MessageBuilder.create("cmdChannelCreateFormat")
+        String channelName = MessageBuilder.create("cmdChannelCreateFormat")
                 .addPlaceholderReplace("NICKNAME", clientInfo.getNickname())
                 .returnMessage();
+
+        if (channelName.length() > 40) {
+            channelName = channelName.substring(0, 40);
+        }
+
+        return channelName;
     }
 
     private String getPassword() {
