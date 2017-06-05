@@ -49,7 +49,8 @@ public class CommandDispatcher extends BotClass {
             return;
         }
 
-        logger.info("Client {} issued server command: {}", clientName, command.getConcatenatedString());
+        String commandLog = command.getConcatenatedString().replace("\n", "\\n");
+        logger.info("Client {} issued server command: {}", clientName, commandLog);
 
         ClientInfo clientInfo = api.getClientInfo(clientId);
         HalfClient client = storage.getClient(clientInfo);

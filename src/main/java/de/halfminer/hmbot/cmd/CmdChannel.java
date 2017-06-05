@@ -159,10 +159,12 @@ class CmdChannel extends Command {
     }
 
     private String getPassword() {
+
         String password = command.getArgument(1);
         if (password.length() > 20) {
             password = password.substring(0, 20);
         }
-        return password;
+
+        return password.replace("\n", "");
     }
 }
