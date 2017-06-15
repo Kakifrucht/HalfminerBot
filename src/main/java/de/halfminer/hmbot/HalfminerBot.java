@@ -9,9 +9,13 @@ import com.github.theholywaffle.teamspeak3.api.exception.TS3ConnectionFailedExce
 import com.github.theholywaffle.teamspeak3.api.reconnect.ConnectionHandler;
 import com.github.theholywaffle.teamspeak3.api.reconnect.ReconnectStrategy;
 import com.github.theholywaffle.teamspeak3.api.wrapper.Channel;
+import de.halfminer.hmbot.config.BotConfig;
+import de.halfminer.hmbot.config.BotPasswordConfig;
 import de.halfminer.hmbot.config.PasswordYamlConfig;
 import de.halfminer.hmbot.config.YamlConfig;
+import de.halfminer.hmbot.storage.DefaultStorage;
 import de.halfminer.hmbot.storage.Storage;
+import de.halfminer.hmbot.task.ExecutorScheduler;
 import de.halfminer.hmbot.task.Scheduler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,7 +27,7 @@ import java.util.List;
  *
  * @author Fabian Prieto Wunderlich - Kakifrucht
  */
-public class HalfminerBot {
+class HalfminerBot implements ComponentHolder, StateHolder {
 
     private final static Logger logger = LoggerFactory.getLogger(HalfminerBot.class);
     private final static Object mainThreadLock = new Object();
@@ -32,9 +36,9 @@ public class HalfminerBot {
 
     public static void main(String[] args) {
 
-        logger.info("HalfminerBot v{} is starting", getVersion());
+        logger.info("HalfminerBot v{} is starting", getVersionStatic());
 
-        PasswordYamlConfig config = new PasswordYamlConfig("config.yml", args.length > 0 ? args[0] : "");
+        BotPasswordConfig config = new PasswordYamlConfig("config.yml", args.length > 0 ? args[0] : "");
         if (!config.reloadConfig() || config.isUsingDefaultConfig()) {
 
             if (config.isUsingDefaultConfig()) {
@@ -61,18 +65,18 @@ public class HalfminerBot {
         }
     }
 
-    static HalfminerBot getInstance() {
+    static ComponentHolder getComponentHolder() {
         return instance;
     }
 
-    public static String getVersion() {
+    private static String getVersionStatic() {
         return HalfminerBot.class.getPackage().getImplementationVersion();
     }
 
     // -- Static End -- //
 
-    private final PasswordYamlConfig config;
-    private final YamlConfig locale = new YamlConfig("locale.yml");
+    private final BotPasswordConfig config;
+    private final BotConfig locale = new YamlConfig("locale.yml");
     private final TS3Query query;
 
     private Scheduler scheduler;
@@ -80,7 +84,7 @@ public class HalfminerBot {
     private Storage storage;
     private BotListeners listeners;
 
-    private HalfminerBot(PasswordYamlConfig config) {
+    private HalfminerBot(BotPasswordConfig config) {
 
         instance = this;
         this.config = config;
@@ -173,13 +177,13 @@ public class HalfminerBot {
         }
 
         if (scheduler == null) {
-            scheduler = new Scheduler();
+            scheduler = new ExecutorScheduler();
         } else {
             scheduler.createNewThreadPool();
         }
 
         if (storage == null) {
-            this.storage = new Storage();
+            this.storage = new DefaultStorage();
         } else {
             storage.doFullReload();
         }
@@ -206,6 +210,7 @@ public class HalfminerBot {
         }
     }
 
+    @Override
     public boolean reloadConfig() {
 
         boolean localeReloaded = locale.reloadConfig();
@@ -219,12 +224,19 @@ public class HalfminerBot {
         }
     }
 
+    @Override
     public void stop(String message, boolean restart) {
 
         logger.info(message.length() > 0 ? message : "Bot quitting...");
 
-        if (scheduler != null) scheduler.shutdown();
-        if (storage != null) storage.saveData();
+        if (scheduler != null) {
+            scheduler.shutdown();
+        }
+
+        if (storage != null) {
+            storage.saveData();
+        }
+
         if (query != null && query.isConnected()) {
             query.exit();
         }
@@ -235,22 +247,37 @@ public class HalfminerBot {
         }
     }
 
-    PasswordYamlConfig getConfig() {
+    @Override
+    public String getVersion() {
+        return HalfminerBot.getVersionStatic();
+    }
+
+    @Override
+    public StateHolder getStateHolder() {
+        return this;
+    }
+
+    @Override
+    public BotPasswordConfig getConfig() {
         return config;
     }
 
-    public YamlConfig getLocale() {
+    @Override
+    public BotConfig getLocale() {
         return locale;
     }
 
-    Scheduler getScheduler() {
+    @Override
+    public Scheduler getScheduler() {
         return scheduler;
     }
 
+    @Override
     public TS3Api getApi() {
         return api;
     }
 
+    @Override
     public Storage getStorage() {
         return storage;
     }

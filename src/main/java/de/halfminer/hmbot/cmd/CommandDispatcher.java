@@ -19,7 +19,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class CommandDispatcher extends BotClass {
 
-    private final Storage storage = bot.getStorage();
+    private final Storage storage = componentHolder.getStorage();
     private final Cache<Integer, Boolean> floodProtection = CacheBuilder.newBuilder()
             .concurrencyLevel(2)
             .expireAfterWrite(2, TimeUnit.SECONDS)

@@ -4,7 +4,7 @@ package de.halfminer.hmbot.config;
  * Custom password field that is kept after reloads, or read from config if not supplied.
  */
 @SuppressWarnings("SameParameterValue")
-public class PasswordYamlConfig extends YamlConfig {
+public class PasswordYamlConfig extends YamlConfig implements BotPasswordConfig {
 
     private String password;
     private final boolean hasCustomPassword;
@@ -24,6 +24,7 @@ public class PasswordYamlConfig extends YamlConfig {
         return toReturn;
     }
 
+    @Override
     public String getPassword() {
         return password;
     }

@@ -110,7 +110,7 @@ public class MessageBuilder extends BotClass {
     }
 
     private String getMessage(String messageKey) {
-        return bot.getLocale().getString(messageKey);
+        return componentHolder.getLocale().getString(messageKey);
     }
 
     /**

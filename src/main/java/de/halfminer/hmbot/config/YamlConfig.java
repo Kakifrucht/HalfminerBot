@@ -13,7 +13,7 @@ import java.util.Map;
  * Class loading and parsing yaml based configuration file from disk.
  * Uses {@link org.yaml.snakeyaml.Yaml SnakeYAML} for parsing.
  */
-public class YamlConfig {
+public class YamlConfig implements BotConfig {
 
     private static final Logger logger = LoggerFactory.getLogger(YamlConfig.class);
 
@@ -33,12 +33,7 @@ public class YamlConfig {
         configFile = new File("hmbot/", fileName);
     }
 
-    /**
-     * Reloads the configuration file. Will only run if file was modified since last
-     * reload and won't reload if configuration is broken.
-     *
-     * @return true if reload was successful, false if not modified/written or {@link ConfigurationException} was thrown
-     */
+    @Override
     public boolean reloadConfig() {
 
         if (configFile.exists() && configFile.lastModified() == lastModified) {
@@ -55,6 +50,11 @@ public class YamlConfig {
             configParsed = oldParsed;
             return false;
         }
+    }
+
+    @Override
+    public boolean isUsingDefaultConfig() {
+        return isUsingDefaultConfig;
     }
 
     private void loadYaml() throws ConfigurationException {
@@ -113,18 +113,22 @@ public class YamlConfig {
         }
     }
 
+    @Override
     public boolean getBoolean(String path) {
         return (boolean) get(path, Boolean.class);
     }
 
+    @Override
     public int getInt(String path) {
         return (int) get(path, Integer.class);
     }
 
+    @Override
     public String getString(String path) {
         return String.valueOf(get(path, Object.class));
     }
 
+    @Override
     public Object get(String path, Class<?> instanceOf) {
 
         Object toGet = get(path, configParsed);
@@ -158,10 +162,6 @@ public class YamlConfig {
         }
 
         return currentSection.get(separator.getArgument(currentIndex));
-    }
-
-    public boolean isUsingDefaultConfig() {
-        return isUsingDefaultConfig;
     }
 
     private class ConfigurationException extends RuntimeException {

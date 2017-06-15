@@ -47,7 +47,7 @@ class ClientMap {
                             int databaseId = (int) o.getKey();
                             int channelID = (Integer) currentMap.get("channelID");
 
-                            HalfClient currentClient = new HalfClient(databaseId, null);
+                            HalfClient currentClient = new DefaultHalfClient(databaseId, null);
                             currentClient.setChannelId(channelID);
                             clientsByDbId.put(databaseId, currentClient);
                         }
@@ -87,7 +87,7 @@ class ClientMap {
         if (clientsByDbId.containsKey(databaseId)) {
             clientsByDbId.get(databaseId).clientJoined(group);
         } else {
-            clientsByDbId.put(databaseId, new HalfClient(client.getDatabaseId(), group));
+            clientsByDbId.put(databaseId, new DefaultHalfClient(client.getDatabaseId(), group));
         }
     }
 

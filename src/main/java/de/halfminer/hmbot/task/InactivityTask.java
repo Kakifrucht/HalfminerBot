@@ -16,7 +16,7 @@ import java.util.Map;
  */
 class InactivityTask extends Task {
 
-    private final Storage storage = bot.getStorage();
+    private final Storage storage = componentHolder.getStorage();
 
     private final int maxClients;
     private Channel afkChannel;

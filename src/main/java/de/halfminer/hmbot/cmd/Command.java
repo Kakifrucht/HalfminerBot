@@ -12,7 +12,7 @@ import de.halfminer.hmbot.util.StringArgumentSeparator;
  */
 abstract class Command extends BotClass {
 
-    final Storage storage = bot.getStorage();
+    final Storage storage = componentHolder.getStorage();
 
     final HalfClient client;
     final ClientInfo clientInfo;

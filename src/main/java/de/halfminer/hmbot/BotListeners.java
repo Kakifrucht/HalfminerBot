@@ -7,7 +7,7 @@ import com.github.theholywaffle.teamspeak3.api.exception.TS3CommandFailedExcepti
 import com.github.theholywaffle.teamspeak3.api.wrapper.ClientInfo;
 import com.github.theholywaffle.teamspeak3.api.wrapper.ServerQueryInfo;
 import de.halfminer.hmbot.cmd.CommandDispatcher;
-import de.halfminer.hmbot.config.YamlConfig;
+import de.halfminer.hmbot.config.BotConfig;
 import de.halfminer.hmbot.storage.HalfClient;
 import de.halfminer.hmbot.storage.Storage;
 import de.halfminer.hmbot.util.MessageBuilder;
@@ -21,10 +21,10 @@ class BotListeners extends TS3EventAdapter {
 
     private final static Logger logger = LoggerFactory.getLogger(BotListeners.class);
 
-    private final HalfminerBot bot = HalfminerBot.getInstance();
-    private final YamlConfig config = bot.getConfig();
-    private final TS3Api api = bot.getApi();
-    private final Storage storage = bot.getStorage();
+    private final ComponentHolder componentHolder = HalfminerBot.getComponentHolder();
+    private final BotConfig config = componentHolder.getConfig();
+    private final TS3Api api = componentHolder.getApi();
+    private final Storage storage = componentHolder.getStorage();
     private final CommandDispatcher cmd = new CommandDispatcher();
 
     private final int idOfBot;
@@ -73,7 +73,7 @@ class BotListeners extends TS3EventAdapter {
             clientEnterMessageAndMove(e.getClientId());
         } else if (e.getClientId() == idOfBot && e.getTargetChannelId() != this.channelOfBot) {
             try {
-                bot.getApi().moveQuery(channelOfBot);
+                componentHolder.getApi().moveQuery(channelOfBot);
             } catch (TS3CommandFailedException ex) {
                 logger.warn("Couldn't move bot back to his channel");
             }

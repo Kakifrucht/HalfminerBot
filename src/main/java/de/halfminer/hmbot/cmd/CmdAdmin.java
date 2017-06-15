@@ -43,11 +43,11 @@ class CmdAdmin extends Command {
                 } else {
                     sendMessage("cmdAdminStopped");
                 }
-                bot.stop("Bot was " + (restart ? "restarted" : "stopped")
+                componentHolder.getStateHolder().stop("Bot was " + (restart ? "restarted" : "stopped")
                         + " via command by client " + clientInfo.getNickname(), restart);
                 return;
             case "reload":
-                if (bot.reloadConfig()) {
+                if (componentHolder.getStateHolder().reloadConfig()) {
                     sendMessage("cmdAdminConfigReloaded");
                 } else {
                     sendMessage("cmdAdminConfigReloadedError");

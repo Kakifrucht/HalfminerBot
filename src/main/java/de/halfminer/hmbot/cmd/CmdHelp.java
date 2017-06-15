@@ -3,7 +3,6 @@ package de.halfminer.hmbot.cmd;
 import com.github.theholywaffle.teamspeak3.api.wrapper.ClientInfo;
 import com.github.theholywaffle.teamspeak3.api.wrapper.Permission;
 import com.github.theholywaffle.teamspeak3.api.wrapper.ServerGroup;
-import de.halfminer.hmbot.HalfminerBot;
 import de.halfminer.hmbot.storage.HalfClient;
 import de.halfminer.hmbot.util.MessageBuilder;
 import de.halfminer.hmbot.util.StringArgumentSeparator;
@@ -58,7 +57,8 @@ class CmdHelp extends Command {
             }
         }
 
-        MessageBuilder.create("[B]HalfminerBot[/B] v" + HalfminerBot.getVersion() + " - © halfminer.de | Kakifrucht")
+        String version = componentHolder.getStateHolder().getVersion();
+        MessageBuilder.create("[B]HalfminerBot[/B] v" + version + " - © halfminer.de | Kakifrucht")
                 .setDirectString()
                 .sendMessage(clientId);
 
