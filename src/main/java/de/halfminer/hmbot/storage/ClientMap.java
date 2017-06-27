@@ -92,6 +92,12 @@ class ClientMap {
     }
 
     void clientLeft(int clientId) {
+
+        if (!clientIdToDatabaseId.containsKey(clientId)) {
+            // query client, not in database
+            return;
+        }
+
         int databaseId = clientIdToDatabaseId.get(clientId);
         HalfClient hClient = clientsByDbId.get(databaseId);
         hClient.clientLeft();
