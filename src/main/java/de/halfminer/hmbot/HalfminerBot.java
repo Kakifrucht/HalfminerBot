@@ -20,7 +20,9 @@ import de.halfminer.hmbot.task.Scheduler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.util.List;
+import java.util.Properties;
 
 /**
  * Halfminer Teamspeak 3 query bot, implementing a chat based command interface and automated tasks.
@@ -70,7 +72,13 @@ class HalfminerBot implements ComponentHolder, StateHolder {
     }
 
     private static String getVersionStatic() {
-        return HalfminerBot.class.getPackage().getImplementationVersion();
+        Properties properties = new Properties();
+        try {
+            properties.load(HalfminerBot.class.getClassLoader().getResourceAsStream("metadata.properties"));
+        } catch (IOException e) {
+            return null;
+        }
+        return properties.getProperty("version");
     }
 
     // -- Static End -- //

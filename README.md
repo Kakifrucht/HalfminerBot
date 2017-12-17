@@ -26,7 +26,7 @@ Current features
   - Permission to use command necessary
 - **Commands**
   - !admin
-    - Lookup player information via username or client id
+    - Lookup client information via username or client id
       - Supports client, database and unique id as parameters
       - Checks database for offline client with given database or unique id, if no player was found
     - Reload the config file

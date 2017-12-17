@@ -22,7 +22,8 @@
                 <directory>${basedir}/src/main/resources/</directory>
                 <includes>
                     <include>*.yml</include>
-                    <include>*.xml</include>
+                    <include>log4j2.xml</include>
+                    <include>metadata.properties</include>
                     <include>META-INF/MANIFEST.MF</include>
                 </includes>
             </resource>
