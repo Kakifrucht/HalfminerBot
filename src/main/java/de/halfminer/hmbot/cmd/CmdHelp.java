@@ -58,7 +58,7 @@ class CmdHelp extends Command {
         }
 
         String version = componentHolder.getStateHolder().getVersion();
-        MessageBuilder.create("[B]HalfminerBot[/B] v" + version + " - © halfminer.de | Kakifrucht")
+        MessageBuilder.create("[B]HalfminerBot[/B] v" + version + " - © Kakifrucht@halfminer.de | [url=https://github.com/Kakifrucht/HalfminerBot]GitHub[/url]")
                 .setDirectString()
                 .sendMessage(clientId);
 

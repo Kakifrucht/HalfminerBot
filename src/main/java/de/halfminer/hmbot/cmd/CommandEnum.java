@@ -16,8 +16,7 @@ enum CommandEnum {
     ADMIN       (CmdAdmin.class),
     BROADCAST   (CmdBroadcast.class),
     CHANNEL     (CmdChannel.class),
-    HELP        (CmdHelp.class),
-    RANK        (CmdRank.class);
+    HELP        (CmdHelp.class);
 
     private Class<?> aClass;
 
@@ -66,7 +65,6 @@ enum CommandEnum {
         putAliases(BROADCAST, "bc");
         putAliases(CHANNEL, "c", "create");
         putAliases(HELP, "h", "?", "version", "ver", "hilfe");
-        putAliases(RANK, "rang", "premium", "vip", "freischalten", "pin");
     }
 
     private static void putAliases(CommandEnum command, String... aliasesToPut) {

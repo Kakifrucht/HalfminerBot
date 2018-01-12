@@ -34,7 +34,7 @@ public class ExecutorScheduler implements Scheduler {
 
     @Override
     public void registerAllTasks() {
-        allTasks = Arrays.asList(new InactivityTask(), new StatusTask());
+        allTasks = Arrays.asList(new InactivityTask());
         for (Task task : allTasks) {
             registerTask(task);
         }
