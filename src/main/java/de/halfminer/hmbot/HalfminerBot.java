@@ -113,6 +113,7 @@ class HalfminerBot implements ComponentHolder, StateHolder {
         if (host.equals("localhost") || config.getBoolean("isWhitelisted")) {
             apiConfig.setFloodRate(FloodRate.UNLIMITED);
         } else {
+            apiConfig.setFloodRate(FloodRate.custom(400));
             logger.info("Command rate is reduced, set isWhitelisted to true in config or connect via localhost");
         }
 
