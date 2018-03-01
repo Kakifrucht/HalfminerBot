@@ -3,7 +3,7 @@ package de.halfminer.hmbot.cmd;
 import com.github.theholywaffle.teamspeak3.api.exception.TS3CommandFailedException;
 import com.github.theholywaffle.teamspeak3.api.wrapper.Client;
 import com.github.theholywaffle.teamspeak3.api.wrapper.ClientInfo;
-import com.github.theholywaffle.teamspeak3.api.wrapper.DatabaseClientInfo;
+import com.github.theholywaffle.teamspeak3.api.wrapper.DatabaseClient;
 import de.halfminer.hmbot.storage.HalfClient;
 import de.halfminer.hmbot.util.MessageBuilder;
 import de.halfminer.hmbot.util.StringArgumentSeparator;
@@ -21,7 +21,6 @@ import java.util.Map;
  */
 class CmdAdmin extends Command {
 
-    private String lookupArg;
 
     public CmdAdmin(HalfClient client, ClientInfo clientInfo, StringArgumentSeparator command) throws InvalidCommandException {
         super(client, clientInfo, command);
@@ -54,35 +53,33 @@ class CmdAdmin extends Command {
                 }
                 return;
             case "lookup":
+
                 if (command.meetsLength(2)) {
 
-                    lookupArg = command.getArgument(1);
+                    String lookupArg = command.getArgument(1);
 
-                    Client toLookup = null;
-                    Map<String, String> mapToSend;
-                    String nickName;
-
-                    int id = command.getArgumentInt(1);
-                    if (id > Integer.MIN_VALUE) {
-                        // lookup by id
-                        try {
-                            toLookup = api.getClientInfo(id);
-                        } catch (TS3CommandFailedException ignored) {}
+                    // determine what input we have
+                    LookupType type;
+                    if (lookupArg.length() == 28 && lookupArg.endsWith("=")) {
+                        type = LookupType.STRING_UID;
+                    } else if (command.getArgumentInt(1) > Integer.MIN_VALUE) {
+                        type = LookupType.NUMERIC_ID;
+                    } else {
+                        type = LookupType.NICKNAME;
                     }
 
-                    if (toLookup == null) {
+                    Map<String, String> mapToSend = null;
+                    boolean isOnline = false;
 
-                        if (isUniqueID()) {
-                            try {
-                                toLookup = api.getClientByUId(lookupArg);
-                            } catch (TS3CommandFailedException ignored) {}
-                        } else {
+                    switch (type) {
+                        case NICKNAME:
+
                             try {
                                 List<Client> clients = api.getClientsByName(lookupArg);
                                 if (clients.size() == 1) {
-                                    toLookup = api.getClientInfo(clients.get(0).getId());
+                                    mapToSend = getClientInfoMap(clients.get(0));
+                                    isOnline = true;
                                 } else {
-
                                     StringBuilder send = new StringBuilder();
                                     for (Client client : clients) {
                                         send.append(" ID: ")
@@ -94,47 +91,68 @@ class CmdAdmin extends Command {
                                     sendMessage("cmdAdminLookupList", "LIST", send.toString());
                                     return;
                                 }
+
                             } catch (TS3CommandFailedException ignored) {}
-                        }
-                    }
+                            break;
+                        case NUMERIC_ID:
 
-                    // if online client lookup was not successful add online data to header, else do offline lookup
-                    if (toLookup != null) {
-                        mapToSend = toLookup.getMap();
-                        nickName = toLookup.getNickname()
-                                + " (ID: "
-                                + toLookup.getId()
-                                + ", DBID: "
-                                + toLookup.getDatabaseId()
-                                + ")";
-                    } else {
-
-                        // no online user was found, check database
-                        DatabaseClientInfo toLookupOffline;
-                        try {
-                            if (isUniqueID()) {
-                                toLookupOffline = api.getDatabaseClientByUId(lookupArg);
-                            } else {
-                                toLookupOffline = api.getDatabaseClientInfo(command.getArgumentInt(1));
+                            int id = command.getArgumentInt(1);
+                            for (Client client : api.getClients()) {
+                                if (client.getId() == id || client.getDatabaseId() == id) {
+                                    mapToSend = getClientInfoMap(client);
+                                    isOnline = true;
+                                    break;
+                                }
                             }
-                            mapToSend = toLookupOffline.getMap();
-                            nickName = toLookupOffline.getNickname() + " (Offline)";
-                        } catch (TS3CommandFailedException e) {
-                            sendMessage("cmdAdminLookupNotFound");
-                            return;
-                        }
+
+                            // offline database id lookup
+                            if (mapToSend == null) {
+                                try {
+                                    DatabaseClient dbClient = api.getDatabaseClientInfo(id);
+                                    mapToSend = dbClient.getMap();
+                                } catch (TS3CommandFailedException ignored) {}
+                            }
+
+                            break;
+                        case STRING_UID:
+
+                            try {
+                                Client client = api.getClientByUId(lookupArg);
+                                mapToSend = getClientInfoMap(client);
+                                isOnline = true;
+                            } catch (TS3CommandFailedException e) {
+
+                                try {
+                                    DatabaseClient dbClient = api.getDatabaseClientByUId(lookupArg);
+                                    mapToSend = dbClient.getMap();
+                                } catch (TS3CommandFailedException ignored) {}
+                            }
+                            break;
                     }
 
-                    StringBuilder send = new StringBuilder("======= ")
-                            .append(nickName)
-                            .append(" =======\n");
+                    if (mapToSend == null) {
+                        sendMessage("cmdAdminLookupNotFound");
+                        return;
+                    }
+
+                    StringBuilder toSend = new StringBuilder("======= ")
+                            .append(mapToSend.get("client_nickname"))
+                            .append(" (")
+                            .append(isOnline ? "Online" : "Offline")
+                            .append(", DBID: ")
+                            .append(mapToSend.get("client_database_id"))
+                            .append(") =======\n");
 
                     for (Map.Entry<String, String> entry : mapToSend.entrySet()) {
                         if (entry.getValue().length() == 0) continue;
-                        send.append(" ").append(entry.getKey()).append("=").append(entry.getValue()).append("\n");
+                        toSend.append(" ")
+                                .append(entry.getKey())
+                                .append("=")
+                                .append(entry.getValue())
+                                .append("\n");
                     }
 
-                    MessageBuilder.create(send.toString())
+                    MessageBuilder.create(toSend.toString())
                             .setDirectString()
                             .sendMessage(clientId);
                     return;
@@ -144,7 +162,21 @@ class CmdAdmin extends Command {
         }
     }
 
-    private boolean isUniqueID() {
-        return lookupArg.length() == 28 && lookupArg.endsWith("=");
+    private Map<String, String> getClientInfoMap(Client client) {
+        if (client instanceof ClientInfo) {
+            return client.getMap();
+        } else {
+            try {
+                return api.getClientInfo(client.getId()).getMap();
+            } catch (TS3CommandFailedException e) {
+                return null;
+            }
+        }
+    }
+
+    private enum LookupType {
+        NUMERIC_ID,
+        STRING_UID,
+        NICKNAME
     }
 }
