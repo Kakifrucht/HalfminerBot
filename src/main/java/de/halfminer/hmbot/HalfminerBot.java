@@ -3,7 +3,6 @@ package de.halfminer.hmbot;
 import com.github.theholywaffle.teamspeak3.TS3Api;
 import com.github.theholywaffle.teamspeak3.TS3Config;
 import com.github.theholywaffle.teamspeak3.TS3Query;
-import com.github.theholywaffle.teamspeak3.TS3Query.FloodRate;
 import com.github.theholywaffle.teamspeak3.api.exception.TS3CommandFailedException;
 import com.github.theholywaffle.teamspeak3.api.exception.TS3ConnectionFailedException;
 import com.github.theholywaffle.teamspeak3.api.reconnect.ConnectionHandler;
@@ -57,7 +56,12 @@ class HalfminerBot implements ComponentHolder, StateHolder {
         // setting startBot to true before stopping threads will restart the bot
         while (startBot) {
             startBot = false;
-            new Thread(() -> new HalfminerBot(config), "bot-launch").start();
+
+            // start the bot
+            Thread botLaunchThread = new Thread((() -> new HalfminerBot(config)), "bot-launch");
+            botLaunchThread.setUncaughtExceptionHandler((t, e) -> logger.error("An uncaught exception has occurred", e));
+            botLaunchThread.start();
+
             synchronized (mainThreadLock) {
                 try {
                     mainThreadLock.wait();
@@ -111,9 +115,8 @@ class HalfminerBot implements ComponentHolder, StateHolder {
                 .setQueryPort(queryPort);
 
         if (host.equals("localhost") || config.getBoolean("isWhitelisted")) {
-            apiConfig.setFloodRate(FloodRate.UNLIMITED);
+            apiConfig.setFloodRate(TS3Query.FloodRate.UNLIMITED);
         } else {
-            apiConfig.setFloodRate(FloodRate.custom(400));
             logger.info("Command rate is reduced, set isWhitelisted to true in config or connect via localhost");
         }
 
@@ -122,7 +125,11 @@ class HalfminerBot implements ComponentHolder, StateHolder {
 
             @Override
             public void onConnect(TS3Query ts3Query) {
-                startBot();
+                try {
+                    startBot(ts3Query);
+                } catch (Exception e) {
+                    logger.info("An error has occurred while connecting to the server", e);
+                }
             }
 
             @Override
@@ -142,7 +149,7 @@ class HalfminerBot implements ComponentHolder, StateHolder {
         }
     }
 
-    private void startBot() {
+    private void startBot(TS3Query query) {
         this.api = query.getApi();
 
         try {
