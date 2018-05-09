@@ -11,8 +11,8 @@ credentials:
   username: 'serveradmin'
   #Can also be provided via command line, as "java -jar HalfminerBot.jar password"
   password: ''
-#If true the bot will not be throttled and send commands as fast as possible. The bots IP must appear in query_ip_whitelist.txt
-#localhost is whitelisted by default, the bot will assume this value to be true if host is localhost
+#Only set this to true if you are whitelisted in file "query_ip_whitelist.txt" in your Teamspeak directory
+#If false the bot will send commands with a delay to avoid getting banned
 isWhitelisted: false
 #Bot name on the server (query clients are not visible in tree view, will be the bots name in chat)
 botName: 'Halfminer TSBot'
@@ -40,6 +40,7 @@ task:
     # Second:   number  delay between subsequent execution
     # Third:    unit    time unit for first and second argument, example: disabled, seconds, minutes, hours, ...
     Inactivity: 10, 10, seconds
+    Status: 0, 2, disabled
   inactivity:
     #String the designated AFK channel must contain, the channels necessary talk power must also be higher than 0
     channelNameContains: 'AFK'
@@ -73,3 +74,4 @@ permissions:
   - bot.chat
   - cmd.channel
   - cmd.help
+  - cmd.rank
