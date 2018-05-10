@@ -74,4 +74,3 @@ permissions:
   - bot.chat
   - cmd.channel
   - cmd.help
-  - cmd.rank
