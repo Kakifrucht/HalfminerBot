@@ -40,7 +40,6 @@ task:
     # Second:   number  delay between subsequent execution
     # Third:    unit    time unit for first and second argument, example: disabled, seconds, minutes, hours, ...
     Inactivity: 10, 10, seconds
-    Status: 0, 2, disabled
   inactivity:
     #String the designated AFK channel must contain, the channels necessary talk power must also be higher than 0
     channelNameContains: 'AFK'
