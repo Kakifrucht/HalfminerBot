@@ -12,7 +12,7 @@ Current features
 - Cold storage as flat file
   - Regulary stores client data to disk, if necessary
   - Bot can be restarted without losing state, like the clients channel id
-    - Use command *!admin stop/restart* to safe state before shutdown
+    - Use command *!admin stop/restart* to save state before shutdown
 - Permission system
   - Define what client belongs to which group via their talk power
   - Higher groups automatically inherit all permissions of lower groups
@@ -35,7 +35,7 @@ Current features
   - !broadcast
     - Broadcast a given message to all clients
     - Optional talk power requirement can be passed as flag
-      - Example: "!broadcast -200 hi this will be broadcast" will broadcast to everybody with at least 200 talk power
+      - Example: "!broadcast -200 hello" will broadcast "hello" to everybody with at least 200 talk power
     - Broadcast format configurable via locale file
       - Adds server group and broadcaster to message
   - !channel
@@ -64,5 +64,5 @@ Current features
     - Move them into AFK channel
     - If server is full, kick AFK users to make room
       - Configure amount of players to kick at once
-    - Exempt clients via permissions via permissions
+    - Exempt clients via permissions
   - *Send current status to API via HTTP PUT* (*not on master branch*)
