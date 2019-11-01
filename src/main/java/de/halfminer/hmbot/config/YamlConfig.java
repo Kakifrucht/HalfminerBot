@@ -60,8 +60,7 @@ public class YamlConfig implements BotConfig {
     private void loadYaml() throws ConfigurationException {
 
         try {
-            //noinspection unchecked
-            defaultParsed = (Map) yamlParser.load(this.getClass().getClassLoader().getResourceAsStream(fileName));
+            defaultParsed = yamlParser.load(this.getClass().getClassLoader().getResourceAsStream(fileName));
         } catch (Exception e) {
             // easiest way to check if format is valid
             throw new ConfigurationException("Default config is not in valid format", e);
@@ -164,7 +163,7 @@ public class YamlConfig implements BotConfig {
         return currentSection.get(separator.getArgument(currentIndex));
     }
 
-    private class ConfigurationException extends RuntimeException {
+    private static class ConfigurationException extends RuntimeException {
 
         ConfigurationException() {
             super("Config file is in invalid format");

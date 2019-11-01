@@ -11,10 +11,15 @@ import org.slf4j.LoggerFactory;
  */
 public class BotClass {
 
+    protected final Logger logger = LoggerFactory.getLogger(this.getClass());
+
     protected final ComponentHolder componentHolder = HalfminerBot.getComponentHolder();
     protected final BotPasswordConfig config = componentHolder.getConfig();
     protected final Scheduler scheduler = componentHolder.getScheduler();
-    protected final TS3Api api = componentHolder.getApi();
 
-    protected final Logger logger = LoggerFactory.getLogger(this.getClass());
+    private final TS3ApiWrapper apiWrapper = componentHolder.getApiWrapper();
+
+    protected TS3Api getTS3Api() {
+        return apiWrapper.getTS3Api();
+    }
 }

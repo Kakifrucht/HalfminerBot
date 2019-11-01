@@ -32,9 +32,12 @@ class ClientMap {
     }
 
     void reload() {
-        saveData();
-        clientsByDbId.clear();
-        clientIdToDatabaseId.clear();
+
+        if (!clientsByDbId.isEmpty()) {
+            saveData();
+            clientsByDbId.clear();
+            clientIdToDatabaseId.clear();
+        }
 
         if (storageFile.exists()) {
             try (FileReader reader = new FileReader(storageFile)) {

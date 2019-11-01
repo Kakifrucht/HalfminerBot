@@ -1,6 +1,5 @@
 package de.halfminer.hmbot;
 
-import com.github.theholywaffle.teamspeak3.TS3Api;
 import com.github.theholywaffle.teamspeak3.api.TextMessageTargetMode;
 import com.github.theholywaffle.teamspeak3.api.event.*;
 import com.github.theholywaffle.teamspeak3.api.exception.TS3CommandFailedException;
@@ -23,15 +22,17 @@ class BotListeners extends TS3EventAdapter {
 
     private final ComponentHolder componentHolder = HalfminerBot.getComponentHolder();
     private final BotConfig config = componentHolder.getConfig();
-    private final TS3Api api = componentHolder.getApi();
     private final Storage storage = componentHolder.getStorage();
     private final CommandDispatcher cmd = new CommandDispatcher();
+
+    private final TS3ApiWrapper apiWrapper;
 
     private final int idOfBot;
     private final int channelOfBot;
 
     BotListeners() {
-        ServerQueryInfo info = api.whoAmI();
+        this.apiWrapper = componentHolder.getApiWrapper();
+        ServerQueryInfo info = apiWrapper.getTS3Api().whoAmI();
         idOfBot = info.getId();
         channelOfBot = info.getChannelId();
     }
@@ -48,7 +49,7 @@ class BotListeners extends TS3EventAdapter {
 
     @Override
     public void onClientJoin(ClientJoinEvent e) {
-        ClientInfo joined = api.getClientInfo(e.getClientId());
+        ClientInfo joined = apiWrapper.getTS3Api().getClientInfo(e.getClientId());
         if (joined.isRegularClient()) {
             storage.clientJoinedOrReloaded(joined);
             if (config.getBoolean("messageOnJoin")) {
@@ -73,7 +74,7 @@ class BotListeners extends TS3EventAdapter {
             clientEnterMessageAndMove(e.getClientId());
         } else if (e.getClientId() == idOfBot && e.getTargetChannelId() != this.channelOfBot) {
             try {
-                componentHolder.getApi().moveQuery(channelOfBot);
+                componentHolder.getApiWrapper().getTS3Api().moveQuery(channelOfBot);
             } catch (TS3CommandFailedException ex) {
                 logger.warn("Couldn't move bot back to his channel");
             }
@@ -81,11 +82,11 @@ class BotListeners extends TS3EventAdapter {
     }
 
     private boolean isRegularClient(int clientId) {
-        return api.getClientInfo(clientId).isRegularClient();
+        return apiWrapper.getTS3Api().getClientInfo(clientId).isRegularClient();
     }
 
     private void clientEnterMessageAndMove(int clientId) {
-        clientEnterMessageAndMove(api.getClientInfo(clientId));
+        clientEnterMessageAndMove(apiWrapper.getTS3Api().getClientInfo(clientId));
     }
 
     private void clientEnterMessageAndMove(ClientInfo client) {

@@ -1,5 +1,6 @@
 package de.halfminer.hmbot.cmd;
 
+import com.github.theholywaffle.teamspeak3.TS3Api;
 import com.github.theholywaffle.teamspeak3.api.wrapper.ClientInfo;
 import de.halfminer.hmbot.BotClass;
 import de.halfminer.hmbot.storage.HalfClient;
@@ -13,12 +14,14 @@ import de.halfminer.hmbot.util.StringArgumentSeparator;
 abstract class Command extends BotClass {
 
     final Storage storage = componentHolder.getStorage();
+    final TS3Api api = getTS3Api();
 
     final HalfClient client;
     final ClientInfo clientInfo;
     final int clientId;
 
     final StringArgumentSeparator command;
+
 
     @SuppressWarnings("WeakerAccess")
     public Command(HalfClient client, ClientInfo clientInfo, StringArgumentSeparator command) {

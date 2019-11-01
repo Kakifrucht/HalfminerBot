@@ -106,7 +106,12 @@ class CmdChannel extends Command {
             return;
         }
 
-        api.setClientChannelGroup(channelGroupAdminId, channelCreateID, clientInfo.getDatabaseId());
+        try {
+            api.setClientChannelGroup(channelGroupAdminId, channelCreateID, clientInfo.getDatabaseId());
+        } catch (TS3CommandFailedException e) {
+            logger.warn("Could not set {} as channel admin, reason: {}", clientInfo.getNickname(), e.getError().getMessage());
+        }
+
         api.addChannelPermission(channelCreateID, "i_icon_id", (int) botChannel.getIconId());
     }
 

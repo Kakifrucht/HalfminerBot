@@ -52,7 +52,7 @@ public class CommandDispatcher extends BotClass {
         String commandLog = command.getConcatenatedString().replace("\n", "\\n");
         logger.info("Client {} issued server command: {}", clientName, commandLog);
 
-        ClientInfo clientInfo = api.getClientInfo(clientId);
+        ClientInfo clientInfo = getTS3Api().getClientInfo(clientId);
         HalfClient client = storage.getClient(clientInfo);
 
         CommandEnum commandEnum = CommandEnum.getCommand(command.getArgument(0));

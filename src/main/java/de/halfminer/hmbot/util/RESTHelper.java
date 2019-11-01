@@ -17,6 +17,6 @@ public final class RESTHelper {
     }
 
     public static RequestBody getRequestBody(String body) {
-        return RequestBody.create(MediaType.parse("application/x-www-form-urlencoded"), body);
+        return RequestBody.create(body, MediaType.parse("application/x-www-form-urlencoded"));
     }
 }

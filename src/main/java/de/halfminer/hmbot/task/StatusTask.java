@@ -17,7 +17,7 @@ class StatusTask extends Task {
 
         Response response = null;
         try {
-            String status = "expiry=240&teamspeak=" + api.getServerInfo().getClientsOnline();
+            String status = "expiry=240&teamspeak=" + getTS3Api().getServerInfo().getClientsOnline();
             Request request = new Request.Builder()
                     .url(RESTHelper.getBaseUrl("storage/status"))
                     .put(RESTHelper.getRequestBody(status))

@@ -121,7 +121,7 @@ public class DefaultStorage extends BotClass implements Storage {
 
         // reload online clients
         clients.reload();
-        api.getClients().forEach(this::clientJoinedOrReloaded);
+        getTS3Api().getClients().forEach(this::clientJoinedOrReloaded);
         clients.doDebugLog();
     }
 
@@ -153,7 +153,7 @@ public class DefaultStorage extends BotClass implements Storage {
 
     @Override
     public Map<Client, HalfClient> getOnlineClients() {
-        return clients.getOnlineClients(api.getClients());
+        return clients.getOnlineClients(getTS3Api().getClients());
     }
 
     @Override

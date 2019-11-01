@@ -18,8 +18,8 @@ public interface HalfClient {
     Channel getChannel();
 
     /**
-     * Move client to his channel if he created one via {@link de.halfminer.hmbot.cmd.CmdChannel},
-     * used on join, when joining the bots channel or when trying to create a channel new channel.
+     * Move client to his channel, to be used on join, when joining the bots channel or
+     * when trying to create a channel new channel.
      *
      * @param clientId id of exact client (one {@link HalfClient} can map to multiple clients online)
      * @return true if user was moved to own channel, false if he doesn't have a channel

@@ -62,7 +62,7 @@ class DefaultHalfClient extends BotClass implements HalfClient {
     public Channel getChannel() {
 
         if (channelId > Integer.MIN_VALUE) {
-            for (Channel channel : api.getChannels()) {
+            for (Channel channel : getTS3Api().getChannels()) {
                 if (channel.getId() == channelId) {
                     return channel;
                 }
@@ -79,10 +79,10 @@ class DefaultHalfClient extends BotClass implements HalfClient {
 
         Channel channelOfUser = getChannel();
         if (channelOfUser != null) {
-            ClientInfo user = api.getClientInfo(clientId);
+            ClientInfo user = getTS3Api().getClientInfo(clientId);
             // check if user is already in his channel, if not move
             if (user.getChannelId() != channelOfUser.getId()) {
-                api.moveClient(clientId, channelOfUser.getId());
+                getTS3Api().moveClient(clientId, channelOfUser.getId());
             }
             MessageBuilder.create("movedToChannel").sendMessage(clientId);
             return true;

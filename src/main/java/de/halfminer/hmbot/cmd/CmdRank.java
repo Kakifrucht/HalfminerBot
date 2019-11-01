@@ -32,7 +32,7 @@ class CmdRank extends Command {
     }
 
     @Override
-    void run() throws InvalidCommandException {
+    void run() {
 
         if (command.meetsLength(1)) {
 
