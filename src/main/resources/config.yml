@@ -1,11 +1,17 @@
 #HalfminerBot configuration
 #Server address to connect to, can be a domain name or IP address
 host: 'localhost'
+#Whether the bot will connect via SSH, recommended if running the bot over the internet, SSH adds a minor overhead
+useSSH: true
 ports:
-  #The servers voice port (the one you use when connecting to it via the client), default is 9987
+  #The servers voice port (the one you use when connecting to it with your TeamSpeak client), default is 9987
   serverPort: 9987
-  #Server query port, default is 10011
-  queryPort: 10011
+  #The servers query port
+  queryPort:
+    #Default port is 10022
+    SSH: 10022
+    #Default port is 10011
+    raw: 10011
 credentials:
   #Query user to login as
   username: 'serveradmin'

@@ -20,11 +20,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 import java.util.Properties;
 
 /**
- * Halfminer Teamspeak 3 query bot, implementing a chat based command interface and automated tasks.
+ * Halfminer TeamSpeak 3 query bot, implementing a chat based command interface and automated tasks.
  *
  * @author Fabian Prieto Wunderlich - Kakifrucht
  */
@@ -78,7 +79,13 @@ class HalfminerBot implements ComponentHolder, StateHolder {
     private static String getVersionStatic() {
         Properties properties = new Properties();
         try {
-            properties.load(HalfminerBot.class.getClassLoader().getResourceAsStream("metadata.properties"));
+            InputStream inputStream = HalfminerBot.class.getClassLoader().getResourceAsStream("metadata.properties");
+            if (inputStream != null) {
+                properties.load(inputStream);
+            } else {
+                return null;
+            }
+
         } catch (IOException e) {
             return null;
         }
@@ -107,11 +114,15 @@ class HalfminerBot implements ComponentHolder, StateHolder {
         }
 
         // configure API
+        boolean useSSH = config.getBoolean("useSSH");
         String host = config.getString("host");
-        int queryPort = config.getInt("ports.queryPort");
+        int queryPort = config.getInt("ports.queryPort." + (useSSH ? "SSH" : "raw"));
+        TS3Query.Protocol protocol = useSSH ? TS3Query.Protocol.SSH : TS3Query.Protocol.RAW;
         TS3Config apiConfig = new TS3Config()
                 .setEnableCommunicationsLogging(true)
                 .setHost(host)
+                .setLoginCredentials(config.getString("credentials.username"), config.getPassword())
+                .setProtocol(protocol)
                 .setQueryPort(queryPort);
 
         if (host.equals("localhost") || config.getBoolean("isWhitelisted")) {
@@ -145,22 +156,16 @@ class HalfminerBot implements ComponentHolder, StateHolder {
         // connect to query
         query = new TS3Query(apiConfig);
         try {
+            logger.info("Trying to connect to query interface via {} on port {}", protocol.name(), queryPort);
             query.connect();
         } catch (TS3ConnectionFailedException e) {
-            stop("Couldn't connect to given server, quitting...", false);
+            stop("Failed to connect, reason: " + e.getMessage(), false);
         }
     }
 
     private void startBot() {
 
         TS3Api api = apiWrapper.getTS3Api();
-        try {
-            api.login(config.getString("credentials.username"), config.getPassword());
-        } catch (TS3CommandFailedException e) {
-            stop("The provided password is not valid, quitting...", false);
-            return;
-        }
-
         try {
             api.selectVirtualServerByPort(config.getInt("ports.serverPort"));
         } catch (TS3CommandFailedException e) {
