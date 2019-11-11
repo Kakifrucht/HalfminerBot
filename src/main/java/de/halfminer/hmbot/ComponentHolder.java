@@ -1,6 +1,5 @@
 package de.halfminer.hmbot;
 
-import com.github.theholywaffle.teamspeak3.TS3Api;
 import de.halfminer.hmbot.config.BotConfig;
 import de.halfminer.hmbot.config.BotPasswordConfig;
 import de.halfminer.hmbot.storage.Storage;
@@ -19,7 +18,7 @@ public interface ComponentHolder {
 
     Scheduler getScheduler();
 
-    TS3Api getApi();
+    TS3ApiWrapper getApiWrapper();
 
     Storage getStorage();
 }

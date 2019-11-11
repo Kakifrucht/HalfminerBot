@@ -25,11 +25,11 @@ public class MessageBuilder extends BotClass {
     }
 
     /**
-     * You can only send 1024 bytes of data via the client, however there is no easy way to determine said length
-     * without breaking characters in between messages. The current value is a random compromise that should ensure
-     * that we have enough bytes left, without manually checking.
+     * You can only send 8192 bytes of data via the client, however there is no easy way to determine said length
+     * without breaking characters in between messages. The current value is a magic compromise that should ensure
+     * that we have enough bytes left, without manually checking. One might want to properly check this limit.
      */
-    private final static int MAX_MESSAGE_SIZE = 768;
+    private final static int MAX_MESSAGE_SIZE = 6553;
     private final static char PLACEHOLDER_CHARACTER = '%';
 
     private final String lang;
@@ -91,7 +91,7 @@ public class MessageBuilder extends BotClass {
     public void broadcastMessage(boolean log, int minimumTalkPower) {
         String messageToBroadcast = returnMessage();
         if (messageToBroadcast.length() > 0) {
-            for (Client client : api.getClients()) {
+            for (Client client : getTS3Api().getClients()) {
                 if (client.getTalkPower() >= minimumTalkPower) {
                     doChunkedSend(client.getId(), messageToBroadcast);
                 }
@@ -105,7 +105,7 @@ public class MessageBuilder extends BotClass {
 
     private void doChunkedSend(int recipient, String message) {
         for (int i = 0; i < message.length(); i += MAX_MESSAGE_SIZE) {
-            api.sendPrivateMessage(recipient, message.substring(i, Math.min(i + MAX_MESSAGE_SIZE, message.length())));
+            getTS3Api().sendPrivateMessage(recipient, message.substring(i, Math.min(i + MAX_MESSAGE_SIZE, message.length())));
         }
     }
 

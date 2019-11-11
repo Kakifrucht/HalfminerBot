@@ -92,7 +92,7 @@ class HalfminerBot implements ComponentHolder, StateHolder {
     private final TS3Query query;
 
     private Scheduler scheduler;
-    private TS3Api api;
+    private TS3ApiWrapper apiWrapper;
     private Storage storage;
     private BotListeners listeners;
 
@@ -124,9 +124,11 @@ class HalfminerBot implements ComponentHolder, StateHolder {
         apiConfig.setConnectionHandler(new ConnectionHandler() {
 
             @Override
-            public void onConnect(TS3Query ts3Query) {
+            public void onConnect(TS3Api ts3Api) {
                 try {
-                    startBot(ts3Query);
+                    apiWrapper = new TS3ApiWrapper(ts3Api);
+                    startBot();
+                    apiWrapper.setTS3Api(query.getApi());
                 } catch (Exception e) {
                     logger.info("An error has occurred while connecting to the server", e);
                 }
@@ -149,9 +151,9 @@ class HalfminerBot implements ComponentHolder, StateHolder {
         }
     }
 
-    private void startBot(TS3Query query) {
-        this.api = query.getApi();
+    private void startBot() {
 
+        TS3Api api = apiWrapper.getTS3Api();
         try {
             api.login(config.getString("credentials.username"), config.getPassword());
         } catch (TS3CommandFailedException e) {
@@ -185,10 +187,16 @@ class HalfminerBot implements ComponentHolder, StateHolder {
         }
 
         // move bot into channel
+        boolean channelMoveSuccess = false;
         try {
             List<Channel> channels = api.getChannelsByName(config.getString("botChannelName"));
-            api.moveQuery(channels.get(0));
-        } catch (TS3CommandFailedException e) {
+            if (!channels.isEmpty()) {
+                api.moveQuery(channels.get(0));
+                channelMoveSuccess = true;
+            }
+        } catch (TS3CommandFailedException ignored) {}
+
+        if (!channelMoveSuccess) {
             logger.warn("The provided channelname does not exist or can't be accessed, staying in default channel");
         }
 
@@ -219,7 +227,7 @@ class HalfminerBot implements ComponentHolder, StateHolder {
 
     private boolean setNickname(String nickName) {
         try {
-            api.setNickname(nickName);
+            apiWrapper.getTS3Api().setNickname(nickName);
             return true;
         } catch (TS3CommandFailedException e) {
             return false;
@@ -289,8 +297,8 @@ class HalfminerBot implements ComponentHolder, StateHolder {
     }
 
     @Override
-    public TS3Api getApi() {
-        return api;
+    public TS3ApiWrapper getApiWrapper() {
+        return apiWrapper;
     }
 
     @Override

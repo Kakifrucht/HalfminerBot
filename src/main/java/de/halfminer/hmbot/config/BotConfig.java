@@ -9,7 +9,7 @@ public interface BotConfig {
      * Reloads the configuration file. Will only run if file was modified since last
      * reload and won't reload if configuration is broken.
      *
-     * @return true if reload was successful, false if not modified/written or {@link YamlConfig.ConfigurationException} was thrown
+     * @return true if reload was successful, false if not modified/written or a config exception was thrown
      */
     boolean reloadConfig();
 

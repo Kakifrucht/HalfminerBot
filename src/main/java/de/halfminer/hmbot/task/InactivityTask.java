@@ -22,13 +22,13 @@ class InactivityTask extends Task {
     private Channel afkChannel;
 
     InactivityTask() {
-        maxClients = api.getServerInfo().getMaxClients();
+        maxClients = getTS3Api().getServerInfo().getMaxClients();
     }
 
     @Override
     boolean checkIfEnabled() {
         try {
-            for (Channel channel : api.getChannelsByName(config.getString("task.inactivity.channelNameContains"))) {
+            for (Channel channel : getTS3Api().getChannelsByName(config.getString("task.inactivity.channelNameContains"))) {
                 if (channel.getNeededTalkPower() > 0) {
                     afkChannel = channel;
                     return true;
@@ -54,13 +54,13 @@ class InactivityTask extends Task {
                     && (client.isAway()
                     || (!isExempt && (client.isOutputMuted() && ((client.getIdleTime() / 1000) > idleTimeUntilMove))))) {
 
-                api.moveClient(client, afkChannel);
+                getTS3Api().moveClient(client, afkChannel);
                 MessageBuilder.create("taskInactivityMoved").sendMessage(client);
                 logger.info("{} is away and has been moved into AFK channel", client.getNickname());
             }
         }
 
-        int currentlyOnline = api.getServerInfo().getClientsOnline();
+        int currentlyOnline = getTS3Api().getServerInfo().getClientsOnline();
         if (currentlyOnline >= maxClients) {
 
             List<Client> afkClients = new ArrayList<>();
@@ -76,8 +76,8 @@ class InactivityTask extends Task {
 
             String message = MessageBuilder.returnMessage("taskInactivityKicked");
             for (Client afk : afkClients) {
-                api.sendPrivateMessage(afk.getId(), message);
-                api.kickClientFromServer(message, afk);
+                getTS3Api().sendPrivateMessage(afk.getId(), message);
+                getTS3Api().kickClientFromServer(message, afk);
             }
         }
     }
