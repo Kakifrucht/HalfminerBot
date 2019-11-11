@@ -40,23 +40,23 @@ class HalfminerBot implements ComponentHolder, StateHolder {
 
         logger.info("HalfminerBot v{} is starting", getVersionStatic());
 
-        BotPasswordConfig config = new PasswordYamlConfig("config.yml", args.length > 0 ? args[0] : "");
-        if (!config.reloadConfig() || config.isUsingDefaultConfig()) {
-
-            if (config.isUsingDefaultConfig()) {
-                logger.info("Please fill out the config file at \"hmbot/config.yml\" and restart the bot");
-            }
-
-            logger.info("Quitting...");
-            try {
-                Thread.sleep(2000L);
-            } catch (InterruptedException ignored) {}
-            return;
-        }
-
         // setting startBot to true before stopping threads will restart the bot
         while (startBot) {
             startBot = false;
+
+            BotPasswordConfig config = new PasswordYamlConfig("config.yml", args.length > 0 ? args[0] : "");
+            if (!config.reloadConfig() || config.isUsingDefaultConfig()) {
+
+                if (config.isUsingDefaultConfig()) {
+                    logger.info("Please fill out the config file at \"hmbot/config.yml\" and restart the bot");
+                }
+
+                logger.info("Quitting...");
+                try {
+                    Thread.sleep(2000L);
+                } catch (InterruptedException ignored) {}
+                return;
+            }
 
             // start the bot
             Thread botLaunchThread = new Thread((() -> new HalfminerBot(config)), "bot-launch");

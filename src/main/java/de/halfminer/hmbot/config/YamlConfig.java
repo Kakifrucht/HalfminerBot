@@ -8,6 +8,7 @@ import org.yaml.snakeyaml.Yaml;
 import java.io.*;
 import java.util.Collections;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * Class loading and parsing yaml based configuration file from disk.
@@ -77,7 +78,7 @@ public class YamlConfig implements BotConfig {
                 // manually copy file
                 byte[] buffer = new byte[1024];
                 int read;
-                while ((read = inputStream.read(buffer)) > 0) {
+                while ((read = Objects.requireNonNull(inputStream).read(buffer)) > 0) {
                     outputStream.write(buffer, 0, read);
                 }
 
