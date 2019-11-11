@@ -1,11 +1,12 @@
 # Halfminer Bot
-Teamspeak 3 Bot for Minecraft Server [Two and a half Miner](https://halfminer.de).
-Connecting to query via [this API](https://github.com/TheHolyWaffle/TeamSpeak-3-Java-API).
+TeamSpeak 3 Bot for Minecraft Server [Two and a half Miner](https://halfminer.de).
+Connecting to query via [TeamSpeak-3-Java-API](https://github.com/TheHolyWaffle/TeamSpeak-3-Java-API).
 
 Current features
 -------
 - Configurable via YAML based config file
   - Query password can either be passed as command line argument or be set via config
+  - Supports connecting to the TeamSpeak query via SSH or Telnet/Raw
 - Bot messages are fully configurable/localizable
 - Automatic reconnect if connection is lost
 - Define channel for bot to join, stays persistent if moved out
