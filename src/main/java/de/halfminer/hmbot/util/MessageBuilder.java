@@ -11,7 +11,6 @@ import java.util.Map;
 /**
  * Class containing a builder used for placeholder replacements and messaging.
  */
-@SuppressWarnings("ALL")
 public class MessageBuilder extends BotClass {
 
     private final static Logger logger = LoggerFactory.getLogger(MessageBuilder.class);
