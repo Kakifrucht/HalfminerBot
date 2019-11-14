@@ -49,7 +49,15 @@ class BotListeners extends TS3EventAdapter {
 
     @Override
     public void onClientJoin(ClientJoinEvent e) {
-        ClientInfo joined = apiWrapper.getTS3Api().getClientInfo(e.getClientId());
+
+        ClientInfo joined;
+        try {
+            joined = apiWrapper.getTS3Api().getClientInfo(e.getClientId());
+        } catch (TS3CommandFailedException ex) {
+            logger.warn("ClientInfo after join could not be pulled: {}", ex.getMessage());
+            return;
+        }
+
         if (joined.isRegularClient()) {
             storage.clientJoinedOrReloaded(joined);
             if (config.getBoolean("messageOnJoin")) {
