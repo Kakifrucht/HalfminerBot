@@ -53,8 +53,10 @@ task:
     channelNameContains: 'AFK'
     #How many clients to kick from AFK channel when server is full
     clientsToKickIfFull: 2
-    #Time in seconds until users will be marked inactive (only if speakers are muted), marking as AFK overrides this
-    idleTimeUntilMove: 300
+    #Time in seconds of inactivity until a client will be moved, being "away" will override this and always cause a move
+    idleTimeUntilMove: 1800
+    #Time in seconds of inactivity until a client will be moved if speakers are muted
+    idleTimeUntilMoveMuted: 300
 groups:
   #Key is the groups name (can be changed) and value is talk power requirement
   #You can add as many groups as you like, but they cannot have the same talk power

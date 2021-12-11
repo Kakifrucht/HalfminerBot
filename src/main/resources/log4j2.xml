@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--suppress ALL -->
 <Configuration monitorInterval="60" status="WARN">
     <Appenders>
         <Console name="consoleAppender">

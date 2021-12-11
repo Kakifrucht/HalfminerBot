@@ -33,7 +33,7 @@ class StatusTask extends Task {
                 }
             } else lastConnectSuccess = true;
         } catch (Exception e) {
-            logger.error("Could not update Teamspeak status", e);
+            logger.error("Could not update TeamSpeak status", e);
         } finally {
             if (response != null) {
                 response.close();
