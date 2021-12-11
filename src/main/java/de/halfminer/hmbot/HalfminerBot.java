@@ -59,7 +59,7 @@ class HalfminerBot implements ComponentHolder, StateHolder {
             }
 
             // start the bot
-            Thread botLaunchThread = new Thread((() -> new HalfminerBot(config)), "bot-launch");
+            Thread botLaunchThread = new Thread(() -> new HalfminerBot(config), "bot-launch");
             botLaunchThread.setUncaughtExceptionHandler((t, e) -> logger.error("An uncaught exception has occurred", e));
             botLaunchThread.start();
 
@@ -156,7 +156,7 @@ class HalfminerBot implements ComponentHolder, StateHolder {
         // connect to query
         query = new TS3Query(apiConfig);
         try {
-            logger.info("Trying to connect to query interface via {} on port {}", protocol.name(), queryPort);
+            logger.info("Connecting to query interface via {} on port {}", protocol.name(), queryPort);
             query.connect();
         } catch (TS3ConnectionFailedException e) {
             stop("Failed to connect, reason: " + e.getMessage(), false);

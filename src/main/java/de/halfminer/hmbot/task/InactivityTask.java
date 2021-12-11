@@ -42,18 +42,22 @@ class InactivityTask extends Task {
     @Override
     public void execute() {
 
+        int idleTimeUntilMove = config.getInt("task.inactivity.idleTimeUntilMove");
+        int idleTimeUntilMoveMuted = config.getInt("task.inactivity.idleTimeUntilMoveMuted");
+
         Map<Client, HalfClient> clientMap = storage.getOnlineClients();
         for (Map.Entry<Client, HalfClient> clientEntry : clientMap.entrySet()) {
 
             Client client = clientEntry.getKey();
             HalfClient hClient = clientEntry.getValue();
+            if (client.getChannelId() == afkChannel.getId() || hClient.hasPermission("task.inactivity.exempt.move")) {
+                continue;
+            }
 
-            int idleTimeUntilMove = config.getInt("task.inactivity.idleTimeUntilMove");
-            boolean isExempt = hClient.hasPermission("task.inactivity.exempt.move");
-            if (client.getChannelId() != afkChannel.getId()
-                    && (client.isAway()
-                    || (!isExempt && (client.isOutputMuted() && ((client.getIdleTime() / 1000) > idleTimeUntilMove))))) {
-
+            long idleTimeSeconds = client.getIdleTime() / 1000L;
+            if (client.isAway()
+                    || idleTimeSeconds > idleTimeUntilMove
+                    || (client.isOutputMuted() && (idleTimeSeconds > idleTimeUntilMoveMuted))) {
                 getTS3Api().moveClient(client, afkChannel);
                 MessageBuilder.create("taskInactivityMoved").sendMessage(client);
                 logger.info("{} is away and has been moved into AFK channel", client.getNickname());
