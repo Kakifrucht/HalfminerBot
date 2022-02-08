@@ -7,7 +7,7 @@
     <groupId>de.halfminer</groupId>
     <artifactId>HalfminerBot</artifactId>
     <name>Halfminer Bot</name>
-    <version>1.4.3-hm</version>
+    <version>1.4.4-hm</version>
     <packaging>jar</packaging>
 
     <properties>
