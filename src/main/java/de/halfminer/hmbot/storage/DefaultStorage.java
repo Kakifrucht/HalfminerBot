@@ -34,7 +34,7 @@ public class DefaultStorage extends BotClass implements Storage {
 
         // load groups and their permissions from config
         groups.clear();
-        Map<?, ?> groupYamlMap = (Map) config.get("groups", Map.class);
+        Map<?, ?> groupYamlMap = (Map<?, ?>) config.get("groups", Map.class);
         for (Map.Entry<?, ?> entry : groupYamlMap.entrySet()) {
 
             if (entry.getKey() instanceof String
@@ -44,7 +44,7 @@ public class DefaultStorage extends BotClass implements Storage {
                 int talkPower = (Integer) entry.getValue();
                 Set<String> permissions = new HashSet<>();
 
-                List<?> permissionsObj = (List) config.get("permissions." + groupName, List.class);
+                List<?> permissionsObj = (List<?>) config.get("permissions." + groupName, List.class);
                 if (permissionsObj != null) {
                     for (Object o : permissionsObj) {
                         permissions.add(String.valueOf(o).toLowerCase());

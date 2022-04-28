@@ -83,10 +83,6 @@ public class MessageBuilder extends BotClass {
         }
     }
 
-    public void broadcastMessage(boolean log) {
-        broadcastMessage(log, 0);
-    }
-
     public void broadcastMessage(boolean log, int minimumTalkPower) {
         String messageToBroadcast = returnMessage();
         if (messageToBroadcast.length() > 0) {

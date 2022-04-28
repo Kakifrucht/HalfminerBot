@@ -11,7 +11,7 @@ public interface StateHolder {
     String getVersion();
 
     /**
-     * Reload the bots config.
+     * Reload the configuration.
      *
      * @return true if config was reloaded, false if it couldn't be read or no changes were made to it
      */

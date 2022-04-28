@@ -13,7 +13,7 @@ import java.util.concurrent.*;
 public class ExecutorScheduler implements Scheduler {
 
     private ScheduledExecutorService service;
-    private Map<Task, ScheduledFuture> registeredTasks;
+    private Map<Task, ScheduledFuture<?>> registeredTasks;
 
     private List<Task> allTasks;
 
@@ -63,7 +63,7 @@ public class ExecutorScheduler implements Scheduler {
 
         if (registeredTasks.containsKey(task)) {
 
-            ScheduledFuture registeredTask = registeredTasks.get(task);
+            ScheduledFuture<?> registeredTask = registeredTasks.get(task);
             if (task.shouldRegisterTask()) {
                 // check if period was changed and re-register if required
                 if (task.shouldReregisterTask()) {

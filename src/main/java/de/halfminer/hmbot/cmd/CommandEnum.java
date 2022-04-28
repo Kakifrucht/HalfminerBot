@@ -18,9 +18,9 @@ enum CommandEnum {
     CHANNEL     (CmdChannel.class),
     HELP        (CmdHelp.class);
 
-    private Class<?> aClass;
+    private final Class<?> aClass;
 
-    CommandEnum(Class aClass) {
+    CommandEnum(Class<?> aClass) {
         this.aClass = aClass;
     }
 

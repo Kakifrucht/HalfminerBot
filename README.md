@@ -56,7 +56,7 @@ Current features
     - Sends list containing every available command per client
       - Checks if client has permission
       - Sends correct usage and description
-    - When calling !help *querypassword* highest available group will be granted (can be disabled)
+    - When calling !help *querypassword* the highest available group will be granted (can be disabled)
   - !rank (*not on master branch*)
     - Automatic retrieval of ranks after querying Halfminer REST API for privileges
     - Removes old server group, even if a different identity was used

@@ -44,9 +44,9 @@ class ClientMap {
 
                 Object loaded = new Yaml().load(reader);
                 if (loaded instanceof Map) {
-                    for (Map.Entry o : ((Map<?, ?>) loaded).entrySet()) {
+                    for (Map.Entry<?, ?> o : ((Map<?, ?>) loaded).entrySet()) {
                         if (o.getValue() instanceof Map) {
-                            Map<?, ?> currentMap = (Map) o.getValue();
+                            Map<?, ?> currentMap = (Map<?, ?>) o.getValue();
                             int databaseId = (int) o.getKey();
                             int channelID = (Integer) currentMap.get("channelID");
 

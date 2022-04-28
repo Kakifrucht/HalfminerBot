@@ -14,7 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Event listeners for bot. Passes commands to {@link CommandDispatcher} and contacts the client on server/channel join.
+ * Event listeners for bot. Passes command to {@link CommandDispatcher} and contacts the client on server/channel join.
  */
 class BotListeners extends TS3EventAdapter {
 
