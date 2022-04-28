@@ -137,8 +137,13 @@ class HalfminerBot implements ComponentHolder, StateHolder {
 
             @Override
             public void onConnect(TS3Api ts3Api) {
-                try {
+                if (apiWrapper == null) {
                     apiWrapper = new TS3ApiWrapper(ts3Api);
+                } else {
+                    apiWrapper.setTS3Api(ts3Api);
+                }
+
+                try {
                     startBot();
                     apiWrapper.setTS3Api(query.getApi());
                 } catch (Exception e) {
