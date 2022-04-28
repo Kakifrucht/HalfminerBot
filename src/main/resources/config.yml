@@ -1,5 +1,5 @@
 #HalfminerBot configuration
-#Server address to connect to, can be a domain name or IP address
+#Server-address to connect to, can be a domain name or IP address
 host: 'localhost'
 #Whether the bot will connect via SSH, recommended if running the bot over the internet, SSH adds a minor overhead
 #Changes to this value won't be taken into account when reloading the bot via *!bot reload*, use *!bot restart* instead
@@ -61,7 +61,7 @@ groups:
   #Key is the groups name (can be changed) and value is talk power requirement
   #You can add as many groups as you like, but they cannot have the same talk power
   #WARNING: Enable the "skip" flag for talk power on the group permission setup screen, to ensure that client/channel
-  #         talk power does not accidentally overwrite the value and puts the client in a higher group after a reload
+  #         talk power does not accidentally overwrite the value and puts the client in a higher group after reloading
   admin: 100
   moderator: 50
   donator: 10

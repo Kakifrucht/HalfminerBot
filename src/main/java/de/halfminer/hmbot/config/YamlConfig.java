@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory;
 import org.yaml.snakeyaml.Yaml;
 
 import java.io.*;
+import java.nio.file.Files;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Objects;
@@ -73,7 +74,7 @@ public class YamlConfig implements BotConfig {
             configParsed = defaultParsed;
 
             try (InputStream inputStream = this.getClass().getClassLoader().getResourceAsStream(fileName);
-                 OutputStream outputStream = new FileOutputStream(configFile)) {
+                 OutputStream outputStream = Files.newOutputStream(configFile.toPath())) {
 
                 // manually copy file
                 byte[] buffer = new byte[1024];
@@ -102,7 +103,7 @@ public class YamlConfig implements BotConfig {
         if (loaded == null || loaded instanceof Map) {
             try {
                 //noinspection unchecked
-                configParsed = loaded != null ? (Map) loaded : Collections.emptyMap();
+                configParsed = loaded != null ? (Map<String, Object>) loaded : Collections.emptyMap();
                 logger.info("Configuration file {} loaded successfully", configFile.getName());
             } catch (ClassCastException e) {
                 throw new ConfigurationException("Config file is in invalid format", e);
@@ -154,7 +155,7 @@ public class YamlConfig implements BotConfig {
         while (separator.meetsLength(currentIndex + 2)) {
             Object checkIfSubsection = currentSection.get(separator.getArgument(currentIndex));
             if (checkIfSubsection instanceof Map) {
-                currentSection = (Map) checkIfSubsection;
+                currentSection = (Map<?, ?>) checkIfSubsection;
             } else {
                 return null;
             }

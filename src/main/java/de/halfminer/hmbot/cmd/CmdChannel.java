@@ -62,7 +62,7 @@ class CmdChannel extends Command {
 
     private void createChannel() {
 
-        // move if user has channel already
+        // move if user has a channel already
         if (client.moveToChannel(clientId)) {
             return;
         }

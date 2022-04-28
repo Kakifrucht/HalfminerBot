@@ -11,7 +11,7 @@ import de.halfminer.hmbot.util.StringArgumentSeparator;
  * - Sends list containing every available command per client
  *   - Checks if client has permission
  *   - Sends correct usage and description
- * - When calling !help < querypassword> highest available group will be granted (can be disabled)
+ * - When calling !help < querypassword> the highest available group will be granted (can be disabled)
  */
 class CmdHelp extends Command {
 

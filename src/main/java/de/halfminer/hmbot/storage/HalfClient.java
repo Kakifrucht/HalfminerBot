@@ -9,9 +9,9 @@ public interface HalfClient {
 
     boolean hasPermission(String permission);
 
-    long getCooldown(Class commandClass);
+    long getCooldown(Class<?> commandClass);
 
-    void addCooldown(Class commandClass, int cooldownSeconds);
+    void addCooldown(Class<?> commandClass, int cooldownSeconds);
 
     void setChannelId(int channelId);
 

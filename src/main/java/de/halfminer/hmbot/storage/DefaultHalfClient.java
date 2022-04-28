@@ -17,10 +17,10 @@ class DefaultHalfClient extends BotClass implements HalfClient {
     private HalfGroup group;
 
     /**
-     * Counts how many clients with this clients database/unique ID are online, as there can be multiple connections.
+     * Counts how many clients with this client's database/unique ID are online, as there can be multiple connections.
      */
     private int onlineCount = 0;
-    private final Map<Class, Long> commandCooldown = new ConcurrentHashMap<>();
+    private final Map<Class<?>, Long> commandCooldown = new ConcurrentHashMap<>();
 
     private int channelId = Integer.MIN_VALUE;
 
@@ -40,7 +40,7 @@ class DefaultHalfClient extends BotClass implements HalfClient {
     }
 
     @Override
-    public long getCooldown(Class commandClass) {
+    public long getCooldown(Class<?> commandClass) {
         clearCommandCooldown();
         if (!hasPermission("cmd.bypass.cooldown") && commandCooldown.containsKey(commandClass)) {
             return commandCooldown.get(commandClass) - (System.currentTimeMillis() / 1000);
@@ -49,7 +49,7 @@ class DefaultHalfClient extends BotClass implements HalfClient {
     }
 
     @Override
-    public void addCooldown(Class commandClass, int cooldownSeconds) {
+    public void addCooldown(Class<?> commandClass, int cooldownSeconds) {
         commandCooldown.put(commandClass, (System.currentTimeMillis() / 1000) + cooldownSeconds);
     }
 

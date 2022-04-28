@@ -19,9 +19,9 @@ enum CommandEnum {
     HELP        (CmdHelp.class),
     RANK        (CmdRank.class);
 
-    private Class<?> aClass;
+    private final Class<?> aClass;
 
-    CommandEnum(Class aClass) {
+    CommandEnum(Class<?> aClass) {
         this.aClass = aClass;
     }
 
